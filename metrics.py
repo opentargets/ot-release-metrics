@@ -296,8 +296,7 @@ def main(args):
     metrics = metrics.withColumn("runId", lit(args.runId))
 
     # Write output
-    metrics.coalesce(1).write.mode('overwrite').options(header='true').csv(args.out) # TODO: remove overwrite flag
-    #metrics.write.json(args.out)
+    metrics.toPandas().to_csv(f"{args.out}", header=True, index=False)
 
     # clean up
     spark.stop()
