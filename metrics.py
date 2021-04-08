@@ -163,6 +163,10 @@ def parse_args():
                         action='store_true',
                         required=False,
                         default=True)
+    parser.add_argument('--prePipeline',
+                        help="State whether the data is prior to the pipeline run",
+                        action='store_true',
+                        required=False)
     args = parser.parse_args()
     return args
 
@@ -185,11 +189,12 @@ def main(args):
 
     # Load data
     evd = spark.read.parquet(args.evidence)
-    evdBad = spark.read.parquet(args.failedEvidence)
-    assDirect = spark.read.parquet(args.directAssociations)
-    assIndirect = spark.read.parquet(args.indirectAssociations)
+    if not args.prePipeline:
+        evdBad = spark.read.parquet(args.failedEvidence)
+        assDirect = spark.read.parquet(args.directAssociations)
+        assIndirect = spark.read.parquet(args.indirectAssociations)
 
-    if "diseaseFromSourceMappedId" in evd.columns:
+    if "diseaseFromSourceMappedId" in evd.columns: # TODO: Remove this from 21.04 on
         columnsToReport = ["datasourceId", "targetFromSourceId", "diseaseFromSourceMappedId", "drugId", "variantId", "literature"]
     else:
         columnsToReport = ["datasourceId", "targetFromSourceId", "diseaseFromSourceId", "drugId", "variantId", "literature"]
