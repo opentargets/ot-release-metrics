@@ -61,6 +61,7 @@ def documentCountBy(
         column: str,
         var_name: str) -> DataFrame:
     '''Count documents by grouping column'''
+    #out = df.withColumn("datasourceId", lit("all"))
     out = df.groupBy(column).count().alias("count")
     out = out.withColumn("variable", lit(var_name))
     out = out.withColumn("field", lit(None).cast(StringType()))
@@ -188,8 +189,12 @@ def main(args):
         )
 
     # Load data
-    evd = spark.read.parquet(args.evidence)
-    if not args.prePipeline:
+    if args.prePipeline:
+        evd = spark.read.option("recursiveFileLookup","true").json(args.evidence)
+    elif args.disease:
+        dis = spark.read.json(args.disease)
+    else:
+        evd = spark.read.parquet(args.evidence)
         evdBad = spark.read.parquet(args.failedEvidence)
         assDirect = spark.read.parquet(args.directAssociations)
         assIndirect = spark.read.parquet(args.indirectAssociations)
@@ -210,32 +215,33 @@ def main(args):
                             "evidenceFieldNotNullCountByDatasource"),
         # distinctCount takes some time on all columns: subsetting them
         evidenceDistinctFieldsCount(evd.select(columnsToReport),
-                                    "evidenceDistinctFieldsCountByDatasource"),
+                                    "evidenceDistinctFieldsCountByDatasource")
+
         # INVALID EVIDENCE
         # Total invalids
         documentTotalCount(evdBad, "evidenceInvalidTotalCount"),
         # Evidence count (duplicates)
-        documentTotalCount(evdBad.filter(col("markedDuplicate")),
+        documentTotalCount(evdBad.filter(F.col("markedDuplicate")),
                            "evidenceDuplicateTotalCount"),
         # Evidence count (targets not resolved)
-        documentTotalCount(evdBad.filter(~col("resolvedTarget")),
+        documentTotalCount(evdBad.filter(~F.col("resolvedTarget")),
                            "evidenceUnresolvedTargetTotalCount"),
         # Evidence count (diseases not resolved)
-        documentTotalCount(evdBad.filter(~col("resolvedDisease")),
+        documentTotalCount(evdBad.filter(~F.col("resolvedDisease")),
                            "evidenceUnresolvedDiseaseTotalCount"),
 
         # Evidence count by datasource (invalids)
         documentCountBy(evdBad, "datasourceId",
                         "evidenceInvalidCountByDatasource"),
         # Evidence count by datasource (duplicates)
-        documentCountBy(evdBad.filter(col("markedDuplicate")), "datasourceId",
+        documentCountBy(evdBad.filter(F.col("markedDuplicate")), "datasourceId",
                         "evidenceDuplicateCountByDatasource"),
         # Evidence count by datasource (targets not resolved)
-        documentCountBy(evdBad.filter(~col("resolvedTarget")),
+        documentCountBy(evdBad.filter(~F.col("resolvedTarget")),
                         "datasourceId",
                         "evidenceUnresolvedTargetCountByDatasource"),
         # Evidence count by datasource (diseases not resolved)
-        documentCountBy(evdBad.filter(~col("resolvedDisease")),
+        documentCountBy(evdBad.filter(~F.col("resolvedDisease")),
                         "datasourceId",
                         "evidenceUnresolvedDiseaseCountByDatasource"),
         # Distinct values in selected fields (invalid evidence)
@@ -246,19 +252,19 @@ def main(args):
         # Evidence count by datasource (duplicates)
         evidenceDistinctFieldsCount(
             evdBad
-            .filter(col("markedDuplicate"))
+            .filter(F.col("markedDuplicate"))
             .select(columnsToReport),
             "evidenceDuplicateDistinctFieldsCountByDatasource"),
         # Evidence count by datasource (targets not resolved)
         evidenceDistinctFieldsCount(
             evdBad
-            .filter(~col("resolvedTarget"))
+            .filter(~F.col("resolvedTarget"))
             .select(columnsToReport),
             "evidenceUnresolvedTargetDistinctFieldsCountByDatasource"),
         # Evidence count by datasource (diseases not resolved)
         evidenceDistinctFieldsCount(
             evdBad
-            .filter(~col("resolvedDisease"))
+            .filter(~F.col("resolvedDisease"))
             .select(columnsToReport),
             "evidenceUnresolvedDiseaseDistinctFieldsCountByDatasource"),
 
@@ -271,8 +277,8 @@ def main(args):
             .select(
                 "targetId",
                 "diseaseId",
-                explode(
-                    col("overallDatasourceHarmonicVector.datasourceId"))
+                F.explode(
+                    F.col("overallDatasourceHarmonicScoreDSs.datasourceId"))
                 .alias("datasourceId")),
             "datasourceId",
             "associationsDirectByDatasource"),
@@ -283,17 +289,17 @@ def main(args):
         # Associations by datasource
         documentCountBy(
             assIndirect
-            .select(
-                "targetId",
-                "diseaseId",
-                explode(
-                    col(
-                        "overallDatasourceHarmonicVector.datasourceId"))
-                .alias("datasourceId")),
+            .select("targetId",
+                    "diseaseId",
+                    F.explode(
+                        F.col(
+                            "overallDatasourceHarmonicScoreDSs.datasourceId"))
+                    .alias("datasourceId")),
             "datasourceId",
             "associationsIndirectByDatasource"),
 
         # TODO: DISEASE
+        documentTotalCount(disease, "diseaseTotalCount")
         # TODO: DRUG
     ]
 
