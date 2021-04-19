@@ -12,6 +12,7 @@ from pyspark.sql.types import *
 
 spark = SparkSession.builder.appName('spark').getOrCreate()
 
+
 # Required to flatten the schema
 def flatten(schema, prefix=None):
     """Flatten schema"""
@@ -46,6 +47,7 @@ def melt(
         col("_vars_and_vals")[x].alias(x) for x in [var_name, value_name]]
     return _tmp.select(*cols)
 
+
 def documentTotalCount(
         df: DataFrame,
         var_name: str) -> DataFrame:
@@ -55,6 +57,7 @@ def documentTotalCount(
     out = out.withColumn("variable", lit(var_name))
     out = out.withColumn("field", lit(None).cast(StringType()))
     return out
+
 
 def documentCountBy(
         df: DataFrame,
@@ -66,6 +69,7 @@ def documentCountBy(
     out = out.withColumn("variable", lit(var_name))
     out = out.withColumn("field", lit(None).cast(StringType()))
     return out
+
 
 def evidenceNotNullFieldsCount(
         df: DataFrame,
@@ -97,6 +101,7 @@ def evidenceNotNullFieldsCount(
     melted = melted.withColumn("variable", lit(var_name))
     return melted
 
+
 def evidenceDistinctFieldsCount(
         df: DataFrame,
         var_name: str) -> DataFrame:
@@ -122,54 +127,56 @@ def evidenceDistinctFieldsCount(
     melted = melted.withColumn("variable", lit(var_name))
     return melted
 
+
 def parse_args():
     """ Load command line args """
     parser = argparse.ArgumentParser()
-    parser.add_argument('--runId',
-                        help=('Pipeline run identifier'),
+    parser.add_argument('--run-id',
+                        help='Pipeline run identifier to be stored in the runId column, for example: 20.04.1.',
                         type=str,
                         required=True)
     parser.add_argument('--disease',
                         metavar="<path>",
-                        help=('Disease path'),
+                        help='Disease path',
                         type=str,
                         required=False)
     parser.add_argument('--evidence',
                         metavar="<path>",
-                        help=('Evidence path'),
+                        help='Evidence path',
                         type=str,
                         required=False)
     parser.add_argument('--failedEvidence',
                         metavar="<path>",
-                        help=('Evidence failing path'),
+                        help='Evidence failing path',
                         type=str,
                         required=False)
     parser.add_argument('--directAssociations',
                         metavar="<path>",
-                        help=('Direct associations'),
+                        help='Direct associations',
                         type=str,
                         required=False)
     parser.add_argument('--indirectAssociations',
                         metavar="<path>",
-                        help=('Indirect associations'),
+                        help='Indirect associations',
                         type=str,
                         required=False)
     parser.add_argument('--out',
                         metavar="<path>",
-                        help=("Output path"),
+                        help='Output filename with the release metrics in the CSV format.',
                         type=str,
                         required=True)
     parser.add_argument('--local',
-                        help="run local[*]",
+                        help='run local[*]',
                         action='store_true',
                         required=False,
                         default=True)
     parser.add_argument('--prePipeline',
-                        help="State whether the data is prior to the pipeline run",
+                        help='State whether the data is prior to the pipeline run',
                         action='store_true',
                         required=False)
     args = parser.parse_args()
     return args
+
 
 def main(args):
     sparkConf = SparkConf()
@@ -190,7 +197,7 @@ def main(args):
 
     # Load data
     if args.prePipeline:
-        evd = spark.read.option("recursiveFileLookup","true").json(args.evidence)
+        evd = spark.read.option("recursiveFileLookup", "true").json(args.evidence)
     elif args.disease:
         dis = spark.read.json(args.disease)
     else:
@@ -199,7 +206,7 @@ def main(args):
         assDirect = spark.read.parquet(args.directAssociations)
         assIndirect = spark.read.parquet(args.indirectAssociations)
 
-    if "diseaseFromSourceMappedId" in evd.columns: # TODO: Remove this from 21.04 on
+    if "diseaseFromSourceMappedId" in evd.columns:  # TODO: Remove this from 21.04 on
         columnsToReport = ["datasourceId", "targetFromSourceId", "diseaseFromSourceMappedId", "drugId", "variantId", "literature"]
     else:
         columnsToReport = ["datasourceId", "targetFromSourceId", "diseaseFromSourceId", "drugId", "variantId", "literature"]
@@ -215,7 +222,7 @@ def main(args):
                             "evidenceFieldNotNullCountByDatasource"),
         # distinctCount takes some time on all columns: subsetting them
         evidenceDistinctFieldsCount(evd.select(columnsToReport),
-                                    "evidenceDistinctFieldsCountByDatasource")
+                                    "evidenceDistinctFieldsCountByDatasource"),
 
         # INVALID EVIDENCE
         # Total invalids
@@ -304,7 +311,7 @@ def main(args):
     ]
 
     metrics = reduce(DataFrame.unionByName, datasets)
-    metrics = metrics.withColumn("runId", lit(args.runId))
+    metrics = metrics.withColumn("runId", lit(args.run_id))
 
     # Write output
     metrics.toPandas().to_csv(f"{args.out}", header=True, index=False)
