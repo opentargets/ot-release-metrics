@@ -23,7 +23,7 @@ sudo docker run --rm \
   -e GOOGLE_APPLICATION_CREDENTIALS="${CREDENTIALS_PATH}" \
   -e GOOGLE_BUCKET=null/null \
   quay.io/opentargets/platform-input-support:master \
-  --output_dir "${pwd}/output" \
+  --output_dir "$(pwd)/output" \
   -steps evidence
 ```
 
