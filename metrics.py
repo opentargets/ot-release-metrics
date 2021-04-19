@@ -27,19 +27,19 @@ def flatten(schema, prefix=None):
 def melt(
         df: DataFrame,
         id_vars: Iterable[str], value_vars: Iterable[str],
-        var_name: str = "variable", value_name: str = "value") -> DataFrame:
+        var_name: str = 'variable', value_name: str = 'value') -> DataFrame:
     """Convert :class:`DataFrame` from wide to long format."""
 
     # Create array<struct<variable: str, value: ...>>
     _vars_and_vals = f.array(*(
         f.struct(f.lit(c).alias(var_name), f.col(c).alias(value_name))
-        for c in value_vars))
+        for c in value_vars
+    ))
 
     # Add to the DataFrame and explode
-    _tmp = df.withColumn("_vars_and_vals", f.explode(_vars_and_vals))
+    _tmp = df.withColumn('_vars_and_vals', f.explode(_vars_and_vals))
 
-    cols = id_vars + [
-        f.col("_vars_and_vals")[x].alias(x) for x in [var_name, value_name]]
+    cols = id_vars + [f.col('_vars_and_vals')[x].alias(x) for x in [var_name, value_name]]
     return _tmp.select(*cols)
 
 
@@ -47,10 +47,10 @@ def document_total_count(
         df: DataFrame,
         var_name: str) -> DataFrame:
     """Count total documents."""
-    out = df.groupBy().count().alias("count")
-    out = out.withColumn("datasourceId", f.lit("all"))
-    out = out.withColumn("variable", f.lit(var_name))
-    out = out.withColumn("field", f.lit(None).cast(t.StringType()))
+    out = df.groupBy().count().alias('count')
+    out = out.withColumn('datasourceId', f.lit('all'))
+    out = out.withColumn('variable', f.lit(var_name))
+    out = out.withColumn('field', f.lit(None).cast(t.StringType()))
     return out
 
 
@@ -59,10 +59,10 @@ def document_count_by(
         column: str,
         var_name: str) -> DataFrame:
     """Count documents by grouping column."""
-    # out = df.withColumn("datasourceId", lit("all"))
-    out = df.groupBy(column).count().alias("count")
-    out = out.withColumn("variable", f.lit(var_name))
-    out = out.withColumn("field", f.lit(None).cast(t.StringType()))
+    # out = df.withColumn('datasourceId', lit('all'))
+    out = df.groupBy(column).count().alias('count')
+    out = out.withColumn('variable', f.lit(var_name))
+    out = out.withColumn('field', f.lit(None).cast(t.StringType()))
     return out
 
 
@@ -80,20 +80,20 @@ def evidence_not_null_fields_count(
              else
              sum(f.when(f.col(field.name).isNotNull(), f.lit(1))
                  .otherwise(f.lit(0))).alias(field.name)
-             for field in list(filter(lambda x: x.name != "datasourceId",
+             for field in list(filter(lambda x: x.name != 'datasourceId',
                                       flat_df.schema))]
-    out = df.groupBy(f.col("datasourceId")).agg(*exprs)
+    out = df.groupBy(f.col('datasourceId')).agg(*exprs)
     # Clean column names
     out_cleaned = out.toDF(*(c.replace('.', '_') for c in out.columns))
     # wide to long format
-    cols = out_cleaned.drop("datasourceId").columns
+    cols = out_cleaned.drop('datasourceId').columns
 
     melted = melt(out_cleaned,
-                  id_vars=["datasourceId"],
-                  var_name="field",
+                  id_vars=['datasourceId'],
+                  var_name='field',
                   value_vars=cols,
-                  value_name="count")
-    melted = melted.withColumn("variable", f.lit(var_name))
+                  value_name='count')
+    melted = melted.withColumn('variable', f.lit(var_name))
     return melted
 
 
@@ -106,20 +106,20 @@ def evidence_distinct_fields_count(
     flat_df = df.select([f.col(c).alias(c) for c in flatten(df.schema)])
     # Unique counts per column field
     exprs = [f.countDistinct(f.col(field.name)).alias(field.name)
-             for field in list(filter(lambda x: x.name != "datasourceId",
+             for field in list(filter(lambda x: x.name != 'datasourceId',
                                       flat_df.schema))]
-    out = df.groupBy(f.col("datasourceId")).agg(*exprs)
+    out = df.groupBy(f.col('datasourceId')).agg(*exprs)
     # Clean column names
     out_cleaned = out.toDF(*(c.replace('.', '_') for c in out.columns))
     # Clean  column names
-    cols = [c.name for c in filter(lambda x: x.name != "datasourceId",
+    cols = [c.name for c in filter(lambda x: x.name != 'datasourceId',
                                    out_cleaned.schema.fields)]
     melted = melt(out_cleaned,
-                  id_vars=["datasourceId"],
-                  var_name="field",
+                  id_vars=['datasourceId'],
+                  var_name='field',
                   value_vars=cols,
-                  value_name="count")
-    melted = melted.withColumn("variable", f.lit(var_name))
+                  value_name='count')
+    melted = melted.withColumn('variable', f.lit(var_name))
     return melted
 
 
