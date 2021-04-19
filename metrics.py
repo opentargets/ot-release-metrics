@@ -5,21 +5,19 @@ from typing import Iterable
 from functools import reduce
 
 from pyspark.sql import SparkSession, DataFrame
-from pyspark import SparkConf
 import pyspark.sql.functions as f
-from pyspark.sql.types import *
+import pyspark.sql.types as t
 
 
-# Required to flatten the schema
 def flatten(schema, prefix=None):
-    """Flatten schema"""
+    """Required to flatten the schema."""
     fields = []
     for field in schema.fields:
         name = prefix + '.' + field.name if prefix else field.name
         dtype = field.dataType
-        if isinstance(dtype, ArrayType):
+        if isinstance(dtype, t.ArrayType):
             dtype = dtype.elementType
-        if isinstance(dtype, StructType):
+        if isinstance(dtype, t.StructType):
             fields += flatten(dtype, prefix=name)
         else:
             fields.append(name)
@@ -33,58 +31,58 @@ def melt(
     """Convert :class:`DataFrame` from wide to long format."""
 
     # Create array<struct<variable: str, value: ...>>
-    _vars_and_vals = array(*(
-        struct(lit(c).alias(var_name), col(c).alias(value_name))
+    _vars_and_vals = f.array(*(
+        f.struct(f.lit(c).alias(var_name), f.col(c).alias(value_name))
         for c in value_vars))
 
     # Add to the DataFrame and explode
-    _tmp = df.withColumn("_vars_and_vals", explode(_vars_and_vals))
+    _tmp = df.withColumn("_vars_and_vals", f.explode(_vars_and_vals))
 
     cols = id_vars + [
-        col("_vars_and_vals")[x].alias(x) for x in [var_name, value_name]]
+        f.col("_vars_and_vals")[x].alias(x) for x in [var_name, value_name]]
     return _tmp.select(*cols)
 
 
-def documentTotalCount(
+def document_total_count(
         df: DataFrame,
         var_name: str) -> DataFrame:
-    '''Count total documents'''
+    """Count total documents."""
     out = df.groupBy().count().alias("count")
-    out = out.withColumn("datasourceId", lit("all"))
-    out = out.withColumn("variable", lit(var_name))
-    out = out.withColumn("field", lit(None).cast(StringType()))
+    out = out.withColumn("datasourceId", f.lit("all"))
+    out = out.withColumn("variable", f.lit(var_name))
+    out = out.withColumn("field", f.lit(None).cast(t.StringType()))
     return out
 
 
-def documentCountBy(
+def document_count_by(
         df: DataFrame,
         column: str,
         var_name: str) -> DataFrame:
-    '''Count documents by grouping column'''
-    #out = df.withColumn("datasourceId", lit("all"))
+    """Count documents by grouping column."""
+    # out = df.withColumn("datasourceId", lit("all"))
     out = df.groupBy(column).count().alias("count")
-    out = out.withColumn("variable", lit(var_name))
-    out = out.withColumn("field", lit(None).cast(StringType()))
+    out = out.withColumn("variable", f.lit(var_name))
+    out = out.withColumn("field", f.lit(None).cast(t.StringType()))
     return out
 
 
-def evidenceNotNullFieldsCount(
+def evidence_not_null_fields_count(
         df: DataFrame,
         var_name: str) -> DataFrame:
-    '''Counts number of evidences with not null values in variable.'''
+    """Count number of evidences with not null values in variable."""
     # flatten dataframe schema
-    flatDf = df.select([col(c).alias(c) for c in flatten(df.schema)])
+    flat_df = df.select([df.col(c).alias(c) for c in flatten(df.schema)])
 
     # counting not-null evidence per field
-    exprs = [sum(when(col(f.name).getItem(0).isNotNull(), lit(1))
-                 .otherwise(lit(0))).alias(f.name)
-             if isinstance(f.dataType, ArrayType)
+    exprs = [sum(f.when(f.col(field.name).getItem(0).isNotNull(), f.lit(1))
+                 .otherwise(f.lit(0))).alias(field.name)
+             if isinstance(field.dataType, t.ArrayType)
              else
-             sum(when(col(f.name).isNotNull(), lit(1))
-                 .otherwise(lit(0))).alias(f.name)
-             for f in list(filter(lambda x: x.name != "datasourceId",
-                                  flatDf.schema))]
-    out = df.groupBy(col("datasourceId")).agg(*exprs)
+             sum(f.when(f.col(field.name).isNotNull(), f.lit(1))
+                 .otherwise(f.lit(0))).alias(field.name)
+             for field in list(filter(lambda x: x.name != "datasourceId",
+                                      flat_df.schema))]
+    out = df.groupBy(f.col("datasourceId")).agg(*exprs)
     # Clean column names
     out_cleaned = out.toDF(*(c.replace('.', '_') for c in out.columns))
     # wide to long format
@@ -95,22 +93,22 @@ def evidenceNotNullFieldsCount(
                   var_name="field",
                   value_vars=cols,
                   value_name="count")
-    melted = melted.withColumn("variable", lit(var_name))
+    melted = melted.withColumn("variable", f.lit(var_name))
     return melted
 
 
-def evidenceDistinctFieldsCount(
+def evidence_distinct_fields_count(
         df: DataFrame,
         var_name: str) -> DataFrame:
-    '''Counts unique values in variable (e.g. targetId) and datasource.'''
+    """Count unique values in variable (e.g. targetId) and datasource."""
 
     # flatten dataframe schema
-    flatDf = df.select([col(c).alias(c) for c in flatten(df.schema)])
+    flat_df = df.select([f.col(c).alias(c) for c in flatten(df.schema)])
     # Unique counts per column field
-    exprs = [countDistinct(col(f.name)).alias(f.name)
-             for f in list(filter(lambda x: x.name != "datasourceId",
-                                  flatDf.schema))]
-    out = df.groupBy(col("datasourceId")).agg(*exprs)
+    exprs = [f.countDistinct(f.col(field.name)).alias(field.name)
+             for field in list(filter(lambda x: x.name != "datasourceId",
+                                      flat_df.schema))]
+    out = df.groupBy(f.col("datasourceId")).agg(*exprs)
     # Clean column names
     out_cleaned = out.toDF(*(c.replace('.', '_') for c in out.columns))
     # Clean  column names
@@ -121,8 +119,15 @@ def evidenceDistinctFieldsCount(
                   var_name="field",
                   value_vars=cols,
                   value_name="count")
-    melted = melted.withColumn("variable", lit(var_name))
+    melted = melted.withColumn("variable", f.lit(var_name))
     return melted
+
+
+def read_parquet_if_provided(spark, parquet_path):
+    if parquet_path:
+        return spark.read.parquet(parquet_path)
+    else:
+        return None
 
 
 def parse_args():
@@ -168,13 +173,6 @@ def parse_args():
     return parser.parse_args()
 
 
-def read_parquet_if_provided(spark, parquet_path):
-    if parquet_path:
-        return spark.read.parquet(parquet_path)
-    else:
-        return None
-
-
 def main(args):
     spark = SparkSession.builder.getOrCreate()
 
@@ -208,67 +206,68 @@ def main(args):
     if evidence:
         datasets.extend([
             # Total evidence count.
-            documentTotalCount(evidence, 'evidenceTotalCount'),
+            document_total_count(evidence, 'evidenceTotalCount'),
             # Evidence count by datasource.
-            documentCountBy(evidence, 'datasourceId', 'evidenceCountByDatasource'),
+            document_count_by(evidence, 'datasourceId', 'evidenceCountByDatasource'),
             # Number of evidences that have a not null value in the given field.
-            evidenceNotNullFieldsCount(evidence, 'evidenceFieldNotNullCountByDatasource'),
+            evidence_not_null_fields_count(evidence, 'evidenceFieldNotNullCountByDatasource'),
             # distinctCount takes some time on all columns: subsetting them.
-            evidenceDistinctFieldsCount(evidence.select(columns_to_report), 'evidenceDistinctFieldsCountByDatasource'),
+            evidence_distinct_fields_count(evidence.select(columns_to_report),
+                                           'evidenceDistinctFieldsCountByDatasource'),
         ])
 
     if evidence_failed:
         datasets.extend([
             # Total invalids.
-            documentTotalCount(evidence_failed,
-                               'evidenceInvalidTotalCount'),
+            document_total_count(evidence_failed,
+                                 'evidenceInvalidTotalCount'),
             # Evidence count (duplicates).
-            documentTotalCount(evidence_failed.filter(f.col('markedDuplicate')),
-                               'evidenceDuplicateTotalCount'),
+            document_total_count(evidence_failed.filter(f.col('markedDuplicate')),
+                                 'evidenceDuplicateTotalCount'),
             # Evidence count (targets not resolved).
-            documentTotalCount(evidence_failed.filter(~f.col('resolvedTarget')),
-                               'evidenceUnresolvedTargetTotalCount'),
+            document_total_count(evidence_failed.filter(~f.col('resolvedTarget')),
+                                 'evidenceUnresolvedTargetTotalCount'),
             # Evidence count (diseases not resolved).
-            documentTotalCount(evidence_failed.filter(~f.col('resolvedDisease')),
-                               'evidenceUnresolvedDiseaseTotalCount'),
+            document_total_count(evidence_failed.filter(~f.col('resolvedDisease')),
+                                 'evidenceUnresolvedDiseaseTotalCount'),
 
             # Evidence count by datasource (invalids).
-            documentCountBy(evidence_failed,
-                            'datasourceId',
-                            'evidenceInvalidCountByDatasource'),
+            document_count_by(evidence_failed,
+                              'datasourceId',
+                              'evidenceInvalidCountByDatasource'),
             # Evidence count by datasource (duplicates).
-            documentCountBy(evidence_failed.filter(f.col('markedDuplicate')),
-                            'datasourceId',
-                            'evidenceDuplicateCountByDatasource'),
+            document_count_by(evidence_failed.filter(f.col('markedDuplicate')),
+                              'datasourceId',
+                              'evidenceDuplicateCountByDatasource'),
             # Evidence count by datasource (targets not resolved).
-            documentCountBy(evidence_failed.filter(~f.col('resolvedTarget')),
-                            'datasourceId',
-                            'evidenceUnresolvedTargetCountByDatasource'),
+            document_count_by(evidence_failed.filter(~f.col('resolvedTarget')),
+                              'datasourceId',
+                              'evidenceUnresolvedTargetCountByDatasource'),
             # Evidence count by datasource (diseases not resolved).
-            documentCountBy(evidence_failed.filter(~f.col('resolvedDisease')),
-                            'datasourceId',
-                            'evidenceUnresolvedDiseaseCountByDatasource'),
+            document_count_by(evidence_failed.filter(~f.col('resolvedDisease')),
+                              'datasourceId',
+                              'evidenceUnresolvedDiseaseCountByDatasource'),
 
             # Distinct values in selected fields (invalid evidence).
-            evidenceDistinctFieldsCount(evidence_failed.select(columns_to_report),
-                                        'evidenceInvalidDistinctFieldsCountByDatasource'),
+            evidence_distinct_fields_count(evidence_failed.select(columns_to_report),
+                                           'evidenceInvalidDistinctFieldsCountByDatasource'),
             # Evidence count by datasource (duplicates).
-            evidenceDistinctFieldsCount(evidence_failed.filter(f.col('markedDuplicate')).select(columns_to_report),
-                                        'evidenceDuplicateDistinctFieldsCountByDatasource'),
+            evidence_distinct_fields_count(evidence_failed.filter(f.col('markedDuplicate')).select(columns_to_report),
+                                           'evidenceDuplicateDistinctFieldsCountByDatasource'),
             # Evidence count by datasource (targets not resolved).
-            evidenceDistinctFieldsCount(evidence_failed.filter(~f.col('resolvedTarget')).select(columns_to_report),
-                                        'evidenceUnresolvedTargetDistinctFieldsCountByDatasource'),
+            evidence_distinct_fields_count(evidence_failed.filter(~f.col('resolvedTarget')).select(columns_to_report),
+                                           'evidenceUnresolvedTargetDistinctFieldsCountByDatasource'),
             # Evidence count by datasource (diseases not resolved).
-            evidenceDistinctFieldsCount(evidence_failed.filter(~f.col('resolvedDisease')).select(columns_to_report),
-                                        'evidenceUnresolvedDiseaseDistinctFieldsCountByDatasource'),
+            evidence_distinct_fields_count(evidence_failed.filter(~f.col('resolvedDisease')).select(columns_to_report),
+                                           'evidenceUnresolvedDiseaseDistinctFieldsCountByDatasource'),
         ])
 
     if associations_direct:
         datasets.extend([
             # Total association count.
-            documentTotalCount(associations_direct, 'associationsDirectTotalCount'),
+            document_total_count(associations_direct, 'associationsDirectTotalCount'),
             # Associations by datasource.
-            documentCountBy(
+            document_count_by(
                 associations_direct.select(
                     'targetId',
                     'diseaseId',
@@ -282,10 +281,10 @@ def main(args):
     if associations_indirect:
         datasets.extend([
             # Total association count.
-            documentTotalCount(associations_indirect,
-                               'associationsIndirectTotalCount'),
+            document_total_count(associations_indirect,
+                                 'associationsIndirectTotalCount'),
             # Associations by datasource.
-            documentCountBy(
+            document_count_by(
                 associations_indirect.select(
                     'targetId',
                     'diseaseId',
@@ -298,7 +297,7 @@ def main(args):
     if diseases:
         # TODO: diseases.
         datasets.extend([
-            documentTotalCount(diseases, 'diseaseTotalCount')
+            document_total_count(diseases, 'diseaseTotalCount')
         ])
 
     # TODO: drugs.
