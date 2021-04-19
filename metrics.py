@@ -71,15 +71,15 @@ def evidence_not_null_fields_count(
         var_name: str) -> DataFrame:
     """Count number of evidences with not null values in variable."""
     # flatten dataframe schema
-    flat_df = df.select([df.col(c).alias(c) for c in flatten(df.schema)])
+    flat_df = df.select([f.col(c).alias(c) for c in flatten(df.schema)])
 
     # counting not-null evidence per field
-    exprs = [sum(f.when(f.col(field.name).getItem(0).isNotNull(), f.lit(1))
-                 .otherwise(f.lit(0))).alias(field.name)
+    exprs = [f.sum(f.when(f.col(field.name).getItem(0).isNotNull(), f.lit(1))
+                    .otherwise(f.lit(0))).alias(field.name)
              if isinstance(field.dataType, t.ArrayType)
              else
-             sum(f.when(f.col(field.name).isNotNull(), f.lit(1))
-                 .otherwise(f.lit(0))).alias(field.name)
+             f.sum(f.when(f.col(field.name).isNotNull(), f.lit(1))
+                    .otherwise(f.lit(0))).alias(field.name)
              for field in list(filter(lambda x: x.name != 'datasourceId',
                                       flat_df.schema))]
     out = df.groupBy(f.col('datasourceId')).agg(*exprs)
