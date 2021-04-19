@@ -1,16 +1,16 @@
-from pyspark.sql import SparkSession, DataFrame
-from pyspark import SparkConf
-from pyspark.sql.functions import *
-from pyspark.sql.types import *
-import pandas as pd
+#!/usr/bin/env python3
+
 import argparse
 from typing import Iterable
 from functools import reduce
 
+from pyspark.sql import SparkSession, DataFrame
+from pyspark import SparkConf
+from pyspark.sql.functions import *
+from pyspark.sql.types import *
 
-spark = (SparkSession.builder
-                .appName('spark')
-                .getOrCreate())
+
+spark = SparkSession.builder.appName('spark').getOrCreate()
 
 # Required to flatten the schema
 def flatten(schema, prefix=None):
