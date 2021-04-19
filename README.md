@@ -27,13 +27,17 @@ sudo docker run --rm \
   -steps evidence
 ```
 
-The process will fail when attempting to upload the files to the Google Cloud bucket, which is expected (we do not want to do that upload). A pull request to platform-input-support to make this upload optional is pending.
+The process will fail when attempting to upload the files to the Google Cloud bucket, **which is expected** (we do not want to do that upload). A pull request to platform-input-support to make the upload step optional is pending.
 
-The evidence strings will be collected in `output/...` in the current working directory.
+The evidence strings will be collected in `output/evidence-files/` in the current working directory. Now the script is ready to be run:
 
 ```bash
 source env/bin/activate
-python3 metrics.py
+python3 metrics.py \
+  --run-id test \
+  --out metrics.csv \
+  pre-pipeline \
+  --evidence-json-dir output/evidence-files/
 ```
 
 ### Post-pipeline run

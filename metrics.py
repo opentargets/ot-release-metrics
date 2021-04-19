@@ -10,9 +10,6 @@ from pyspark.sql.functions import *
 from pyspark.sql.types import *
 
 
-spark = SparkSession.builder.appName('spark').getOrCreate()
-
-
 # Required to flatten the schema
 def flatten(schema, prefix=None):
     """Flatten schema"""
@@ -129,71 +126,48 @@ def evidenceDistinctFieldsCount(
 
 
 def parse_args():
-    """ Load command line args """
+    """Load command line arguments."""
     parser = argparse.ArgumentParser()
-    parser.add_argument('--run-id',
-                        help='Pipeline run identifier to be stored in the runId column, for example: 20.04.1.',
-                        type=str,
-                        required=True)
-    parser.add_argument('--disease',
-                        metavar="<path>",
-                        help='Disease path',
-                        type=str,
-                        required=False)
-    parser.add_argument('--evidence',
-                        metavar="<path>",
-                        help='Evidence path',
-                        type=str,
-                        required=False)
-    parser.add_argument('--failedEvidence',
-                        metavar="<path>",
-                        help='Evidence failing path',
-                        type=str,
-                        required=False)
-    parser.add_argument('--directAssociations',
-                        metavar="<path>",
-                        help='Direct associations',
-                        type=str,
-                        required=False)
-    parser.add_argument('--indirectAssociations',
-                        metavar="<path>",
-                        help='Indirect associations',
-                        type=str,
-                        required=False)
-    parser.add_argument('--out',
-                        metavar="<path>",
-                        help='Output filename with the release metrics in the CSV format.',
-                        type=str,
-                        required=True)
-    parser.add_argument('--local',
-                        help='run local[*]',
-                        action='store_true',
-                        required=False,
-                        default=True)
-    parser.add_argument('--prePipeline',
-                        help='State whether the data is prior to the pipeline run',
-                        action='store_true',
-                        required=False)
-    args = parser.parse_args()
-    return args
+    subparsers = parser.add_subparsers()
+
+    pre_pipeline_parser = subparsers.add_parser('pre-pipeline', help=(
+        'Calculate the metrics for the submitted files (gzipped JSON), before the ETL pipeline is run.'))
+    pre_pipeline_parser.add_argument(
+        '--evidence-json-dir', required=True, dest='evidence', metavar='<path>', type=str, help=(
+            'Directory containing all gzipped JSON files with the submitted evidence strings. Files from the '
+            'subdirectories are also recursively collected.'))
+
+    post_pipeline_parser = subparsers.add_parser('post-pipeline', help=(
+        'Calculate the complete set of metrics after running the ETL pipeline.'))
+    post_pipeline_parser.add_argument(
+        '--evidence-parquet-dir', required=True, dest='evidence', metavar='<path>', type=str, help=(
+            'Directory containing all Parquet evidence files from the pipeline run. They can be found in '
+            'gs://open-targets-data-releases/{RELEASE}/output/etl-parquet/evidence/.'))
+    post_pipeline_parser.add_argument(
+        '--disease', required=False, metavar='<path>', type=str, help='Disease path')
+    post_pipeline_parser.add_argument(
+        '--failedEvidence', required=False, metavar='<path>', type=str, help=(
+            'Evidence failing path'))
+    post_pipeline_parser.add_argument(
+        '--directAssociations', required=False, metavar='<path>', type=str, help=(
+            'Direct associations'))
+    post_pipeline_parser.add_argument(
+        '--indirectAssociations', required=False, metavar='<path>', type=str, help=(
+            'Indirect associations'))
+
+    required_arguments = parser.add_argument_group('required arguments')
+    required_arguments.add_argument(
+        '--run-id', required=True, type=str, help=(
+            'Pipeline run identifier to be stored in the runId column, for example: 20.04.1.'))
+    required_arguments.add_argument(
+        '--out', required=True, metavar='<path>', type=str, help=(
+            'Output filename with the release metrics in the CSV format.'))
+
+    return parser.parse_args()
 
 
 def main(args):
-    sparkConf = SparkConf()
-
-    if args.local:
-        spark = (
-            SparkSession.builder
-            .config(conf=sparkConf)
-            .master('local[*]')
-            .getOrCreate()
-        )
-    else:
-        spark = (
-            SparkSession.builder
-            .config(conf=sparkConf)
-            .getOrCreate()
-        )
+    spark = SparkSession.builder.config(conf=SparkConf()).getOrCreate()
 
     # Load data
     if args.prePipeline:
