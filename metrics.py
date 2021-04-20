@@ -271,7 +271,7 @@ def main(args):
                 associations_direct.select(
                     'targetId',
                     'diseaseId',
-                    f.explode(f.col('overallDatasourceHarmonicScoreDSs.datasourceId')).alias('datasourceId')
+                    f.explode(f.col('overallDatasourceHarmonicVector.datasourceId')).alias('datasourceId')
                 ),
                 'datasourceId',
                 'associationsDirectByDatasource'
@@ -288,7 +288,7 @@ def main(args):
                 associations_indirect.select(
                     'targetId',
                     'diseaseId',
-                    f.explode(f.col('overallDatasourceHarmonicScoreDSs.datasourceId')).alias('datasourceId')
+                    f.explode(f.col('overallDatasourceHarmonicVector.datasourceId')).alias('datasourceId')
                 ),
                 'datasourceId',
                 'associationsIndirectByDatasource'),
