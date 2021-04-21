@@ -234,7 +234,6 @@ def main(args):
             evidence_distinct_fields_count(evidence.select(columns_to_report),
                                            'evidenceDistinctFieldsCountByDatasource'),
         ])
-        logging.info(f'Metrics from {args.evidence} have been generated.')
 
     if evidence_failed:
         logging.info(f'Running metrics from {args.evidence_failed}.')
