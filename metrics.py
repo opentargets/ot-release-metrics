@@ -126,9 +126,6 @@ def evidence_distinct_fields_count(
 def read_file_if_provided(spark, filename):
     if filename:
         return spark.read.json(filename) if 'json' in filename else spark.read.parquet(filename)
-    else:
-        return None
-
 
 def parse_args():
     """Load command line arguments."""
