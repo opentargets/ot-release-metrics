@@ -5,6 +5,7 @@ import logging
 import sys
 from typing import Iterable
 from functools import reduce
+
 from pyspark.sql import SparkSession, DataFrame
 import pyspark.sql.functions as f
 import pyspark.sql.types as t
@@ -125,7 +126,7 @@ def evidence_distinct_fields_count(
 
 def read_file_if_provided(spark, filename):
     if filename:
-        return spark.read.json(filename) if 'json' in filename else spark.read.parquet(filename)
+        return spark.read.json(filename) if filename.endswith('.json') or filename.endswith('.json.gz') else spark.read.parquet(filename)
 
 def parse_args():
     """Load command line arguments."""
