@@ -181,9 +181,9 @@ def main(args):
 
     # Initialize logging:
     logging.basicConfig(
-    level=logging.INFO,
-    format='%(name)s - %(levelname)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S',
+        level=logging.INFO,
+        format='%(name)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S',
     )
     if args.logFile:
         logging.config.fileConfig(filename=args.logFile)
