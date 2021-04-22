@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 
 import argparse
-import logging
-import sys
-from typing import Iterable
 from functools import reduce
+import logging
+import logging.config
+from typing import Iterable
+
 from pyspark.sql import SparkSession, DataFrame
 import pyspark.sql.functions as f
 import pyspark.sql.types as t
@@ -40,7 +41,7 @@ def melt(
     # Add to the DataFrame and explode
     _tmp = df.withColumn('_vars_and_vals', f.explode(_vars_and_vals))
 
-    cols = id_vars + [f.col('_vars_and_vals')[x].alias(x) for x in [var_name, value_name]]
+    cols = list(id_vars) + [f.col('_vars_and_vals')[x].alias(x) for x in [var_name, value_name]]
     return _tmp.select(*cols)
 
 
@@ -123,9 +124,11 @@ def evidence_distinct_fields_count(
     melted = melted.withColumn('variable', f.lit(var_name))
     return melted
 
+
 def read_file_if_provided(spark, filename):
     if filename:
         return spark.read.json(filename) if 'json' in filename else spark.read.parquet(filename)
+
 
 def parse_args():
     """Load command line arguments."""
@@ -177,18 +180,18 @@ def parse_args():
 
 
 def main(args):
+    # Initialise a Spark session.
     spark = SparkSession.builder.getOrCreate()
 
-    # Initialize logging:
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(name)s - %(levelname)s - %(message)s',
-        datefmt='%Y-%m-%d %H:%M:%S',
-    )
+    # Initialise logging.
+    logging_config = {
+        'level': logging.INFO,
+        'format': '%(name)s - %(levelname)s - %(message)s',
+        'datefmt': '%Y-%m-%d %H:%M:%S',
+    }
     if args.logFile:
-        logging.config.fileConfig(filename=args.logFile)
-    else:
-        logging.StreamHandler(sys.stderr)
+        logging_config['filename'] = args.logFile
+    logging.basicConfig(**logging_config)
 
     # All datasets are optional.
     evidence, evidence_failed, associations_direct, associations_indirect, diseases, drugs = [None] * 6
