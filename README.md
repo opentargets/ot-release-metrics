@@ -40,10 +40,9 @@ The evidence strings will be collected in `platform-input-support/output/evidenc
 ```bash
 source env/bin/activate
 python3 metrics.py \
-  --run-id test \
-  --out metrics.csv \
-  pre-pipeline \
-  --evidence-json-dir platform-input-support/output/evidence-files/
+  --run-id test-pre-pipeline \
+  --out metrics-pre-pipeline.csv \
+  --evidence-pre-pipeline platform-input-support/output/evidence-files/
 ```
 
 ### Post-pipeline run
