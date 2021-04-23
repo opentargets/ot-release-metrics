@@ -169,16 +169,16 @@ def parse_args():
             'Failed evidence files from ${ETL_PARQUET_OUTPUT_ROOT}/evidenceFailed.'))
     parser.add_argument(
         '--associations-direct', required=False, metavar='<path>', type=str, help=(
-            'Direct association files from ${ETL_PARQUET_OUTPUT_ROOT}/associationByDatasourceDirect.'))
+            'Direct association files from ${ETL_PARQUET_OUTPUT_ROOT}/associationByOverallDirect.'))
     parser.add_argument(
         '--associations-indirect', required=False, metavar='<path>', type=str, help=(
-            'Indirect association files from ${ETL_PARQUET_OUTPUT_ROOT}/associationByDatasourceIndirect.'))
+            'Indirect association files from ${ETL_PARQUET_OUTPUT_ROOT}/associationByOverallIndirect.'))
     parser.add_argument(
         '--diseases', required=False, metavar='<path>', type=str, help=(
             'Disease information from ${ETL_PARQUET_OUTPUT_ROOT}/diseases.'))
     parser.add_argument(
         '--drugs', required=False, metavar='<path>', type=str, help=(
-            'ChEMBL dataset directory from ${ETL_INPUT_ROOT}/annotation-files/chembl.'))
+            'ChEMBL dataset directory from ${ETL_INPUT_ROOT}/annotation-files/chembl/chembl_*molecule*.jsonl.'))
 
     return parser.parse_args()
 

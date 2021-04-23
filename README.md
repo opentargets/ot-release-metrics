@@ -56,26 +56,26 @@ export ETL_INPUT_ROOT=gs://open-targets-data-releases/21.04/input
 Now download the files:
 ```bash
 mkdir post-pipeline
-gsutil -m -r cp \
-  ${ETL_PARQUET_OUTPUT_ROOT}/parquet/evidence \
-  ${ETL_PARQUET_OUTPUT_ROOT}/parquet/evidenceFailed \
-  ${ETL_PARQUET_OUTPUT_ROOT}/parquet/associationByDatasourceDirect \
-  ${ETL_PARQUET_OUTPUT_ROOT}/parquet/associationByDatasourceIndirect/ \
-  ${ETL_PARQUET_OUTPUT_ROOT}/parquet/diseases \
-  ${ETL_INPUT_ROOT}/annotation-files/chembl \
+gsutil -m cp -r \
+  ${ETL_PARQUET_OUTPUT_ROOT}/evidence \
+  ${ETL_PARQUET_OUTPUT_ROOT}/evidenceFailed \
+  ${ETL_PARQUET_OUTPUT_ROOT}/associationByOverallDirect \
+  ${ETL_PARQUET_OUTPUT_ROOT}/associationByOverallIndirect \
+  ${ETL_PARQUET_OUTPUT_ROOT}/diseases \
+  ${ETL_INPUT_ROOT}/annotation-files/chembl/chembl_*molecule*.jsonl \
   post-pipeline
 ```
 
 Next run the script to generate the metrics:
 ```bash
 source env/bin/activate
-python3 metrics.py \
+time python3 metrics.py \
   --run-id test-post-pipeline \
   --out metrics-post-pipeline.csv \
   --evidence-post-pipeline post-pipeline/evidence \
   --evidence-failed post-pipeline/evidenceFailed \
-  --associations-direct post-pipeline/associationByDatasourceDirect \
-  --associations-indirect post-pipeline/associationByDatasourceInirect \
+  --associations-direct post-pipeline/associationByOverallDirect \
+  --associations-indirect post-pipeline/associationByOverallIndirect \
   --diseases post-pipeline/diseases \
-  --drugs post-pipeline/chembl
+  --drugs post-pipeline/chembl_*molecule*.jsonl
 ```
