@@ -16,6 +16,7 @@ st.set_page_config(
 )
 
 st.title("A sneak peek at the stats in the Open Targets Platform.")
+st.markdown('##')
 st.markdown("This application is a dashboard to display the metrics of the different data releases in Open Targets.")
 
 st.sidebar.header("What do you want to do?")
@@ -48,7 +49,11 @@ if page == "Explore metrics":
     # Display metrics
     select_pivot = st.checkbox("See pivot table.")
     if select_pivot:
-        output = pd.pivot_table(data, values="count", index=["variable", "field"], columns="datasourceId")
+        try:
+            # Custom pivot table to avoid loss of data when field == NaN
+            output = data.set_index(["variable", "field", "datasourceId"]).unstack("datasourceId", fill_value=0)
+        except ValueError:
+            st.write("Please, indicate a specific pipeline run to group and explore the data.")
     else:
         output = data.copy()
     st.write(output)
@@ -116,13 +121,24 @@ if page == "Compare metrics":
         )
 
         # DISEASES
+        # BUG: Fix comparison when the data in one dataset is missing
         old_diseases_count = (data
-            .query('runId == @previous_run & variable == "diseasesTotalCount"')[["count", "datasourceId"]]
+            .query('runId == @previous_run & variable == "diseasesTotalCount"')[["count"]]
             .rename({"count" : "Nr of diseases in the last release"}, axis=1)
         )
         new_diseases_count = (data
-            .query('runId == @latest_run & variable == "diseasesTotalCount"')[["count", "datasourceId"]]
+            .query('runId == @latest_run & variable == "diseasesTotalCount"')[["count"]]
             .rename({"count" : "Nr of diseases in the latest release"}, axis=1)
+        )
+
+        # DRUGS
+        old_drugs_count = (data
+            .query('runId == @previous_run & variable == "drugsTotalCount"')[["count"]]
+            .rename({"count" : "Nr of drugs in the last release"}, axis=1)
+        )
+        new_drugs_count = (data
+            .query('runId == @latest_run & variable == "drugsTotalCount"')[["count"]]
+            .rename({"count" : "Nr of drugs in the latest release"}, axis=1)
         )
 
         # Aggregate metrics
@@ -131,18 +147,33 @@ if page == "Compare metrics":
             new_evidence_invalid, new_evidence_duplicates,
             new_evidence_unresolved_target, new_evidence_unresolved_disease
         ]
-        evidence = reduce(lambda x, y: pd.merge(x, y, on = "datasourceId"), evidence_datasets).set_index("datasourceId")
-        
+        evidence = reduce(lambda x, y: pd.merge(x, y, on="datasourceId", how="outer"), evidence_datasets).set_index("datasourceId").fillna(0)
+        evidence = evidence.append(evidence.sum().rename('Total')).assign(Total=lambda d: d.sum(1))
+
         association_datasets = [
             old_indirect_association, new_indirect_association,
             old_direct_association, new_indirect_association,
         ]
-        association = reduce(lambda x, y: pd.merge(x, y, on = "datasourceId"), association_datasets).set_index("datasourceId")
+        association = reduce(lambda x, y: pd.merge(x, y, on="datasourceId"), association_datasets).set_index("datasourceId")
+        association = association.append(association.sum().rename('Total')).assign(Total=lambda d: d.sum(1))
+
+        #disease = pd.concat([old_diseases_count, new_diseases_count], axis=0)
+        #disease.set_index(disease.columns, inplace=True)
+        #disease = disease["Nr of diseases in the latest release"].combine_first(disease["Nr of diseases in the last release"]).rename({"Nr of diseases in the latest release" : "count"}, axis=1)
+
+        drug = pd.concat([old_drugs_count, new_drugs_count], axis=0)
+        drug.set_index(drug.columns, inplace=True)
+        drug = drug["Nr of drugs in the latest release"].combine_first(drug["Nr of drugs in the last release"]) # TODO: Refactor this and change column name 
 
         # Display tables
         st.header("Evidence related metrics:")
         st.table(evidence)
         st.header("Associations related metrics:")
         st.table(association)
+        #st.header("Diseases related metrics:")
+        #st.table(disease)
+        st.header("Drugs related metrics:")
+        st.table(drug)
 
+st.markdown('###')
 st.image(Image.open("img/OT logo.png"), width = 150)
