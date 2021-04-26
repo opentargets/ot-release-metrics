@@ -67,41 +67,40 @@ def document_count_by(
         column: str,
         var_name: str) -> DataFrame:
     """Count documents by grouping column."""
-    # out = df.withColumn('datasourceId', lit('all'))
     out = df.groupBy(column).count().alias('count')
     out = out.withColumn('variable', f.lit(var_name))
     out = out.withColumn('field', f.lit(None).cast(t.StringType()))
     return out
 
 
-def evidence_not_null_fields_count(
-        df: DataFrame,
-        var_name: str) -> DataFrame:
-    """Count number of evidences with not null values in variable."""
-    # flatten dataframe schema
+def not_null_fields_count(df: DataFrame, var_name: str, group_by_datasource: bool) -> DataFrame:
+    """Count number of not null values for each field in the dataframe. If `group_by_column` is provided, the
+    calculation is performed separately for every distinct value in that column."""
+    # Flatten the dataframe schema.
     flat_df = df.select([f.col(c).alias(c) for c in flatten(df.schema)])
-
-    # counting not-null evidence per field
-    exprs = [f.sum(f.when(f.col(field.name).getItem(0).isNotNull(), f.lit(1))
-                    .otherwise(f.lit(0))).alias(field.name)
-             if isinstance(field.dataType, t.ArrayType)
-             else
-             f.sum(f.when(f.col(field.name).isNotNull(), f.lit(1))
-                    .otherwise(f.lit(0))).alias(field.name)
-             for field in list(filter(lambda x: x.name != 'datasourceId',
-                                      flat_df.schema))]
-    out = df.groupBy(f.col('datasourceId')).agg(*exprs)
-    # Clean column names
-    out_cleaned = out.toDF(*(c.replace('.', '_') for c in out.columns))
-    # wide to long format
-    cols = out_cleaned.drop('datasourceId').columns
-
-    melted = melt(out_cleaned,
-                  id_vars=['datasourceId'],
-                  var_name='field',
-                  value_vars=cols,
-                  value_name='count')
+    # Get the list of fields to count.
+    field_list = flat_df.schema
+    if group_by_datasource:
+        field_list = [field for field in field_list if field.name != 'datasourceId']
+    # Count not-null values per field.
+    exprs = [
+        f.sum(f.when(f.col(field.name).getItem(0).isNotNull(), f.lit(1)).otherwise(f.lit(0))).alias(field.name)
+        if isinstance(field.dataType, t.ArrayType)
+        else f.sum(f.when(f.col(field.name).isNotNull(), f.lit(1)).otherwise(f.lit(0))).alias(field.name)
+        for field in field_list
+    ]
+    # Group (if necessary) and aggregate.
+    df_grouped = df.groupBy(f.col('datasourceId')) if group_by_datasource else df
+    df_aggregated = df_grouped.agg(*exprs)
+    # Clean column names.
+    df_cleaned = df_aggregated.toDF(*(c.replace('.', '_') for c in df_aggregated.columns))
+    # Wide to long format.
+    cols = df_cleaned.drop('datasourceId').columns if group_by_datasource else df_cleaned.columns
+    melted = melt(df_cleaned, id_vars=['datasourceId'] if group_by_datasource else [], var_name='field',
+                  value_vars=cols, value_name='count')
     melted = melted.withColumn('variable', f.lit(var_name))
+    if not group_by_datasource:
+        melted = melted.withColumn('datasourceId', f.lit('all'))
     return melted
 
 
@@ -185,6 +184,17 @@ def parse_args():
     return parser.parse_args()
 
 
+def get_columns_to_report(dataset_columns):
+    return [
+        'datasourceId',
+        'targetFromSourceId',
+        'diseaseFromSourceMappedId' if 'diseaseFromSourceMappedId' in dataset_columns else 'diseaseFromSourceId',
+        'drugId',
+        'variantId',
+        'literature'
+    ]
+
+
 def main(args):
     # Initialise a Spark session.
     spark = SparkSession.builder.getOrCreate()
@@ -216,26 +226,19 @@ def main(args):
     diseases = read_file_if_provided(spark, args.diseases)
     drugs = read_file_if_provided(spark, args.drugs)
 
-    columns_to_report = [
-        'datasourceId',
-        'targetFromSourceId',
-        'diseaseFromSourceMappedId' if 'diseaseFromSourceMappedId' in evidence.columns else 'diseaseFromSourceId',
-        'drugId',
-        'variantId',
-        'literature'
-    ]
-
     datasets = []
 
     if evidence:
         logging.info(f'Running metrics from {evidence_filename}.')
+        columns_to_report = get_columns_to_report(evidence.columns)
+
         datasets.extend([
             # Total evidence count.
             document_total_count(evidence, 'evidenceTotalCount'),
             # Evidence count by datasource.
             document_count_by(evidence, 'datasourceId', 'evidenceCountByDatasource'),
             # Number of evidences that have a not null value in the given field.
-            evidence_not_null_fields_count(evidence, 'evidenceFieldNotNullCountByDatasource'),
+            not_null_fields_count(evidence, 'evidenceFieldNotNullCountByDatasource', group_by_datasource=True),
             # distinctCount takes some time on all columns: subsetting them.
             evidence_distinct_fields_count(evidence.select(columns_to_report),
                                            'evidenceDistinctFieldsCountByDatasource'),
@@ -243,6 +246,7 @@ def main(args):
 
     if evidence_failed:
         logging.info(f'Running metrics from {args.evidence_failed}.')
+        columns_to_report = get_columns_to_report(evidence_failed.columns)
         datasets.extend([
             # Total invalids.
             document_total_count(evidence_failed,
@@ -326,14 +330,16 @@ def main(args):
         # TODO: diseases.
         logging.info(f'Running metrics from {args.diseases}.')
         datasets.extend([
-            document_total_count(diseases, 'diseasesTotalCount')
+            document_total_count(diseases, 'diseasesTotalCount'),
+            not_null_fields_count(diseases, 'diseasesNotNullCount', group_by_datasource=False),
         ])
 
     if drugs:
         # TODO: drugs.
         logging.info(f'Running metrics from {args.drugs}.')
         datasets.extend([
-            document_total_count(drugs, 'drugsTotalCount')
+            document_total_count(drugs, 'drugsTotalCount'),
+            not_null_fields_count(drugs, 'drugsNotNullCount', group_by_datasource=False),
         ])
 
     # Write output and clean up.
