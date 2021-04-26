@@ -144,10 +144,12 @@ def parse_args():
     required_arguments = parser.add_argument_group('required arguments')
     required_arguments.add_argument(
         '--run-id', required=True, type=str, help=(
-            'Pipeline run identifier to be stored in the runId column, for example: 20.04.1.'))
+            'Pipeline run identifier to be stored in the runId column. This should be of the format YY.MM.RUN-TYPE, '
+            'for example: 20.04.1-pre.'))
     required_arguments.add_argument(
         '--out', required=True, metavar='<path>', type=str, help=(
-            'Output filename with the release metrics in the CSV format.'))
+            'Output filename with the release metrics in the CSV format. For consistency, the basename should match '
+            'the run ID provided in --run-id. For example: data/20.04.1-pre.csv.'))
 
     # General optional arguments.
     parser.add_argument(

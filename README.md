@@ -40,8 +40,8 @@ The evidence strings will be collected in `platform-input-support/output/evidenc
 ```bash
 source env/bin/activate
 python3 metrics.py \
-  --run-id test-pre-pipeline \
-  --out metrics-pre-pipeline.csv \
+  --run-id 21.02.2-pre \
+  --out data/21.02.2-pre.csv \
   --evidence-pre-pipeline platform-input-support/output/evidence-files/
 ```
 
@@ -69,9 +69,9 @@ gsutil -m cp -r \
 Next run the script to generate the metrics:
 ```bash
 source env/bin/activate
-time python3 metrics.py \
-  --run-id test-post-pipeline \
-  --out metrics-post-pipeline.csv \
+python3 metrics.py \
+  --run-id 21.02.2-post \
+  --out data/21.02.2-post.csv \
   --evidence-post-pipeline post-pipeline/evidence \
   --evidence-failed post-pipeline/evidenceFailed \
   --associations-direct post-pipeline/associationByOverallDirect \
