@@ -14,6 +14,8 @@ python3 -m pip install -r requirements.txt
 
 ## Running
 
+The modules can be run locally or in the Google Cloud (in this case, a `e2-highcpu-8` instance is recommended).
+
 ### Pre-pipeline run
 You will first need to collect the latest evidence string JSON files for all sources. This can be done using the [`platform-input-support`](https://github.com/opentargets/platform-input-support) module. The easiest way is to run it is through Docker.
 
