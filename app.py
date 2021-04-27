@@ -45,8 +45,25 @@ if page == "Explore metrics":
     if select_run != "All":
         mask_run = data["runId"] == select_run
         data = data[mask_run]
+    
+    # Refine the query
+    st.markdown("## Filter the data")
+    select_variables = st.multiselect(
+        "Filter by your variables of interest to refine your analysis. You can select as many as you want:",
+        data.variable.unique()
+    )
+    if select_variables:
+        mask_variable = data["variable"].isin(select_variables)
+        data = data[mask_variable]
+        if any("Field" in variable for variable in select_variables):
+            select_fields = st.multiselect(
+                "You can also filter by your field of interest:",
+                data.field.unique()
+            )
+            mask_field = data["field"].isin(select_fields)
+            data = data[mask_field] if select_fields else data.copy()
 
-    # Display metrics
+    # Generate pivot table
     select_pivot = st.checkbox("See pivot table.")
     if select_pivot:
         try:
@@ -56,6 +73,9 @@ if page == "Explore metrics":
             st.write("Please, indicate a specific pipeline run to group and explore the data.")
     else:
         output = data.copy()
+
+    # Display table
+
     st.write(output)
     st.markdown(get_table_download_link_csv(output), unsafe_allow_html=True)
 
@@ -79,27 +99,27 @@ if page == "Compare metrics":
         # EVIDENCE
         old_evidence_count = (data
             .query('runId == @previous_run & variable == "evidenceCountByDatasource"')[["count", "datasourceId"]]
-            .rename({"count" : "Nr of evidence strings in the last release"}, axis=1)
+            .rename({"count" : f"Nr of evidence strings in {previous_run.split('-')[0]}"}, axis=1)
         )
         new_evidence_count = (data
             .query('runId == @latest_run & variable == "evidenceCountByDatasource"')[["count", "datasourceId"]]
-            .rename({"count" : "Nr of evidence strings in the latest release"}, axis=1)
+            .rename({"count" : f"Nr of evidence strings in {latest_run.split('-')[0]}"}, axis=1)
         )
         new_evidence_invalid = (data
             .query('runId == @latest_run & variable == "evidenceInvalidCountByDatasource"')[["count", "datasourceId"]]
-            .rename({"count" : "Nr of invalid evidence strings"}, axis=1)
+            .rename({"count" : f"Nr of invalid evidence strings in {latest_run.split('-')[0]}"}, axis=1)
         )
         new_evidence_duplicates = (data
             .query('runId == @latest_run & variable == "evidenceDuplicateCountByDatasource"')[["count", "datasourceId"]]
-            .rename({"count" : "Nr of evidence strings dropped due to duplication"}, axis=1)
+            .rename({"count" : f"Nr of evidence strings dropped due to duplication in {latest_run.split('-')[0]}"}, axis=1)
         )
         new_evidence_unresolved_target = (data
             .query('runId == @latest_run & variable == "evidenceUnresolvedTargetCountByDatasource"')[["count", "datasourceId"]]
-            .rename({"count" : "Nr of evidence strings dropped due to unresolved target"}, axis=1)
+            .rename({"count" : f"Nr of evidence strings dropped due to unresolved target in {latest_run.split('-')[0]}"}, axis=1)
         )
         new_evidence_unresolved_disease = (data
             .query('runId == @latest_run & variable == "evidenceUnresolvedDiseaseCountByDatasource"')[["count", "datasourceId"]]
-            .rename({"count" : "Nr of evidence strings dropped due to unresolved disease"}, axis=1)
+            .rename({"count" : f"Nr of evidence strings dropped due to unresolved disease in {latest_run.split('-')[0]}"}, axis=1)
         )
         
         # ASSOCIATION
