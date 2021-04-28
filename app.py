@@ -105,17 +105,33 @@ if page == "Compare metrics":
             .query('runId == @latest_run & variable == "evidenceCountByDatasource"')[["count", "datasourceId"]]
             .rename({"count" : f"Nr of evidence strings in {latest_run.split('-')[0]}"}, axis=1)
         )
+        old_evidence_invalid = (data
+            .query('runId == @previous_run & variable == "evidenceInvalidCountByDatasource"')[["count", "datasourceId"]]
+            .rename({"count" : f"Nr of invalid evidence strings in {previous_run.split('-')[0]}"}, axis=1)
+        )
         new_evidence_invalid = (data
             .query('runId == @latest_run & variable == "evidenceInvalidCountByDatasource"')[["count", "datasourceId"]]
             .rename({"count" : f"Nr of invalid evidence strings in {latest_run.split('-')[0]}"}, axis=1)
+        )
+        old_evidence_duplicates = (data
+            .query('runId == @previous_run & variable == "evidenceDuplicateCountByDatasource"')[["count", "datasourceId"]]
+            .rename({"count" : f"Nr of evidence strings dropped due to duplication in {previous_run.split('-')[0]}"}, axis=1)
         )
         new_evidence_duplicates = (data
             .query('runId == @latest_run & variable == "evidenceDuplicateCountByDatasource"')[["count", "datasourceId"]]
             .rename({"count" : f"Nr of evidence strings dropped due to duplication in {latest_run.split('-')[0]}"}, axis=1)
         )
+        old_evidence_unresolved_target = (data
+            .query('runId == @previous_run & variable == "evidenceUnresolvedTargetCountByDatasource"')[["count", "datasourceId"]]
+            .rename({"count" : f"Nr of evidence strings dropped due to unresolved target in {previous_run.split('-')[0]}"}, axis=1)
+        )
         new_evidence_unresolved_target = (data
             .query('runId == @latest_run & variable == "evidenceUnresolvedTargetCountByDatasource"')[["count", "datasourceId"]]
             .rename({"count" : f"Nr of evidence strings dropped due to unresolved target in {latest_run.split('-')[0]}"}, axis=1)
+        )
+        old_evidence_unresolved_disease = (data
+            .query('runId == @previous_run & variable == "evidenceUnresolvedDiseaseCountByDatasource"')[["count", "datasourceId"]]
+            .rename({"count" : f"Nr of evidence strings dropped due to unresolved disease in {previous_run.split('-')[0]}"}, axis=1)
         )
         new_evidence_unresolved_disease = (data
             .query('runId == @latest_run & variable == "evidenceUnresolvedDiseaseCountByDatasource"')[["count", "datasourceId"]]
@@ -125,75 +141,84 @@ if page == "Compare metrics":
         # ASSOCIATION
         old_indirect_association = (data
             .query('runId == @previous_run & variable == "associationsIndirectByDatasource"')[["count", "datasourceId"]]
-            .rename({"count" : "Nr of indirect associations in the last release"}, axis=1)
+            .rename({"count" : f"Nr of indirect associations in {previous_run.split('-')[0]}"}, axis=1)
         )
         new_indirect_association = (data
             .query('runId == @latest_run & variable == "associationsIndirectByDatasource"')[["count", "datasourceId"]]
-            .rename({"count" : "Nr of indirect associations in the latest release"}, axis=1)
+            .rename({"count" : f"Nr of indirect associations in {latest_run.split('-')[0]}"}, axis=1)
         )
         old_direct_association = (data
             .query('runId == @previous_run & variable == "associationsDirectByDatasource"')[["count", "datasourceId"]]
-            .rename({"count" : "Nr of direct associations in the last release"}, axis=1)
+            .rename({"count" : f"Nr of direct associations in {previous_run.split('-')[0]}"}, axis=1)
         )
-        new_indirect_association = (data
+        new_direct_association = (data
             .query('runId == @latest_run & variable == "associationsDirectByDatasource"')[["count", "datasourceId"]]
-            .rename({"count" : "Nr of direct associations in the latest release"}, axis=1)
+            .rename({"count" : f"Nr of direct associations in {latest_run.split('-')[0]}"}, axis=1)
         )
 
         # DISEASES
         # BUG: Fix comparison when the data in one dataset is missing
         old_diseases_count = (data
             .query('runId == @previous_run & variable == "diseasesTotalCount"')[["count"]]
-            .rename({"count" : "Nr of diseases in the last release"}, axis=1)
+            .rename({"count" : f"Nr of diseases in {previous_run.split('-')[0]}"}, axis=1)
         )
         new_diseases_count = (data
             .query('runId == @latest_run & variable == "diseasesTotalCount"')[["count"]]
-            .rename({"count" : "Nr of diseases in the latest release"}, axis=1)
+            .rename({"count" : f"Nr of diseases in {latest_run.split('-')[0]}"}, axis=1)
         )
 
         # DRUGS
         old_drugs_count = (data
-            .query('runId == @previous_run & variable == "drugsTotalCount"')[["count"]]
-            .rename({"count" : "Nr of drugs in the last release"}, axis=1)
-        )
+            .query('runId == @previous_run & variable == "drugsTotalCount"')["count"])
         new_drugs_count = (data
-            .query('runId == @latest_run & variable == "drugsTotalCount"')[["count"]]
-            .rename({"count" : "Nr of drugs in the latest release"}, axis=1)
-        )
+            .query('runId == @latest_run & variable == "drugsTotalCount"')["count"])
 
         # Aggregate metrics
         evidence_datasets = [
             old_evidence_count, new_evidence_count,
-            new_evidence_invalid, new_evidence_duplicates,
-            new_evidence_unresolved_target, new_evidence_unresolved_disease
+            old_evidence_invalid, new_evidence_invalid,
+            old_evidence_duplicates, new_evidence_duplicates,
+            old_evidence_unresolved_target, new_evidence_unresolved_target,
+            old_evidence_unresolved_disease, new_evidence_unresolved_disease
         ]
         evidence = reduce(lambda x, y: pd.merge(x, y, on="datasourceId", how="outer"), evidence_datasets).set_index("datasourceId").fillna(0)
-        evidence = evidence.append(evidence.sum().rename('Total')).assign(Total=lambda d: d.sum(1))
+        evidence["Δ in number of evidence strings"] = evidence[f"Nr of evidence strings in {latest_run.split('-')[0]}"].sub(evidence[f"Nr of evidence strings in {previous_run.split('-')[0]}"], axis=0, fill_value=0)
+        evidence["Δ in number of invalid evidence strings"] = evidence[f"Nr of invalid evidence strings in {latest_run.split('-')[0]}"].sub(evidence[f"Nr of invalid evidence strings in {previous_run.split('-')[0]}"], axis=0, fill_value=0)
+        evidence["Δ in number of evidence strings dropped due to duplication"] = evidence[f"Nr of evidence strings dropped due to duplication in {latest_run.split('-')[0]}"].sub(evidence[f"Nr of evidence strings dropped due to duplication in {previous_run.split('-')[0]}"], axis=0, fill_value=0)
+        evidence["Δ in number of evidence strings dropped due to unresolved target"] = evidence[f"Nr of evidence strings dropped due to unresolved target in {latest_run.split('-')[0]}"].sub(evidence[f"Nr of evidence strings dropped due to unresolved target in {previous_run.split('-')[0]}"], axis=0, fill_value=0)
+        evidence["Δ in number of evidence strings dropped due to unresolved disease"] = evidence[f"Nr of evidence strings dropped due to unresolved disease in {latest_run.split('-')[0]}"].sub(evidence[f"Nr of evidence strings dropped due to unresolved disease in {previous_run.split('-')[0]}"], axis=0, fill_value=0)
+        #evidence = evidence.append(evidence.sum().rename('Total')).assign(Total=lambda d: d.sum(1))
+        evidence = evidence[evidence.columns[-5:]].iloc[:-1]
 
         association_datasets = [
             old_indirect_association, new_indirect_association,
-            old_direct_association, new_indirect_association,
+            old_direct_association, new_direct_association,
         ]
         association = reduce(lambda x, y: pd.merge(x, y, on="datasourceId"), association_datasets).set_index("datasourceId")
-        association = association.append(association.sum().rename('Total')).assign(Total=lambda d: d.sum(1))
+        association["Δ in number of direct associations"] = association[f"Nr of direct associations in {latest_run.split('-')[0]}"].sub(association[f"Nr of direct associations in {previous_run.split('-')[0]}"], axis=0, fill_value=0)
+        association["Δ in number of indirect associations"] = association[f"Nr of indirect associations in {latest_run.split('-')[0]}"].sub(association[f"Nr of indirect associations in {previous_run.split('-')[0]}"], axis=0, fill_value=0)
+        #association = association.append(association.sum().rename('Total')).assign(Total=lambda d: d.sum(1))
+        association = association[association.columns[-2:]]
 
         #disease = pd.concat([old_diseases_count, new_diseases_count], axis=0)
         #disease.set_index(disease.columns, inplace=True)
         #disease = disease["Nr of diseases in the latest release"].combine_first(disease["Nr of diseases in the last release"]).rename({"Nr of diseases in the latest release" : "count"}, axis=1)
 
-        drug = pd.concat([old_drugs_count, new_drugs_count], axis=0)
-        drug.set_index(drug.columns, inplace=True)
-        drug = drug["Nr of drugs in the latest release"].combine_first(drug["Nr of drugs in the last release"]) # TODO: Refactor this and change column name 
+        #drug = pd.concat([old_drugs_count, new_drugs_count], axis=0)
+        #drug["diff"] = new_drugs_count.sub(old_drugs_count, axis=0, fill_value=0)
+        
+        #drug.set_index(drug.columns, inplace=True)
+        #drug = drug[f"Nr of drugs in {previous_run.split('-')[0]}"].combine_first(drug[f"Nr of drugs in {previous_run.split('-')[0]}"]) # TODO: Refactor this and change column name 
 
         # Display tables
         st.header("Evidence related metrics:")
         st.table(evidence)
         st.header("Associations related metrics:")
         st.table(association)
-        #st.header("Diseases related metrics:")
+        st.header("Diseases related metrics: WIP")
         #st.table(disease)
-        st.header("Drugs related metrics:")
-        st.table(drug)
+        st.header("Drugs related metrics: WIP")
+        #st.table(drug)
 
 st.markdown('###')
 st.image(Image.open("img/OT logo.png"), width = 150)
