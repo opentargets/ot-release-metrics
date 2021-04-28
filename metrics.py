@@ -88,7 +88,9 @@ def not_null_fields_count(
     # Flatten the dataframe schema.
     flat_df = df.select([f.col(c).alias(c) for c in flatten(df.schema)])
     # Get the list of fields to count.
-    field_list = flat_df.drop('datasourceId').columns if group_by_datasource else flat_df.columns
+    field_list = flat_df.schema
+    if group_by_datasource:
+        field_list = [field for field in field_list if field.name != 'datasourceId']
     # Count not-null values per field.
     exprs = [
         f.sum(f.when(f.col(field.name).getItem(0).isNotNull(), f.lit(1)).otherwise(f.lit(0))).alias(field.name)
@@ -107,7 +109,7 @@ def not_null_fields_count(
             df=df_cleaned,
             id_vars=['datasourceId'] if group_by_datasource else [],
             var_name='field',
-            value_vars=field_list,
+            value_vars=df_cleaned.drop('datasourceId').columns if group_by_datasource else df_cleaned.columns,
             value_name='count'
         )
         .withColumn('variable', f.lit(var_name))
