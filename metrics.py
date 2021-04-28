@@ -74,14 +74,12 @@ def document_count_by(
 
 
 def not_null_fields_count(df: DataFrame, var_name: str, group_by_datasource: bool) -> DataFrame:
-    """Count number of not null values for each field in the dataframe. If `group_by_column` is provided, the
-    calculation is performed separately for every distinct value in that column."""
+    """Count number of not null values for each field in the dataframe. If `group_by_datasource` is enabled, the
+    calculation is performed separately for every datasource in the `datasourceId` column."""
     # Flatten the dataframe schema.
     flat_df = df.select([f.col(c).alias(c) for c in flatten(df.schema)])
     # Get the list of fields to count.
-    field_list = flat_df.schema
-    if group_by_datasource:
-        field_list = [field for field in field_list if field.name != 'datasourceId']
+    field_list = flat_df.drop('datasourceId').columns if group_by_datasource else flat_df.columns
     # Count not-null values per field.
     exprs = [
         f.sum(f.when(f.col(field.name).getItem(0).isNotNull(), f.lit(1)).otherwise(f.lit(0))).alias(field.name)
@@ -95,9 +93,8 @@ def not_null_fields_count(df: DataFrame, var_name: str, group_by_datasource: boo
     # Clean column names.
     df_cleaned = df_aggregated.toDF(*(c.replace('.', '_') for c in df_aggregated.columns))
     # Wide to long format.
-    cols = df_cleaned.drop('datasourceId').columns if group_by_datasource else df_cleaned.columns
     melted = melt(df_cleaned, id_vars=['datasourceId'] if group_by_datasource else [], var_name='field',
-                  value_vars=cols, value_name='count')
+                  value_vars=field_list, value_name='count')
     melted = melted.withColumn('variable', f.lit(var_name))
     if not group_by_datasource:
         melted = melted.withColumn('datasourceId', f.lit('all'))
