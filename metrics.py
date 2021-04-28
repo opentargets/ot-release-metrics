@@ -93,9 +93,16 @@ def not_null_fields_count(df: DataFrame, var_name: str, group_by_datasource: boo
     # Clean column names.
     df_cleaned = df_aggregated.toDF(*(c.replace('.', '_') for c in df_aggregated.columns))
     # Wide to long format.
-    melted = melt(df_cleaned, id_vars=['datasourceId'] if group_by_datasource else [], var_name='field',
-                  value_vars=field_list, value_name='count')
-    melted = melted.withColumn('variable', f.lit(var_name))
+    melted = (
+        melt(
+            df=df_cleaned,
+            id_vars=['datasourceId'] if group_by_datasource else [],
+            var_name='field',
+            value_vars=field_list,
+            value_name='count'
+        )
+        .withColumn('variable', f.lit(var_name))
+    )
     if not group_by_datasource:
         melted = melted.withColumn('datasourceId', f.lit('all'))
     return melted
@@ -103,7 +110,8 @@ def not_null_fields_count(df: DataFrame, var_name: str, group_by_datasource: boo
 
 def evidence_distinct_fields_count(
         df: DataFrame,
-        var_name: str) -> DataFrame:
+        var_name: str
+) -> DataFrame:
     """Count unique values in variable (e.g. targetId) and datasource."""
 
     # flatten dataframe schema
