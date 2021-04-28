@@ -49,7 +49,7 @@ source env/bin/activate
 python3 metrics.py \
   --run-id 21.02.2-pre \
   --out data/21.02.2-pre.csv \
-  --evidence-pre-pipeline platform-input-support/output/evidence-files/
+  --evidence platform-input-support/output/evidence-files/
 ```
 
 ### Post-pipeline run
@@ -79,7 +79,7 @@ source env/bin/activate
 python3 metrics.py \
   --run-id 21.02.2-post \
   --out data/21.02.2-post.csv \
-  --evidence-post-pipeline post-pipeline/evidence \
+  --evidence post-pipeline/evidence \
   --evidence-failed post-pipeline/evidenceFailed \
   --associations-direct post-pipeline/associationByOverallDirect \
   --associations-indirect post-pipeline/associationByOverallIndirect \

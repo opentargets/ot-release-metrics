@@ -2,14 +2,14 @@
 """Calculates the various quality metrics for evidence and the associated datasets.
 
 For the post-pipeline run, the ${ETL_INPUT_ROOT} is gs://open-targets-data-releases/${RELEASE}/input/.
-The ${ETL_PARQUET_OUTPUT_ROOT} is:
-* gs://ot-snapshots/etl/outputs/${RELEASE}/parquet/ for the snapshots (releases in progress);
-* gs://open-targets-data-releases/${RELEASE}/output/etl-parquet/ for the completed releases."""
+The ${ETL_PARQUET_OUTPUT_ROOT} is gs://ot-snapshots/etl/outputs/${RELEASE}/parquet/ for the snapshots (releases in
+progress), and gs://open-targets-data-releases/${RELEASE}/output/etl-parquet/ for the completed releases."""
 
 import argparse
 from functools import reduce
 import logging
 import logging.config
+import os.path
 from typing import Iterable
 
 from pyspark.sql import SparkSession, DataFrame
@@ -144,9 +144,46 @@ def evidence_distinct_fields_count(
     return melted
 
 
-def read_file_if_provided(spark, filename):
-    if filename:
-        return spark.read.json(filename) if 'json' in filename else spark.read.parquet(filename)
+def read_path_if_provided(spark, path):
+    """Automatically detect the format of the input data and read it into the Spark dataframe. The supported formats
+    are: a single JSON file; a directory with JSON files; a directory with Parquet files."""
+    # All datasets are optional.
+    if path is None:
+        return None
+
+    # The provided path must exist and must be either a file or a directory.
+    assert os.path.exists(path), f'The provided path {path} does not exist.'
+    assert os.path.isdir(path) or os.path.isfile(path), \
+        f'The provided path {path} is neither a file or a directory.'
+
+    # Case 1: We are provided with a single file.
+    if os.path.isfile(path):
+        # In this case, this must be a (possibly compressed) JSON.
+        if path.endswith(('.json', '.json.gz', '.jsonl', '.jsonl.gz')):
+            return spark.read.json(path)
+        else:
+            raise AssertionError(f'The format of the provided file {path} is not supported.')
+
+    # Case 2: We are provided with a directory. Let's peek inside to see what it contains.
+    all_files = [
+        os.path.join(dp, filename)
+        for dp, dn, filenames in os.walk(path)
+        for filename in filenames
+    ]
+
+    # It must be either exclusively JSON, or exclusively Parquet.
+    json_files = [fn for fn in all_files if fn.endswith(('.json', '.json.gz', '.jsonl', '.jsonl.gz'))]
+    parquet_files = [fn for fn in all_files if fn.endswith('.parquet')]
+    assert not(json_files and parquet_files), f'The provided directory {path} contains a mix of JSON and Parquet.'
+    assert json_files or parquet_files, f'The provided directory {path} contains neither JSON nor Parquet.'
+
+    # A directory with JSON files.
+    if json_files:
+        return spark.read.option('recursiveFileLookup', 'true').json(path)
+
+    # A directory with Parquet files.
+    if parquet_files:
+        return spark.read.parquet(path)
 
 
 def parse_args():
@@ -164,36 +201,34 @@ def parse_args():
             'Output filename with the release metrics in the CSV format. For consistency, the basename should match '
             'the run ID provided in --run-id. For example: data/20.04.1-pre.csv.'))
 
+    # Dataset specification arguments.
+    dataset_arguments = parser.add_argument_group('dataset specification arguments (all optional)')
+    dataset_arguments.add_argument('--evidence', required=False, metavar='<path>', type=str, help=(
+        'The directory containing the evidence files. Depending on when this script is being run, this can be either '
+        'of the two possible formats.\n\nWhen running before the ETL pipeline, this directory is expected to contain '
+        'all gzipped JSON files with the original submitted evidence strings. Files from the subdirectories will also '
+        'be recursively collected.\n\nWhen running after the ETL pipeline, this directory is expected to contain the '
+        'processed evidence in Parquet format from ${ETL_PARQUET_OUTPUT_ROOT}/evidence.'))
+    dataset_arguments.add_argument(
+        '--evidence-failed', required=False, metavar='<path>', type=str, help=(
+            'Failed evidence files from ${ETL_PARQUET_OUTPUT_ROOT}/evidenceFailed.'))
+    dataset_arguments.add_argument(
+        '--associations-direct', required=False, metavar='<path>', type=str, help=(
+            'Direct association files from ${ETL_PARQUET_OUTPUT_ROOT}/associationByOverallDirect.'))
+    dataset_arguments.add_argument(
+        '--associations-indirect', required=False, metavar='<path>', type=str, help=(
+            'Indirect association files from ${ETL_PARQUET_OUTPUT_ROOT}/associationByOverallIndirect.'))
+    dataset_arguments.add_argument(
+        '--diseases', required=False, metavar='<path>', type=str, help=(
+            'Disease information from ${ETL_PARQUET_OUTPUT_ROOT}/diseases.'))
+    dataset_arguments.add_argument(
+        '--drugs', required=False, metavar='<path>', type=str, help=(
+            'ChEMBL dataset directory from ${ETL_INPUT_ROOT}/annotation-files/chembl/chembl_*molecule*.jsonl.'))
+
     # General optional arguments.
     parser.add_argument(
         '--log-file', required=False, type=str, help=(
             'Destination of the logs generated by this script.'))
-
-    # The evidence dataset. Can be supplied in different formats depending on whether we are running this before or
-    # after the ETL pipeline.
-    evidence = parser.add_mutually_exclusive_group()
-    evidence.add_argument('--evidence-pre-pipeline', required=False, metavar='<path>', type=str, help=(
-        'Directory containing all gzipped JSON files with the submitted evidence strings. Files from the ' 
-        'subdirectories are also recursively collected.'))
-    evidence.add_argument('--evidence-post-pipeline', required=False, metavar='<path>', type=str, help=(
-        'Evidence files from ${ETL_PARQUET_OUTPUT_ROOT}/evidence.'))
-
-    # All of the remaining datasets.
-    parser.add_argument(
-        '--evidence-failed', required=False, metavar='<path>', type=str, help=(
-            'Failed evidence files from ${ETL_PARQUET_OUTPUT_ROOT}/evidenceFailed.'))
-    parser.add_argument(
-        '--associations-direct', required=False, metavar='<path>', type=str, help=(
-            'Direct association files from ${ETL_PARQUET_OUTPUT_ROOT}/associationByOverallDirect.'))
-    parser.add_argument(
-        '--associations-indirect', required=False, metavar='<path>', type=str, help=(
-            'Indirect association files from ${ETL_PARQUET_OUTPUT_ROOT}/associationByOverallIndirect.'))
-    parser.add_argument(
-        '--diseases', required=False, metavar='<path>', type=str, help=(
-            'Disease information from ${ETL_PARQUET_OUTPUT_ROOT}/diseases.'))
-    parser.add_argument(
-        '--drugs', required=False, metavar='<path>', type=str, help=(
-            'ChEMBL dataset directory from ${ETL_INPUT_ROOT}/annotation-files/chembl/chembl_*molecule*.jsonl.'))
 
     return parser.parse_args()
 
@@ -223,27 +258,18 @@ def main(args):
         logging_config['filename'] = args.log_file
     logging.basicConfig(**logging_config)
 
-    # All datasets are optional.
-    evidence, evidence_failed, associations_direct, associations_indirect, diseases, drugs = [None] * 6
-
-    # Load data.
-    evidence_filename = None
-    if args.evidence_pre_pipeline:
-        evidence = spark.read.option('recursiveFileLookup', 'true').json(args.evidence_pre_pipeline)
-        evidence_filename = args.evidence_pre_pipeline
-    elif args.evidence_post_pipeline:
-        evidence = read_file_if_provided(spark, args.evidence_post_pipeline)
-        evidence_filename = args.evidence_post_pipeline
-    evidence_failed = read_file_if_provided(spark, args.evidence_failed)
-    associations_direct = read_file_if_provided(spark, args.associations_direct)
-    associations_indirect = read_file_if_provided(spark, args.associations_indirect)
-    diseases = read_file_if_provided(spark, args.diseases)
-    drugs = read_file_if_provided(spark, args.drugs)
+    # Load data. All datasets are optional.
+    evidence = read_path_if_provided(spark, args.evidence)
+    evidence_failed = read_path_if_provided(spark, args.evidence_failed)
+    associations_direct = read_path_if_provided(spark, args.associations_direct)
+    associations_indirect = read_path_if_provided(spark, args.associations_indirect)
+    diseases = read_path_if_provided(spark, args.diseases)
+    drugs = read_path_if_provided(spark, args.drugs)
 
     datasets = []
 
     if evidence:
-        logging.info(f'Running metrics from {evidence_filename}.')
+        logging.info(f'Running metrics from {args.evidence}.')
         columns_to_report = get_columns_to_report(evidence.columns)
 
         datasets.extend([
