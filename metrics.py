@@ -34,8 +34,11 @@ def flatten(schema, prefix=None):
 
 def melt(
         df: DataFrame,
-        id_vars: Iterable[str], value_vars: Iterable[str],
-        var_name: str = 'variable', value_name: str = 'value') -> DataFrame:
+        id_vars: Iterable[str],
+        value_vars: Iterable[str],
+        var_name: str = 'variable',
+        value_name: str = 'value'
+) -> DataFrame:
     """Convert :class:`DataFrame` from wide to long format."""
 
     # Create array<struct<variable: str, value: ...>>
@@ -53,7 +56,8 @@ def melt(
 
 def document_total_count(
         df: DataFrame,
-        var_name: str) -> DataFrame:
+        var_name: str
+) -> DataFrame:
     """Count total documents."""
     out = df.groupBy().count().alias('count')
     out = out.withColumn('datasourceId', f.lit('all'))
@@ -65,7 +69,8 @@ def document_total_count(
 def document_count_by(
         df: DataFrame,
         column: str,
-        var_name: str) -> DataFrame:
+        var_name: str
+) -> DataFrame:
     """Count documents by grouping column."""
     out = df.groupBy(column).count().alias('count')
     out = out.withColumn('variable', f.lit(var_name))
@@ -73,7 +78,11 @@ def document_count_by(
     return out
 
 
-def not_null_fields_count(df: DataFrame, var_name: str, group_by_datasource: bool) -> DataFrame:
+def not_null_fields_count(
+        df: DataFrame,
+        var_name: str,
+        group_by_datasource: bool
+) -> DataFrame:
     """Count number of not null values for each field in the dataframe. If `group_by_datasource` is enabled, the
     calculation is performed separately for every datasource in the `datasourceId` column."""
     # Flatten the dataframe schema.
