@@ -224,8 +224,11 @@ def parse_args():
         '--diseases', required=False, metavar='<path>', type=str, help=(
             'Disease information from ${ETL_PARQUET_OUTPUT_ROOT}/diseases.'))
     dataset_arguments.add_argument(
+        '--targets', required=False, metavar='<path>', type=str, help=(
+            'Targets dataset from ${ETL_PARQUET_OUTPUT_ROOT}/targets.'))
+    dataset_arguments.add_argument(
         '--drugs', required=False, metavar='<path>', type=str, help=(
-            'ChEMBL dataset directory from ${ETL_INPUT_ROOT}/annotation-files/chembl/chembl_*molecule*.jsonl.'))
+            'ChEMBL dataset from ${ETL_INPUT_ROOT}/annotation-files/chembl/chembl_*molecule*.jsonl.'))
 
     # General optional arguments.
     parser.add_argument(
@@ -266,6 +269,7 @@ def main(args):
     associations_direct = read_path_if_provided(spark, args.associations_direct)
     associations_indirect = read_path_if_provided(spark, args.associations_indirect)
     diseases = read_path_if_provided(spark, args.diseases)
+    targets = read_path_if_provided(spark, args.targets)
     drugs = read_path_if_provided(spark, args.drugs)
 
     datasets = []
@@ -369,15 +373,19 @@ def main(args):
         ])
 
     if diseases:
-        # TODO: diseases.
         logging.info(f'Running metrics from {args.diseases}.')
         datasets.extend([
             document_total_count(diseases, 'diseasesTotalCount'),
             not_null_fields_count(diseases, 'diseasesNotNullCount', group_by_datasource=False),
         ])
 
+    if targets:
+        logging.info(f'Running metrics from {args.targets}.')
+        datasets.extend([
+            document_total_count(targets, 'targetsTotalCount'),
+        ])
+
     if drugs:
-        # TODO: drugs.
         logging.info(f'Running metrics from {args.drugs}.')
         datasets.extend([
             document_total_count(drugs, 'drugsTotalCount'),

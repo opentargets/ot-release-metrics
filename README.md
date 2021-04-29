@@ -56,7 +56,7 @@ python3 metrics.py \
 First specify the ETL input and output roots. Note that there are two options for the output root depending on whether the script is being run on a completed release or on a snapshot (pick one option accordingly):
 ```bash
 export ETL_PARQUET_OUTPUT_ROOT=gs://ot-snapshots/etl/outputs/21.04.2/parquet  # For snapshots.
-export ETL_OUTPUT_ROOT=gs://open-targets-data-releases/21.04/output/etl-parquet  # For completed releases. 
+export ETL_PARQUET_OUTPUT_ROOT=gs://open-targets-data-releases/21.04/output/etl/parquet  # For completed releases.
 export ETL_INPUT_ROOT=gs://open-targets-data-releases/21.04/input
 ```
 
@@ -69,6 +69,7 @@ gsutil -m cp -r \
   ${ETL_PARQUET_OUTPUT_ROOT}/associationByOverallDirect \
   ${ETL_PARQUET_OUTPUT_ROOT}/associationByOverallIndirect \
   ${ETL_PARQUET_OUTPUT_ROOT}/diseases \
+  ${ETL_PARQUET_OUTPUT_ROOT}/targets \
   ${ETL_INPUT_ROOT}/annotation-files/chembl/chembl_*molecule*.jsonl \
   post-pipeline
 ```
@@ -84,5 +85,6 @@ python3 metrics.py \
   --associations-direct post-pipeline/associationByOverallDirect \
   --associations-indirect post-pipeline/associationByOverallIndirect \
   --diseases post-pipeline/diseases \
+  --targets post-pipeline/targets \
   --drugs post-pipeline/chembl_*molecule*.jsonl
 ```
