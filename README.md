@@ -2,12 +2,19 @@
 
 Contains modules to calculate and visualise Open Targets release metrics.
 
-### Dependencies installation
+## Installation
+As system level dependencies, the modules require Python3 with the `venv` module and Java. In Ubuntu, they can be installed using `sudo apt install -y python3-venv openjdk-14-jre-headless`.
+
+After that, create and prepare the environment:
 ```bash
 python3 -m venv env
 source env/bin/activate
 python3 -m pip install -r requirements.txt
 ```
+
+## Running
+
+The modules can be run locally or in the Google Cloud (in this case, a `e2-highcpu-8` instance is recommended).
 
 ### Pre-pipeline run
 You will first need to collect the latest evidence string JSON files for all sources. This can be done using the [`platform-input-support`](https://github.com/opentargets/platform-input-support) module. The easiest way is to run it is through Docker.
@@ -42,14 +49,14 @@ source env/bin/activate
 python3 metrics.py \
   --run-id 21.02.2-pre \
   --out data/21.02.2-pre.csv \
-  --evidence-pre-pipeline platform-input-support/output/evidence-files/
+  --evidence platform-input-support/output/evidence-files/
 ```
 
 ### Post-pipeline run
 First specify the ETL input and output roots. Note that there are two options for the output root depending on whether the script is being run on a completed release or on a snapshot (pick one option accordingly):
 ```bash
 export ETL_PARQUET_OUTPUT_ROOT=gs://ot-snapshots/etl/outputs/21.04.2/parquet  # For snapshots.
-export ETL_OUTPUT_ROOT=gs://open-targets-data-releases/21.04/output/etl-parquet  # For completed releases. 
+export ETL_PARQUET_OUTPUT_ROOT=gs://open-targets-data-releases/21.04/output/etl/parquet  # For completed releases.
 export ETL_INPUT_ROOT=gs://open-targets-data-releases/21.04/input
 ```
 
@@ -62,6 +69,7 @@ gsutil -m cp -r \
   ${ETL_PARQUET_OUTPUT_ROOT}/associationByOverallDirect \
   ${ETL_PARQUET_OUTPUT_ROOT}/associationByOverallIndirect \
   ${ETL_PARQUET_OUTPUT_ROOT}/diseases \
+  ${ETL_PARQUET_OUTPUT_ROOT}/targets \
   ${ETL_INPUT_ROOT}/annotation-files/chembl/chembl_*molecule*.jsonl \
   post-pipeline
 ```
@@ -72,10 +80,11 @@ source env/bin/activate
 python3 metrics.py \
   --run-id 21.02.2-post \
   --out data/21.02.2-post.csv \
-  --evidence-post-pipeline post-pipeline/evidence \
+  --evidence post-pipeline/evidence \
   --evidence-failed post-pipeline/evidenceFailed \
   --associations-direct post-pipeline/associationByOverallDirect \
   --associations-indirect post-pipeline/associationByOverallIndirect \
   --diseases post-pipeline/diseases \
+  --targets post-pipeline/targets \
   --drugs post-pipeline/chembl_*molecule*.jsonl
 ```
