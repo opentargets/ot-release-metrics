@@ -118,6 +118,29 @@ def not_null_fields_count(
         melted = melted.withColumn('datasourceId', f.lit('all'))
     return melted
 
+def numeric_fields_stats(
+    df: DataFrame,
+    var_name: str
+) -> DataFrame:
+    """Calculate maximum, minimum, mean and median for numeric fields."""
+    # Flatten the dataframe schema.
+    flat_df = df.select([f.col(c).alias(c) for c in flatten(df.schema)])
+    # Extract stats from numeric columns
+    numeric_cols = [col.name for col in flat_df.schema.fields if isinstance(col.dataType, t.DoubleType) or isinstance(col.dataType, t.LongType)]
+    out = (flat_df
+            .select(numeric_cols)
+            .summary("min", "max", "mean", "50%"))
+    melted = (
+        melt(
+            df=out,
+            id_vars=[],
+            var_name='field',
+            value_vars=out.columns,
+            value_name='stat'
+        )
+        .withColumn('variable', f.lit(var_name))
+    )
+    return melted
 
 def evidence_distinct_fields_count(
         df: DataFrame,
