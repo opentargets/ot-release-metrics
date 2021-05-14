@@ -68,14 +68,14 @@ if page == "Explore metrics":
     if select_pivot:
         try:
             # Custom pivot table to avoid loss of data when field == NaN
-            output = data.set_index(["variable", "field", "datasourceId"]).unstack("datasourceId", fill_value=0)
+            output = data.set_index(["variable", "field", "datasourceId"]).unstack("datasourceId", fill_value=0).drop("runId", axis=1)
+            output.columns = output.columns.get_level_values(1)
         except ValueError:
             st.write("Please, indicate a specific pipeline run to group and explore the data.")
     else:
         output = data.copy()
 
     # Display table
-
     st.write(output)
     st.markdown(get_table_download_link_csv(output), unsafe_allow_html=True)
 
