@@ -7,14 +7,16 @@ def get_table_download_link_csv(df):
     href = f'<a href="data:file/csv;base64,{b64}" download="ot_metrics_data.csv" target="_blank">Download data</a>'
     return href
 
-def add_delta(evidence, metric, previous_run, latest_run):
-    evidence[f"Δ in number of {metric}"] = (
-        evidence[f"Nr of {metric} in {latest_run.split('-')[0]}"]
+def add_delta(
+    df: pd.DataFrame,
+    metric: str,
+    previous_run: str,
+    latest_run: str):
+    df[f"Δ in number of {metric}"] = (
+        df[f"Nr of {metric} in {latest_run.split('-')[0]}"]
         .sub(
-            evidence[f"Nr of {metric} in {previous_run.split('-')[0]}"],
-            axis=0, fill_value=0
-        )
-    )
+            df[f"Nr of {metric} in {previous_run.split('-')[0]}"],
+            axis=0, fill_value=0))
 
 def compare_evidence(
     evidence: pd.DataFrame,
