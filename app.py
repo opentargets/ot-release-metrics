@@ -10,7 +10,7 @@ from src.utils import *
 # App UI
 st.set_page_config(
     page_title="Open Targets Data Metrics",
-    page_icon="🧊",
+    page_icon=Image.open("img/favicon.png"),
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -22,7 +22,7 @@ st.markdown("This application is a dashboard to display the metrics of the diffe
 st.sidebar.header("What do you want to do?")
 page = st.sidebar.radio(
     "Choose an option",
-    ("Explore metrics", "Compare metrics", "Statistics"),
+    ("Explore metrics", "Compare metrics", "Visualise metrics"),
     index=1,
     help=("Explore metrics allows you to visualise and filter the metrics of the selected datasets. Compare metrics"
             "allows you to compare the main metrics between two releases."))
