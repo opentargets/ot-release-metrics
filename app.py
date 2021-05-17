@@ -24,7 +24,7 @@ page = st.sidebar.radio(
     "Choose an option",
     ("Explore metrics", "Compare metrics", "Visualise metrics"),
     index=1,
-    help=("Explore metrics allows you to visualise and filter the metrics of the selected datasets. Compare metrics "
+    help=("Explore metrics allows you to visualise and filter the metrics of the selected datasets. Compare metrics"
             "allows you to compare the main metrics between two releases."))
 
 # Load data
@@ -195,18 +195,20 @@ if page == "Compare metrics":
             old_direct_association, new_direct_association,
         ]
         association = reduce(lambda x, y: pd.merge(x, y, on="datasourceId"), association_datasets).set_index("datasourceId")
-        st.dataframe(association)
+        
         disease_datasets = [old_diseases_count, new_diseases_count]
         disease = pd.concat(disease_datasets, axis=0, ignore_index=True).T.rename(columns={0: "count"})
-        
+
         drug_datasets = [old_drugs_count, new_drugs_count]
         drug = pd.concat(drug_datasets, axis=0, ignore_index=True).T
 
         # Compare datasets
         evidence_comparison = compare_evidence(evidence, latest_run, previous_run)
         association_comparison = compare_association(association, latest_run, previous_run)
-        disease_comparison = compare_disease(disease, latest_run, previous_run)
-
+        try:
+            disease_comparison = compare_disease(disease, latest_run, previous_run)
+        except KeyError:
+            disease_comparison = disease.copy()
         try:
             drug_comparison = compare_drug(drug, latest_run, previous_run)
         except KeyError:
