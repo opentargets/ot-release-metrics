@@ -25,7 +25,7 @@ page = st.sidebar.radio(
     ("Explore metrics", "Compare metrics", "Statistics"),
     index=1,
     help=("Explore metrics allows you to visualise and filter the metrics of the selected datasets. Compare metrics"
-            "allows you to compare the main metrics between two releases.")
+            "allows you to compare the main metrics between two releases."))
 
 # Load data
 files = glob.glob("data/*.csv")

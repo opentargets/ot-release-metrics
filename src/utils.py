@@ -17,7 +17,7 @@ def compare_evidence(
     evidence["Δ in number of evidence strings dropped due to duplication"] = evidence[f"Nr of evidence strings dropped due to duplication in {latest_run.split('-')[0]}"].sub(evidence[f"Nr of evidence strings dropped due to duplication in {previous_run.split('-')[0]}"], axis=0, fill_value=0)
     evidence["Δ in number of evidence strings dropped due to unresolved target"] = evidence[f"Nr of evidence strings dropped due to unresolved target in {latest_run.split('-')[0]}"].sub(evidence[f"Nr of evidence strings dropped due to unresolved target in {previous_run.split('-')[0]}"], axis=0, fill_value=0)
     evidence["Δ in number of evidence strings dropped due to unresolved disease"] = evidence[f"Nr of evidence strings dropped due to unresolved disease in {latest_run.split('-')[0]}"].sub(evidence[f"Nr of evidence strings dropped due to unresolved disease in {previous_run.split('-')[0]}"], axis=0, fill_value=0)
-    evidence = evidence.iloc[:-1] # Delete row with NaN
+    evidence = evidence.iloc[:-1]  # Delete row with NaN
     evidence.loc['Total'] = evidence.sum()
     return evidence[evidence.columns[-5:]]
 
