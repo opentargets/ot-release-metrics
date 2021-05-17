@@ -1,5 +1,5 @@
-import glob
 from functools import reduce
+import glob
 
 import streamlit as st
 import pandas as pd
@@ -24,8 +24,8 @@ page = st.sidebar.radio(
     "Choose an option",
     ("Explore metrics", "Compare metrics", "Statistics"),
     index=1,
-    help="Explore metrics allows you to visualise and filter the metrics of the selected datasets. Compare metrics allows you to compare the main metrics between two releases."
-)
+    help=("Explore metrics allows you to visualise and filter the metrics of the selected datasets. Compare metrics"
+            "allows you to compare the main metrics between two releases.")
 
 # Load data
 files = glob.glob("data/*.csv")
@@ -68,7 +68,11 @@ if page == "Explore metrics":
     if select_pivot:
         try:
             # Custom pivot table to avoid loss of data when field == NaN
-            output = data.set_index(["variable", "field", "datasourceId"]).unstack("datasourceId", fill_value=0).drop("runId", axis=1)
+            output = (
+                data
+                    .set_index(["variable", "field", "datasourceId"])
+                    .unstack("datasourceId", fill_value=0)
+                    .drop("runId", axis=1))
             output.columns = output.columns.get_level_values(1)
         except ValueError:
             st.write("Please, indicate a specific pipeline run to group and explore the data.")
@@ -89,7 +93,7 @@ if page == "Compare metrics":
     )
 
     # Apply masks
-    if len(select_runs) >=2:
+    if len(select_runs) >= 2:
         previous_run = select_runs[0]
         latest_run = select_runs[1]
         masks_run = (data["runId"] == previous_run) | (data["runId"] == latest_run)
