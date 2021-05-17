@@ -86,5 +86,5 @@ python3 metrics.py \
   --associations-indirect post-pipeline/associationByOverallIndirect \
   --diseases post-pipeline/diseases \
   --targets post-pipeline/targets \
-  --drugs post-pipeline/chembl_*molecule*.jsonl
+  --drugs post-pipeline/molecule
 ```
