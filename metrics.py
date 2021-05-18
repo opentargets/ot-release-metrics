@@ -12,6 +12,7 @@ import logging.config
 import os.path
 from typing import Iterable
 
+from pyspark.mllib.evaluation import BinaryClassificationMetrics
 from pyspark.sql import SparkSession, DataFrame
 import pyspark.sql.functions as f
 import pyspark.sql.types as t
@@ -147,24 +148,38 @@ def evidence_distinct_fields_count(
 
 
 def gold_standard_benchmark(
+        spark,
         associations: DataFrame,
-        associations_type: str,
-        gold_standard: DataFrame
+        associations_type: str
 ) -> list:
     """Run a benchmark of associations against a known gold standard.
 
     Args:
         associations: A Spark dataframe with associations for all datasets.
         associations_type: Can be either "Direct" or "Indirect", used to compute the names of metrics.
-        gold_standard: A Spark dataframe with gold standard associations (efo_id, ensembl_id).
 
     Returns:
         A list containing two sets of metrics, AUC and OR, both for each dataframe and overall."""
 
+    auc_metrics = []
+    or_metrics = []
+
     if 'Overall' in associations_type:
-        return []
+        auc = BinaryClassificationMetrics(
+            associations
+            .select('overallDatasourceHarmonicScore', 'gold_standard')
+            .rdd.map(list)
+        ).areaUnderROC
+        auc_metrics = spark.createDataFrame([{
+            'count': f'{auc:.2f}',
+            'datasourceId': 'all',
+            'variable': f'associations{associations_type}AUC',
+            'field': '',
+        }])
     else:
-        return []
+        pass
+
+    return auc_metrics
 
 
 def read_path_if_provided(spark, path):
@@ -318,7 +333,8 @@ def main(args):
             gold_standard_associations
             .join(gold_standard_mappings, on=gold_standard_associations.MSH == gold_standard_mappings.mesh_label)
             .select(f.col('ensembl_id').alias('targetId'), f.col('efo_id').alias('diseaseId'))
-            .withColumn('score', f.lit(1.0))
+            .withColumn('diseaseId', f.regexp_replace('diseaseId', ':', '_'))
+            .withColumn('gold_standard', f.lit(1.0))
         )
 
     datasets = []
@@ -392,8 +408,8 @@ def main(args):
         if gold_standard:
             associations_direct = (
                 associations_direct
-                .join(gold_standard, on=('targetId', 'diseaseId'), how='left')
-                .fillna({'score': 0.0})
+                .join(gold_standard, on=['targetId', 'diseaseId'], how='left')
+                .fillna({'gold_standard': 0.0})
             )
         associations_direct_by_datasource = associations_direct.select(
             'targetId',
@@ -408,8 +424,8 @@ def main(args):
         ])
         if gold_standard:
             datasets.extend([
-                gold_standard_benchmark(associations_direct, 'DirectOverall', gold_standard),
-                gold_standard_benchmark(associations_direct_by_datasource, 'DirectByDatasource', gold_standard),
+                gold_standard_benchmark(spark, associations_direct, 'DirectOverall'),
+                # gold_standard_benchmark(spark, associations_direct_by_datasource, 'DirectByDatasource'),
             ])
 
     if associations_indirect:
@@ -417,8 +433,8 @@ def main(args):
         if gold_standard:
             associations_indirect = (
                 associations_indirect
-                .join(gold_standard, on=('targetId', 'diseaseId'), how='left')
-                .fillna({'score': 0.0})
+                .join(gold_standard, on=['targetId', 'diseaseId'], how='left')
+                .fillna({'gold_standard': 0.0})
             )
         associations_indirect_by_datasource = associations_indirect.select(
             'targetId',
@@ -433,8 +449,8 @@ def main(args):
         ])
         if gold_standard:
             datasets.extend([
-                gold_standard_benchmark(associations_indirect, 'IndirectOverall', gold_standard),
-                gold_standard_benchmark(associations_indirect_by_datasource, 'IndirectByDatasource', gold_standard),
+                gold_standard_benchmark(spark, associations_indirect, 'IndirectOverall'),
+                # gold_standard_benchmark(spark, associations_indirect_by_datasource, 'IndirectByDatasource'),
             ])
 
     if diseases:
