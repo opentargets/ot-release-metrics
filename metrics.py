@@ -160,7 +160,11 @@ def gold_standard_benchmark(
 
     Returns:
         A list containing two sets of metrics, AUC and OR, both for each dataframe and overall."""
-    return []
+
+    if 'Overall' in associations_type:
+        return []
+    else:
+        return []
 
 
 def read_path_if_provided(spark, path):
@@ -313,7 +317,8 @@ def main(args):
         gold_standard = (
             gold_standard_associations
             .join(gold_standard_mappings, on=gold_standard_associations.MSH == gold_standard_mappings.mesh_label)
-            .select('ensembl_id', 'efo_id')
+            .select(f.col('ensembl_id').alias('targetId'), f.col('efo_id').alias('diseaseId'))
+            .withColumn('score', f.lit(1.0))
         )
 
     datasets = []
@@ -384,6 +389,12 @@ def main(args):
 
     if associations_direct:
         logging.info(f'Running metrics from {args.associations_direct}.')
+        if gold_standard:
+            associations_direct = (
+                associations_direct
+                .join(gold_standard, on=('targetId', 'diseaseId'), how='left')
+                .fillna({'score': 0.0})
+            )
         associations_direct_by_datasource = associations_direct.select(
             'targetId',
             'diseaseId',
@@ -403,11 +414,17 @@ def main(args):
 
     if associations_indirect:
         logging.info(f'Running metrics from {args.associations_indirect}.')
+        if gold_standard:
+            associations_indirect = (
+                associations_indirect
+                .join(gold_standard, on=('targetId', 'diseaseId'), how='left')
+                .fillna({'score': 0.0})
+            )
         associations_indirect_by_datasource = associations_indirect.select(
-                    'targetId',
-                    'diseaseId',
-                    f.explode(f.col('overallDatasourceHarmonicVector.datasourceId')).alias('datasourceId')
-                )
+            'targetId',
+            'diseaseId',
+            f.explode(f.col('overallDatasourceHarmonicVector.datasourceId')).alias('datasourceId')
+        )
         datasets.extend([
             # Total association count.
             document_total_count(associations_indirect, 'associationsIndirectTotalCount'),
