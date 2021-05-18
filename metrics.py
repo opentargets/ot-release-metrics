@@ -289,9 +289,15 @@ def main(args):
     gold_standard_associations = read_path_if_provided(spark, args.gold_standard_associations)
     gold_standard_mappings = read_path_if_provided(spark, args.gold_standard_mappings)
 
+    gold_standard = None
     if gold_standard_associations and gold_standard_mappings:
         logging.info(f'Processing gold standard information from {args.gold_standard_associations} '
                      f'and {args.gold_standard_mappings}')
+        gold_standard = (
+            gold_standard_associations
+            .join(gold_standard_mappings, on=gold_standard_associations.MSH == gold_standard_mappings.mesh_label)
+            .select('ensembl_id', 'efo_id')
+        )
 
     datasets = []
 
