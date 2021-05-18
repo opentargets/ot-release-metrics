@@ -146,6 +146,23 @@ def evidence_distinct_fields_count(
     return melted
 
 
+def gold_standard_benchmark(
+        associations: DataFrame,
+        associations_type: str,
+        gold_standard: DataFrame
+) -> list:
+    """Run a benchmark of associations against a known gold standard.
+
+    Args:
+        associations: A Spark dataframe with associations for all datasets.
+        associations_type: Can be either "Direct" or "Indirect", used to compute the names of metrics.
+        gold_standard: A Spark dataframe with gold standard associations (efo_id, ensembl_id).
+
+    Returns:
+        A list containing two sets of metrics, AUC and OR, both for each dataframe and overall."""
+    return []
+
+
 def read_path_if_provided(spark, path):
     """Automatically detect the format of the input data and read it into the Spark dataframe. The supported formats
     are: a single TSV file; a single JSON file; a directory with JSON files; a directory with Parquet files."""
@@ -381,6 +398,8 @@ def main(args):
                 'associationsDirectByDatasource'
             ),
         ])
+        if gold_standard:
+            datasets.extend(gold_standard_benchmark(associations_direct, 'Direct', gold_standard))
 
     if associations_indirect:
         logging.info(f'Running metrics from {args.associations_indirect}.')
@@ -398,6 +417,8 @@ def main(args):
                 'datasourceId',
                 'associationsIndirectByDatasource'),
         ])
+        if gold_standard:
+            datasets.extend(gold_standard_benchmark(associations_direct, 'Indirect', gold_standard))
 
     if diseases:
         logging.info(f'Running metrics from {args.diseases}.')
