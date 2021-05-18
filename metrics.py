@@ -384,41 +384,41 @@ def main(args):
 
     if associations_direct:
         logging.info(f'Running metrics from {args.associations_direct}.')
+        associations_direct_by_datasource = associations_direct.select(
+            'targetId',
+            'diseaseId',
+            f.explode(f.col('overallDatasourceHarmonicVector.datasourceId')).alias('datasourceId')
+        )
         datasets.extend([
             # Total association count.
             document_total_count(associations_direct, 'associationsDirectTotalCount'),
             # Associations by datasource.
-            document_count_by(
-                associations_direct.select(
-                    'targetId',
-                    'diseaseId',
-                    f.explode(f.col('overallDatasourceHarmonicVector.datasourceId')).alias('datasourceId')
-                ),
-                'datasourceId',
-                'associationsDirectByDatasource'
-            ),
+            document_count_by(associations_direct_by_datasource, 'datasourceId', 'associationsDirectByDatasource'),
         ])
         if gold_standard:
-            datasets.extend(gold_standard_benchmark(associations_direct, 'Direct', gold_standard))
+            datasets.extend([
+                gold_standard_benchmark(associations_direct, 'DirectOverall', gold_standard),
+                gold_standard_benchmark(associations_direct_by_datasource, 'DirectByDatasource', gold_standard),
+            ])
 
     if associations_indirect:
         logging.info(f'Running metrics from {args.associations_indirect}.')
-        datasets.extend([
-            # Total association count.
-            document_total_count(associations_indirect,
-                                 'associationsIndirectTotalCount'),
-            # Associations by datasource.
-            document_count_by(
-                associations_indirect.select(
+        associations_indirect_by_datasource = associations_indirect.select(
                     'targetId',
                     'diseaseId',
                     f.explode(f.col('overallDatasourceHarmonicVector.datasourceId')).alias('datasourceId')
-                ),
-                'datasourceId',
-                'associationsIndirectByDatasource'),
+                )
+        datasets.extend([
+            # Total association count.
+            document_total_count(associations_indirect, 'associationsIndirectTotalCount'),
+            # Associations by datasource.
+            document_count_by(associations_indirect_by_datasource, 'datasourceId', 'associationsIndirectByDatasource'),
         ])
         if gold_standard:
-            datasets.extend(gold_standard_benchmark(associations_direct, 'Indirect', gold_standard))
+            datasets.extend([
+                gold_standard_benchmark(associations_indirect, 'IndirectOverall', gold_standard),
+                gold_standard_benchmark(associations_indirect_by_datasource, 'IndirectByDatasource', gold_standard),
+            ])
 
     if diseases:
         logging.info(f'Running metrics from {args.diseases}.')
