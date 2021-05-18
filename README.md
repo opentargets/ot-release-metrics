@@ -86,5 +86,7 @@ python3 metrics.py \
   --associations-indirect post-pipeline/associationByOverallIndirect \
   --diseases post-pipeline/diseases \
   --targets post-pipeline/targets \
-  --drugs post-pipeline/molecule
+  --drugs post-pipeline/molecule \
+  --gold-standard-associations gold-standard/informa_abbvie.tsv \
+  --gold-standard-mappings gold-standard/mesh_mappings.tsv
 ```
