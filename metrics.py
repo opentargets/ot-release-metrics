@@ -189,18 +189,19 @@ def gold_standard_benchmark(
             'field': '',
         }]
     else:
+        datasource_names = [v.datasourceId for v in associations.select('datasourceId').distinct().collect()]
         auc_metrics = [{
-            'count': auc(associations.filter(f.col('datasourceId') == value.datasourceId), 'datasourceHarmonicScore'),
-            'datasourceId': value.datasourceId,
+            'count': auc(associations.filter(f.col('datasourceId') == datasource), 'datasourceHarmonicScore'),
+            'datasourceId': datasource,
             'variable': f'associations{associations_type}AUC',
             'field': '',
-        } for value in associations.select('datasourceId').distinct().collect()]
+        } for datasource in datasource_names]
         or_metrics = [{
-            'count': auc(associations, value.datasourceId),
-            'datasourceId': value.datasourceId,
+            'count': odds_ratio(associations, datasource),
+            'datasourceId': datasource,
             'variable': f'associations{associations_type}OR',
             'field': '',
-        } for value in associations.select('datasourceId').distinct().collect()]
+        } for datasource in datasource_names]
 
     return spark.createDataFrame(auc_metrics + or_metrics)
 
