@@ -60,7 +60,7 @@ def document_total_count(
         var_name: str
 ) -> DataFrame:
     """Count total documents."""
-    out = df.groupBy().count().alias('count')
+    out = df.groupBy().count().alias('value')
     out = out.withColumn('datasourceId', f.lit('all'))
     out = out.withColumn('variable', f.lit(var_name))
     out = out.withColumn('field', f.lit(None).cast(t.StringType()))
@@ -73,7 +73,7 @@ def document_count_by(
         var_name: str
 ) -> DataFrame:
     """Count documents by grouping column."""
-    out = df.groupBy(column).count().alias('count')
+    out = df.groupBy(column).count().alias('value')
     out = out.withColumn('variable', f.lit(var_name))
     out = out.withColumn('field', f.lit(None).cast(t.StringType()))
     return out
@@ -111,7 +111,7 @@ def not_null_fields_count(
             id_vars=['datasourceId'] if group_by_datasource else [],
             var_name='field',
             value_vars=df_cleaned.drop('datasourceId').columns if group_by_datasource else df_cleaned.columns,
-            value_name='count'
+            value_name='value'
         )
         .withColumn('variable', f.lit(var_name))
     )
@@ -142,7 +142,7 @@ def evidence_distinct_fields_count(
                   id_vars=['datasourceId'],
                   var_name='field',
                   value_vars=cols,
-                  value_name='count')
+                  value_name='value')
     melted = melted.withColumn('variable', f.lit(var_name))
     return melted
 
@@ -177,13 +177,13 @@ def gold_standard_benchmark(
 
     if 'Overall' in associations_type:
         auc_metrics = [{
-            'count': auc(associations, 'overallDatasourceHarmonicScore'),
+            'value': auc(associations, 'overallDatasourceHarmonicScore'),
             'datasourceId': 'all',
             'variable': f'associations{associations_type}AUC',
             'field': '',
         }]
         or_metrics = [{
-            'count': 1.0,
+            'value': 1.0,
             'datasourceId': 'all',
             'variable': f'associations{associations_type}OR',
             'field': '',
@@ -191,13 +191,13 @@ def gold_standard_benchmark(
     else:
         datasource_names = [v.datasourceId for v in associations.select('datasourceId').distinct().collect()]
         auc_metrics = [{
-            'count': auc(associations.filter(f.col('datasourceId') == datasource), 'datasourceHarmonicScore'),
+            'value': auc(associations.filter(f.col('datasourceId') == datasource), 'datasourceHarmonicScore'),
             'datasourceId': datasource,
             'variable': f'associations{associations_type}AUC',
             'field': '',
         } for datasource in datasource_names]
         or_metrics = [{
-            'count': odds_ratio(associations, datasource),
+            'value': odds_ratio(associations, datasource),
             'datasourceId': datasource,
             'variable': f'associations{associations_type}OR',
             'field': '',
