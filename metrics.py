@@ -6,6 +6,7 @@ The ${ETL_PARQUET_OUTPUT_ROOT} is gs://ot-snapshots/etl/outputs/${RELEASE}/parqu
 progress), and gs://open-targets-data-releases/${RELEASE}/output/etl-parquet/ for the completed releases."""
 
 import argparse
+from collections import namedtuple
 from functools import reduce
 import logging
 import logging.config
@@ -428,16 +429,22 @@ def main(args):
                                            'evidenceUnresolvedDiseaseDistinctFieldsCountByDatasource'),
         ])
 
-    if associations_direct:
-        logging.info(f'Running metrics from {args.associations_direct}.')
+    AssociationsDataset = namedtuple('AssociationsDataset', 'kind df filename')
+    for associations in (
+        AssociationsDataset(kind='Direct', df=associations_direct, filename=args.associations_direct),
+        AssociationsDataset(kind='Indirect', df=associations_indirect, filename=args.associations_indirect),
+    ):
+        if not associations.df:
+            continue
+        logging.info(f'Running metrics from {associations.filename}.')
         if gold_standard:
-            associations_direct = (
-                associations_direct
+            associations.df = (
+                associations.df
                 .join(gold_standard, on=['targetId', 'diseaseId'], how='left')
                 .fillna({'gold_standard': 0.0})
             )
-        associations_direct_by_datasource = (
-            associations_direct
+        associations_by_datasource = (
+            associations.df
             .select(
                 'targetId',
                 'diseaseId',
@@ -457,53 +464,15 @@ def main(args):
         )
         datasets.extend([
             # Total association count.
-            document_total_count(associations_direct, 'associationsDirectTotalCount'),
+            document_total_count(associations.df, f'associations{associations.kind}TotalCount'),
             # Associations by datasource.
-            document_count_by(associations_direct_by_datasource, 'datasourceId', 'associationsDirectByDatasource'),
+            document_count_by(associations_by_datasource, 'datasourceId',
+                              f'associations{associations.kind}ByDatasource'),
         ])
         if gold_standard:
             datasets.extend([
-                gold_standard_benchmark(spark, associations_direct, 'DirectOverall'),
-                gold_standard_benchmark(spark, associations_direct_by_datasource, 'DirectByDatasource'),
-            ])
-
-    if associations_indirect:
-        logging.info(f'Running metrics from {args.associations_indirect}.')
-        if gold_standard:
-            associations_indirect = (
-                associations_indirect
-                .join(gold_standard, on=['targetId', 'diseaseId'], how='left')
-                .fillna({'gold_standard': 0.0})
-            )
-        associations_indirect_by_datasource = (
-            associations_indirect
-            .select(
-                'targetId',
-                'diseaseId',
-                f.col('overallDatasourceHarmonicVector.datasourceId').alias('datasourceId'),
-                f.col('overallDatasourceHarmonicVector.datasourceHarmonicScore').alias('datasourceHarmonicScore'),
-                'gold_standard'
-            )
-            .withColumn('zip', f.arrays_zip('datasourceId', 'datasourceHarmonicScore'))
-            .withColumn('zip', f.explode('zip'))
-            .select(
-                'targetId',
-                'diseaseId',
-                f.col('zip.datasourceId').alias('datasourceId'),
-                f.col('zip.datasourceHarmonicScore').alias('datasourceHarmonicScore'),
-                'gold_standard'
-            )
-        )
-        datasets.extend([
-            # Total association count.
-            document_total_count(associations_indirect, 'associationsIndirectTotalCount'),
-            # Associations by datasource.
-            document_count_by(associations_indirect_by_datasource, 'datasourceId', 'associationsIndirectByDatasource'),
-        ])
-        if gold_standard:
-            datasets.extend([
-                gold_standard_benchmark(spark, associations_indirect, 'IndirectOverall'),
-                gold_standard_benchmark(spark, associations_indirect_by_datasource, 'IndirectByDatasource'),
+                gold_standard_benchmark(spark, associations.df, f'{associations.kind}Overall'),
+                gold_standard_benchmark(spark, associations_by_datasource, f'{associations.kind}ByDatasource'),
             ])
 
     if diseases:
