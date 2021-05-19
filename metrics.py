@@ -147,6 +147,10 @@ def evidence_distinct_fields_count(
     return melted
 
 
+def auc(df, score_column_name):
+    return BinaryClassificationMetrics(df.select(score_column_name, 'gold_standard').rdd.map(list)).areaUnderROC
+
+
 def gold_standard_benchmark(
         spark,
         associations: DataFrame,
@@ -161,25 +165,22 @@ def gold_standard_benchmark(
     Returns:
         A list containing two sets of metrics, AUC and OR, both for each dataframe and overall."""
 
-    auc_metrics = []
-    or_metrics = []
-
     if 'Overall' in associations_type:
-        auc = BinaryClassificationMetrics(
-            associations
-            .select('overallDatasourceHarmonicScore', 'gold_standard')
-            .rdd.map(list)
-        ).areaUnderROC
-        auc_metrics = spark.createDataFrame([{
-            'count': f'{auc:.2f}',
+        auc_metrics = [{
+            'count': auc(associations, 'overallDatasourceHarmonicScore'),
             'datasourceId': 'all',
             'variable': f'associations{associations_type}AUC',
             'field': '',
-        }])
+        }]
     else:
-        pass
+        auc_metrics = [{
+            'count': auc(associations.filter(f.col('datasourceId') == value.datasourceId), 'datasourceHarmonicScore'),
+            'datasourceId': value.datasourceId,
+            'variable': f'associations{associations_type}AUC',
+            'field': '',
+        } for value in associations.select('datasourceId').distinct().collect()]
 
-    return auc_metrics
+    return spark.createDataFrame(auc_metrics)
 
 
 def read_path_if_provided(spark, path):
@@ -332,6 +333,7 @@ def main(args):
         gold_standard = (
             gold_standard_associations
             .join(gold_standard_mappings, on=gold_standard_associations.MSH == gold_standard_mappings.mesh_label)
+            .filter(f.col('`Phase.Latest`') == 'Approved')
             .select(f.col('ensembl_id').alias('targetId'), f.col('efo_id').alias('diseaseId'))
             .withColumn('diseaseId', f.regexp_replace('diseaseId', ':', '_'))
             .withColumn('gold_standard', f.lit(1.0))
@@ -411,10 +413,24 @@ def main(args):
                 .join(gold_standard, on=['targetId', 'diseaseId'], how='left')
                 .fillna({'gold_standard': 0.0})
             )
-        associations_direct_by_datasource = associations_direct.select(
-            'targetId',
-            'diseaseId',
-            f.explode(f.col('overallDatasourceHarmonicVector.datasourceId')).alias('datasourceId')
+        associations_direct_by_datasource = (
+            associations_direct
+            .select(
+                'targetId',
+                'diseaseId',
+                f.col('overallDatasourceHarmonicVector.datasourceId').alias('datasourceId'),
+                f.col('overallDatasourceHarmonicVector.datasourceHarmonicScore').alias('datasourceHarmonicScore'),
+                'gold_standard'
+            )
+            .withColumn('zip', f.arrays_zip('datasourceId', 'datasourceHarmonicScore'))
+            .withColumn('zip', f.explode('zip'))
+            .select(
+                'targetId',
+                'diseaseId',
+                f.col('zip.datasourceId').alias('datasourceId'),
+                f.col('zip.datasourceHarmonicScore').alias('datasourceHarmonicScore'),
+                'gold_standard'
+            )
         )
         datasets.extend([
             # Total association count.
@@ -425,7 +441,7 @@ def main(args):
         if gold_standard:
             datasets.extend([
                 gold_standard_benchmark(spark, associations_direct, 'DirectOverall'),
-                # gold_standard_benchmark(spark, associations_direct_by_datasource, 'DirectByDatasource'),
+                gold_standard_benchmark(spark, associations_direct_by_datasource, 'DirectByDatasource'),
             ])
 
     if associations_indirect:
@@ -436,10 +452,24 @@ def main(args):
                 .join(gold_standard, on=['targetId', 'diseaseId'], how='left')
                 .fillna({'gold_standard': 0.0})
             )
-        associations_indirect_by_datasource = associations_indirect.select(
-            'targetId',
-            'diseaseId',
-            f.explode(f.col('overallDatasourceHarmonicVector.datasourceId')).alias('datasourceId')
+        associations_indirect_by_datasource = (
+            associations_indirect
+            .select(
+                'targetId',
+                'diseaseId',
+                f.col('overallDatasourceHarmonicVector.datasourceId').alias('datasourceId'),
+                f.col('overallDatasourceHarmonicVector.datasourceHarmonicScore').alias('datasourceHarmonicScore'),
+                'gold_standard'
+            )
+            .withColumn('zip', f.arrays_zip('datasourceId', 'datasourceHarmonicScore'))
+            .withColumn('zip', f.explode('zip'))
+            .select(
+                'targetId',
+                'diseaseId',
+                f.col('zip.datasourceId').alias('datasourceId'),
+                f.col('zip.datasourceHarmonicScore').alias('datasourceHarmonicScore'),
+                'gold_standard'
+            )
         )
         datasets.extend([
             # Total association count.
@@ -450,7 +480,7 @@ def main(args):
         if gold_standard:
             datasets.extend([
                 gold_standard_benchmark(spark, associations_indirect, 'IndirectOverall'),
-                # gold_standard_benchmark(spark, associations_indirect_by_datasource, 'IndirectByDatasource'),
+                gold_standard_benchmark(spark, associations_indirect_by_datasource, 'IndirectByDatasource'),
             ])
 
     if diseases:
