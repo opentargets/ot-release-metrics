@@ -61,7 +61,7 @@ def document_total_count(
         var_name: str
 ) -> DataFrame:
     """Count total documents."""
-    out = df.groupBy().count().alias('value')
+    out = df.groupBy().count().withColumnRenamed('count', 'value')
     out = out.withColumn('datasourceId', f.lit('all'))
     out = out.withColumn('variable', f.lit(var_name))
     out = out.withColumn('field', f.lit(None).cast(t.StringType()))
@@ -74,7 +74,7 @@ def document_count_by(
         var_name: str
 ) -> DataFrame:
     """Count documents by grouping column."""
-    out = df.groupBy(column).count().alias('value')
+    out = df.groupBy(column).count().withColumnRenamed('count', 'value')
     out = out.withColumn('variable', f.lit(var_name))
     out = out.withColumn('field', f.lit(None).cast(t.StringType()))
     return out
@@ -437,14 +437,15 @@ def main(args):
         if not associations.df:
             continue
         logging.info(f'Running metrics from {associations.filename}.')
+        associations_df = associations.df
         if gold_standard:
-            associations.df = (
-                associations.df
+            associations_df = (
+                associations_df
                 .join(gold_standard, on=['targetId', 'diseaseId'], how='left')
                 .fillna({'gold_standard': 0.0})
             )
         associations_by_datasource = (
-            associations.df
+            associations_df
             .select(
                 'targetId',
                 'diseaseId',
@@ -464,14 +465,14 @@ def main(args):
         )
         datasets.extend([
             # Total association count.
-            document_total_count(associations.df, f'associations{associations.kind}TotalCount'),
+            document_total_count(associations_df, f'associations{associations.kind}TotalCount'),
             # Associations by datasource.
             document_count_by(associations_by_datasource, 'datasourceId',
                               f'associations{associations.kind}ByDatasource'),
         ])
         if gold_standard:
             datasets.extend([
-                gold_standard_benchmark(spark, associations.df, f'{associations.kind}Overall'),
+                gold_standard_benchmark(spark, associations_df, f'{associations.kind}Overall'),
                 gold_standard_benchmark(spark, associations_by_datasource, f'{associations.kind}ByDatasource'),
             ])
 
