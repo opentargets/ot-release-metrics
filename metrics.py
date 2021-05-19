@@ -147,8 +147,18 @@ def evidence_distinct_fields_count(
     return melted
 
 
-def auc(df, score_column_name):
-    return BinaryClassificationMetrics(df.select(score_column_name, 'gold_standard').rdd.map(list)).areaUnderROC
+def auc(associations, score_column_name):
+    return BinaryClassificationMetrics(
+        associations.select(score_column_name, 'gold_standard').rdd.map(list)
+    ).areaUnderROC
+
+
+def odds_ratio(associations, datasource):
+    a = associations.filter((f.col('gold_standard') == 1.0) & (f.col('datasourceId') == datasource)).count()
+    b = associations.filter((f.col('gold_standard') == 0.0) & (f.col('datasourceId') == datasource)).count()
+    c = associations.filter((f.col('gold_standard') == 1.0) & (f.col('datasourceId') != datasource)).count()
+    d = associations.filter((f.col('gold_standard') == 0.0) & (f.col('datasourceId') != datasource)).count()
+    return a * d / (b * c)
 
 
 def gold_standard_benchmark(
@@ -172,6 +182,12 @@ def gold_standard_benchmark(
             'variable': f'associations{associations_type}AUC',
             'field': '',
         }]
+        or_metrics = [{
+            'count': 1.0,
+            'datasourceId': 'all',
+            'variable': f'associations{associations_type}OR',
+            'field': '',
+        }]
     else:
         auc_metrics = [{
             'count': auc(associations.filter(f.col('datasourceId') == value.datasourceId), 'datasourceHarmonicScore'),
@@ -179,8 +195,14 @@ def gold_standard_benchmark(
             'variable': f'associations{associations_type}AUC',
             'field': '',
         } for value in associations.select('datasourceId').distinct().collect()]
+        or_metrics = [{
+            'count': auc(associations, value.datasourceId),
+            'datasourceId': value.datasourceId,
+            'variable': f'associations{associations_type}OR',
+            'field': '',
+        } for value in associations.select('datasourceId').distinct().collect()]
 
-    return spark.createDataFrame(auc_metrics)
+    return spark.createDataFrame(auc_metrics + or_metrics)
 
 
 def read_path_if_provided(spark, path):
