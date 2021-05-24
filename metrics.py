@@ -444,23 +444,22 @@ def main(args):
                 .join(gold_standard, on=['targetId', 'diseaseId'], how='left')
                 .fillna({'gold_standard': 0.0})
             )
+        base_col_list = ['targetId', 'diseaseId']
+        if gold_standard:
+            base_col_list.append('gold_standard')
         associations_by_datasource = (
             associations_df
             .select(
-                'targetId',
-                'diseaseId',
+                *base_col_list,
                 f.col('overallDatasourceHarmonicVector.datasourceId').alias('datasourceId'),
-                f.col('overallDatasourceHarmonicVector.datasourceHarmonicScore').alias('datasourceHarmonicScore'),
-                'gold_standard'
+                f.col('overallDatasourceHarmonicVector.datasourceHarmonicScore').alias('datasourceHarmonicScore')
             )
             .withColumn('zip', f.arrays_zip('datasourceId', 'datasourceHarmonicScore'))
             .withColumn('zip', f.explode('zip'))
             .select(
-                'targetId',
-                'diseaseId',
+                *base_col_list,
                 f.col('zip.datasourceId').alias('datasourceId'),
                 f.col('zip.datasourceHarmonicScore').alias('datasourceHarmonicScore'),
-                'gold_standard'
             )
         )
         datasets.extend([
