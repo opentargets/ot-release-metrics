@@ -342,14 +342,10 @@ def main(args):
         logging.info(f'Running metrics from {args.associations_direct}.')
         datasets.extend([
             # Total association count.
-            document_total_count(associations_direct, 'associationsDirectTotalCount'),
+            document_total_count(associations_direct.select("diseaseId", "targetId").distinct(), 'associationsDirectTotalCount'),
             # Associations by datasource.
             document_count_by(
-                associations_direct.select(
-                    'targetId',
-                    'diseaseId',
-                    f.explode(f.col('overallDatasourceHarmonicVector.datasourceId')).alias('datasourceId')
-                ),
+                associations_direct,
                 'datasourceId',
                 'associationsDirectByDatasource'
             ),
@@ -359,15 +355,11 @@ def main(args):
         logging.info(f'Running metrics from {args.associations_indirect}.')
         datasets.extend([
             # Total association count.
-            document_total_count(associations_indirect,
+            document_total_count(associations_indirect.select("diseaseId", "targetId").distinct(),
                                  'associationsIndirectTotalCount'),
             # Associations by datasource.
             document_count_by(
-                associations_indirect.select(
-                    'targetId',
-                    'diseaseId',
-                    f.explode(f.col('overallDatasourceHarmonicVector.datasourceId')).alias('datasourceId')
-                ),
+                associations_indirect,
                 'datasourceId',
                 'associationsIndirectByDatasource'),
         ])
