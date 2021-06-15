@@ -216,10 +216,10 @@ def parse_args():
             'Failed evidence files from ${ETL_PARQUET_OUTPUT_ROOT}/evidenceFailed.'))
     dataset_arguments.add_argument(
         '--associations-direct', required=False, metavar='<path>', type=str, help=(
-            'Direct association files from ${ETL_PARQUET_OUTPUT_ROOT}/associationByOverallDirect.'))
+            'Direct association files from ${ETL_PARQUET_OUTPUT_ROOT}/associationByDatasourceDirect.'))
     dataset_arguments.add_argument(
         '--associations-indirect', required=False, metavar='<path>', type=str, help=(
-            'Indirect association files from ${ETL_PARQUET_OUTPUT_ROOT}/associationByOverallIndirect.'))
+            'Indirect association files from ${ETL_PARQUET_OUTPUT_ROOT}/associationByDatasourceIndirect.'))
     dataset_arguments.add_argument(
         '--diseases', required=False, metavar='<path>', type=str, help=(
             'Disease information from ${ETL_PARQUET_OUTPUT_ROOT}/diseases.'))
@@ -342,14 +342,10 @@ def main(args):
         logging.info(f'Running metrics from {args.associations_direct}.')
         datasets.extend([
             # Total association count.
-            document_total_count(associations_direct, 'associationsDirectTotalCount'),
+            document_total_count(associations_direct.select("diseaseId", "targetId").distinct(), 'associationsDirectTotalCount'),
             # Associations by datasource.
             document_count_by(
-                associations_direct.select(
-                    'targetId',
-                    'diseaseId',
-                    f.explode(f.col('overallDatasourceHarmonicVector.datasourceId')).alias('datasourceId')
-                ),
+                associations_direct,
                 'datasourceId',
                 'associationsDirectByDatasource'
             ),
@@ -359,15 +355,11 @@ def main(args):
         logging.info(f'Running metrics from {args.associations_indirect}.')
         datasets.extend([
             # Total association count.
-            document_total_count(associations_indirect,
+            document_total_count(associations_indirect.select("diseaseId", "targetId").distinct(),
                                  'associationsIndirectTotalCount'),
             # Associations by datasource.
             document_count_by(
-                associations_indirect.select(
-                    'targetId',
-                    'diseaseId',
-                    f.explode(f.col('overallDatasourceHarmonicVector.datasourceId')).alias('datasourceId')
-                ),
+                associations_indirect,
                 'datasourceId',
                 'associationsIndirectByDatasource'),
         ])

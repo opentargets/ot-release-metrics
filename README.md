@@ -66,8 +66,8 @@ mkdir post-pipeline
 gsutil -m cp -r \
   ${ETL_PARQUET_OUTPUT_ROOT}/evidence \
   ${ETL_PARQUET_OUTPUT_ROOT}/evidenceFailed \
-  ${ETL_PARQUET_OUTPUT_ROOT}/associationByOverallDirect \
-  ${ETL_PARQUET_OUTPUT_ROOT}/associationByOverallIndirect \
+  ${ETL_PARQUET_OUTPUT_ROOT}/associationByDatasourceDirect \
+  ${ETL_PARQUET_OUTPUT_ROOT}/associationByDatasourceIndirect \
   ${ETL_PARQUET_OUTPUT_ROOT}/diseases \
   ${ETL_PARQUET_OUTPUT_ROOT}/targets \
   ${ETL_INPUT_ROOT}/annotation-files/chembl/chembl_*molecule*.jsonl \
@@ -82,8 +82,8 @@ python3 metrics.py \
   --out data/21.02.2-post.csv \
   --evidence post-pipeline/evidence \
   --evidence-failed post-pipeline/evidenceFailed \
-  --associations-direct post-pipeline/associationByOverallDirect \
-  --associations-indirect post-pipeline/associationByOverallIndirect \
+  --associations-direct post-pipeline/associationByDatasourceDirect \
+  --associations-indirect post-pipeline/associationByDatasourceIndirect \
   --diseases post-pipeline/diseases \
   --targets post-pipeline/targets \
   --drugs post-pipeline/molecule
