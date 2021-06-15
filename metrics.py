@@ -216,10 +216,10 @@ def parse_args():
             'Failed evidence files from ${ETL_PARQUET_OUTPUT_ROOT}/evidenceFailed.'))
     dataset_arguments.add_argument(
         '--associations-direct', required=False, metavar='<path>', type=str, help=(
-            'Direct association files from ${ETL_PARQUET_OUTPUT_ROOT}/associationByOverallDirect.'))
+            'Direct association files from ${ETL_PARQUET_OUTPUT_ROOT}/associationByDatasourceDirect.'))
     dataset_arguments.add_argument(
         '--associations-indirect', required=False, metavar='<path>', type=str, help=(
-            'Indirect association files from ${ETL_PARQUET_OUTPUT_ROOT}/associationByOverallIndirect.'))
+            'Indirect association files from ${ETL_PARQUET_OUTPUT_ROOT}/associationByDatasourceIndirect.'))
     dataset_arguments.add_argument(
         '--diseases', required=False, metavar='<path>', type=str, help=(
             'Disease information from ${ETL_PARQUET_OUTPUT_ROOT}/diseases.'))
