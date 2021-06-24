@@ -34,8 +34,8 @@ data = pd.concat(dfs, ignore_index=True)
 
 if page == "Explore metrics":
     # Select a dataset to explore
-    runs = list(data.runId.unique())
-    runs.insert(0, "All")
+    runs = sorted(list(data.runId.unique()), reverse=True)
+    runs.insert(0, "All")   
     select_run = st.sidebar.selectbox(
         "Select a pipeline run:",
         runs
@@ -88,7 +88,7 @@ if page == "Compare metrics":
     st.sidebar.header("What do you want to compare?")
     select_runs = st.sidebar.multiselect(
         "Select two datasets:",
-        data.runId.unique(),
+        sorted(data.runId.unique(), reverse=True),
         help="First indicate the run with which you wish to make the comparison."
     )
 
