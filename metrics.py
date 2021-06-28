@@ -454,7 +454,7 @@ def main(args):
                 .join(gold_standard, on=['targetId', 'diseaseId'], how='left')
                 .fillna({'gold_standard': 0.0})
             )
-        if "overall" not in associations.filename:
+        if "Overall" not in associations.filename:
             datasets.extend([
                 # Total association count.
                 document_total_count(associations_df.select("diseaseId", "targetId").distinct(), f'associations{associations.kind}TotalCount'),
