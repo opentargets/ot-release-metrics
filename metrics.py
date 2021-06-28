@@ -178,7 +178,7 @@ def gold_standard_benchmark(
 
     if 'Overall' in associations_type:
         auc_metrics = [{
-            'value': auc(associations, 'overallDatasourceHarmonicScore'),
+            'value': auc(associations, 'score'),
             'datasourceId': 'all',
             'variable': f'associations{associations_type}AUC',
             'field': '',
@@ -190,9 +190,9 @@ def gold_standard_benchmark(
             'field': '',
         }]
     else:
-        datasource_names = [v.datasourceId for v in associations.select('datasourceId').distinct().collect()]
+        datasource_names = associations.select('datasourceId').toPandas()['datasourceId'].unique()
         auc_metrics = [{
-            'value': auc(associations.filter(f.col('datasourceId') == datasource), 'datasourceHarmonicScore'),
+            'value': auc(associations.filter(f.col('datasourceId') == datasource), 'score'),
             'datasourceId': datasource,
             'variable': f'associations{associations_type}AUC',
             'field': '',
@@ -277,11 +277,17 @@ def parse_args():
         '--evidence-failed', required=False, metavar='<path>', type=str, help=(
             'Failed evidence files from ${ETL_PARQUET_OUTPUT_ROOT}/evidenceFailed.'))
     dataset_arguments.add_argument(
-        '--associations-direct', required=False, metavar='<path>', type=str, help=(
+        '--associations-overall-indirect', required=False, metavar='<path>', type=str, help=(
+            'Indirect association files from ${ETL_PARQUET_OUTPUT_ROOT}/associationByOverallIndirect.'))
+    dataset_arguments.add_argument(
+        '--associations-overall-direct', required=False, metavar='<path>', type=str, help=(
             'Direct association files from ${ETL_PARQUET_OUTPUT_ROOT}/associationByOverallDirect.'))
     dataset_arguments.add_argument(
+        '--associations-direct', required=False, metavar='<path>', type=str, help=(
+            'Direct association files from ${ETL_PARQUET_OUTPUT_ROOT}/associationByDatasourceDirect.'))
+    dataset_arguments.add_argument(
         '--associations-indirect', required=False, metavar='<path>', type=str, help=(
-            'Indirect association files from ${ETL_PARQUET_OUTPUT_ROOT}/associationByOverallIndirect.'))
+            'Indirect association files from ${ETL_PARQUET_OUTPUT_ROOT}/associationByDatasourceIndirect.'))
     dataset_arguments.add_argument(
         '--diseases', required=False, metavar='<path>', type=str, help=(
             'Disease information from ${ETL_PARQUET_OUTPUT_ROOT}/diseases.'))
@@ -344,6 +350,8 @@ def main(args):
     evidence_failed = read_path_if_provided(spark, args.evidence_failed)
     associations_direct = read_path_if_provided(spark, args.associations_direct)
     associations_indirect = read_path_if_provided(spark, args.associations_indirect)
+    associations_overall_direct = read_path_if_provided(spark, args.associations_overall_direct)
+    associations_overall_indirect = read_path_if_provided(spark, args.associations_overall_indirect)
     diseases = read_path_if_provided(spark, args.diseases)
     targets = read_path_if_provided(spark, args.targets)
     drugs = read_path_if_provided(spark, args.drugs)
@@ -433,6 +441,8 @@ def main(args):
     for associations in (
         AssociationsDataset(kind='Direct', df=associations_direct, filename=args.associations_direct),
         AssociationsDataset(kind='Indirect', df=associations_indirect, filename=args.associations_indirect),
+        AssociationsDataset(kind='Direct', df=associations_overall_direct, filename=args.associations_overall_direct),
+        AssociationsDataset(kind='Indirect', df=associations_overall_indirect, filename=args.associations_overall_indirect),
     ):
         if not associations.df:
             continue
@@ -444,35 +454,21 @@ def main(args):
                 .join(gold_standard, on=['targetId', 'diseaseId'], how='left')
                 .fillna({'gold_standard': 0.0})
             )
-        base_col_list = ['targetId', 'diseaseId']
-        if gold_standard:
-            base_col_list.append('gold_standard')
-        associations_by_datasource = (
-            associations_df
-            .select(
-                *base_col_list,
-                f.col('overallDatasourceHarmonicVector.datasourceId').alias('datasourceId'),
-                f.col('overallDatasourceHarmonicVector.datasourceHarmonicScore').alias('datasourceHarmonicScore')
-            )
-            .withColumn('zip', f.arrays_zip('datasourceId', 'datasourceHarmonicScore'))
-            .withColumn('zip', f.explode('zip'))
-            .select(
-                *base_col_list,
-                f.col('zip.datasourceId').alias('datasourceId'),
-                f.col('zip.datasourceHarmonicScore').alias('datasourceHarmonicScore'),
-            )
-        )
-        datasets.extend([
-            # Total association count.
-            document_total_count(associations_df, f'associations{associations.kind}TotalCount'),
-            # Associations by datasource.
-            document_count_by(associations_by_datasource, 'datasourceId',
-                              f'associations{associations.kind}ByDatasource'),
-        ])
-        if gold_standard:
+        if "overall" not in associations.filename:
             datasets.extend([
-                gold_standard_benchmark(spark, associations_df, f'{associations.kind}Overall'),
-                gold_standard_benchmark(spark, associations_by_datasource, f'{associations.kind}ByDatasource'),
+                # Total association count.
+                document_total_count(associations_df.select("diseaseId", "targetId").distinct(), f'associations{associations.kind}TotalCount'),
+                # Associations by datasource.
+                document_count_by(associations_df, 'datasourceId',
+                                f'associations{associations.kind}ByDatasource'),
+                # Associations by datasource benchmark.
+                gold_standard_benchmark(spark, associations_df, f'{associations.kind}ByDatasource') if gold_standard else None
+            ])
+        else:
+            datasets.extend([
+                # Total association benchmark.
+                gold_standard_benchmark(spark, associations_df,
+                                        f'{associations.kind}Overall') if gold_standard else None,
             ])
 
     if diseases:
