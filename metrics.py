@@ -190,7 +190,7 @@ def gold_standard_benchmark(
             'field': '',
         }]
     else:
-        datasource_names = associations.select('datasourceId').toPandas()['datasourceId'].unique()
+        datasource_names = associations.select('datasourceId').distinct().toPandas()['datasourceId'].unique()
         auc_metrics = [{
             'value': auc(associations.filter(f.col('datasourceId') == datasource), 'score'),
             'datasourceId': datasource,
