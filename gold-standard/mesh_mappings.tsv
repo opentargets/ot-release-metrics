@@ -1,0 +1,703 @@
+efo_id	efo_label	mesh_id	unknown_column	mesh_label
+EFO:0000274	atopic eczema	MeSH:D003876	0.700000	Dermatitis, Atopic
+EFO:0000274	atopic eczema	MeSH:C564133	0.000000	Ige Responsiveness, Atopic
+EFO:0000274	atopic eczema	MeSH:C565293	0.000000	Dermatitis, Atopic, 2
+EFO:0000676	psoriasis	MeSH:D011565	0.700000	Psoriasis
+EFO:0001358	post-traumatic stress disorder	MeSH:D013313	0.700000	Stress Disorders, Post-Traumatic
+EFO:0003776	coronary artery bypass	MeSH:D001026	0.700000	Coronary Artery Bypass
+EFO:0000275	atrial fibrillation	MeSH:D001281	0.700000	Atrial Fibrillation
+EFO:0000275	atrial fibrillation	MeSH:C567734	0.000000	Brugada Syndrome 7
+EFO:0000275	atrial fibrillation	MeSH:D029597	0.000000	Romano-Ward Syndrome
+EFO:0000275	atrial fibrillation	MeSH:D053840	0.000000	Brugada Syndrome
+EFO:0000275	atrial fibrillation	MeSH:C567514	0.000000	Long Qt Syndrome 10
+EFO:0000270	asthma	MeSH:D001249	0.700000	Asthma
+EFO:0000289	bipolar disorder	MeSH:D001714	0.700000	Bipolar Disorder
+EFO:0000289	bipolar disorder	MeSH:C567530	0.000000	Major Affective Disorder 8
+EFO:0000289	bipolar disorder	MeSH:C567529	0.000000	Major Affective Disorder 7
+EFO:1001254	noise-induced hearing loss	MeSH:D006317	0.700000	Hearing Loss, Noise-Induced
+EFO:0003834	cutaneous lupus erythematosus	MeSH:D008178	0.700000	Lupus Erythematosus, Cutaneous
+EFO:0000637	osteosarcoma	MeSH:D012516	0.700000	Osteosarcoma
+EFO:0000637	osteosarcoma	MeSH:D018213	0.000559	Neoplasms, Bone Tissue
+EFO:0004318	smoking behavior	MeSH:D012907	0.700000	Smoking
+EFO:0004318	smoking behavior	MeSH:D014029	0.000000	Tobacco Use Disorder
+EFO:0004251	myeloproliferative disorder	MeSH:D009196	0.700000	Myeloproliferative Disorders
+EFO:0004251	myeloproliferative disorder	MeSH:D019046	0.000000	Bone Marrow Neoplasms
+EFO:0004235	exfoliation syndrome	MeSH:D017889	0.700000	Exfoliation Syndrome
+EFO:0002614	insulin resistance	MeSH:D007333	0.700000	Insulin Resistance
+EFO:1001482	cardiotoxicity	MeSH:D066126	0.700000	Cardiotoxicity
+EFO:0004340	body mass index	MeSH:D015992	0.700000	Body Mass Index
+EFO:0000384	Crohn's disease	MeSH:D003424	0.700000	Crohn Disease
+EFO:0000384	Crohn's disease	MeSH:D003093	0.000000	Colitis, Ulcerative
+EFO:0000692	schizophrenia	MeSH:D012559	0.700000	Schizophrenia
+EFO:0001064	Down syndrome	MeSH:D004314	0.700000	Down Syndrome
+EFO:0003780	Behcet's syndrome	MeSH:D001528	0.700000	Behcet Syndrome
+EFO:0001378	multiple myeloma	MeSH:D009101	0.700000	Multiple Myeloma
+EFO:0001378	multiple myeloma	MeSH:D010954	0.000000	Plasmacytoma
+EFO:0003756	autism spectrum disorder	MeSH:D002659	0.700000	Child Development Disorders, Pervasive
+EFO:0003756	autism spectrum disorder	MeSH:D000067877	0.000559	Autism Spectrum Disorder
+EFO:0003756	autism spectrum disorder	MeSH:D001321	0.000000	Autistic Disorder
+EFO:0000249	Alzheimer's disease	MeSH:D000544	0.700000	Alzheimer Disease
+EFO:0000249	Alzheimer's disease	MeSH:C536597	0.000559
+EFO:0000249	Alzheimer's disease	MeSH:C566578	0.000000	Alzheimer Disease 5
+EFO:0000249	Alzheimer's disease	MeSH:C565228	0.000000	Alzheimer Disease 11
+EFO:0000249	Alzheimer's disease	MeSH:C564622	0.000000	Alzheimer Disease 8
+EFO:0000249	Alzheimer's disease	MeSH:C565325	0.000000	Alzheimer Disease 6
+EFO:0000249	Alzheimer's disease	MeSH:C566999	0.000000	Alzheimer Disease 14
+EFO:0000249	Alzheimer's disease	MeSH:C563834	0.000000	Alzheimer Disease 9
+EFO:0000249	Alzheimer's disease	MeSH:C565251	0.000000	Alzheimer Disease 7
+EFO:0000249	Alzheimer's disease	MeSH:C566465	0.000000	Alzheimer Disease 10
+EFO:0000249	Alzheimer's disease	MeSH:C567000	0.000000	Alzheimer Disease 13
+EFO:0000249	Alzheimer's disease	MeSH:C566998	0.000000	Alzheimer Disease 15
+EFO:0000249	Alzheimer's disease	MeSH:C536595	0.000000	Alzheimer disease type 2
+EFO:0000249	Alzheimer's disease	MeSH:C567022	0.000000	Alzheimer Disease 12
+EFO:0000305	breast carcinoma	MeSH:D001943	0.700000	Breast Neoplasms
+EFO:0000305	breast carcinoma	MeSH:C562840	0.000000	Breast Cancer, Familial
+EFO:0007536	vesicoureteral reflux	MeSH:D014718	0.700000	Vesico-Ureteral Reflux
+EFO:0004270	restless legs syndrome	MeSH:D012148	0.700000	Restless Legs Syndrome
+EFO:0001360	type II diabetes mellitus	MeSH:D003924	0.700000	Diabetes Mellitus, Type 2
+EFO:0001360	type II diabetes mellitus	MeSH:C563359	0.000000	Diabetes Mellitus, Noninsulin-Dependent, 1
+EFO:0001360	type II diabetes mellitus	MeSH:D003920	0.000000	Diabetes Mellitus
+EFO:0003949	eye color	MeSH:D005127	0.700000	Eye Color
+EFO:0007191	cannabis dependence	MeSH:D002189	0.700000	Marijuana Abuse
+EFO:0003761	unipolar depression	MeSH:D003865	0.700000	Depressive Disorder, Major
+EFO:0003761	unipolar depression	MeSH:D003866	0.000559	Depressive Disorder
+EFO:0004274	gout	MeSH:D006073	0.490000	Gout
+EFO:0004274	gout	MeSH:D015210	0.000391	Arthritis, Gouty
+EFO:0000182	hepatocellular carcinoma	MeSH:D006528	0.490000	Carcinoma, Hepatocellular
+EFO:0000182	hepatocellular carcinoma	MeSH:D018197	0.000000	Hepatoblastoma
+EFO:0004197	hepatitis B infection	MeSH:D019694	0.490000	Hepatitis B, Chronic
+EFO:0004197	hepatitis B infection	MeSH:D006509	0.000391	Hepatitis B
+EFO:0001065	endometriosis	MeSH:D004715	0.490000	Endometriosis
+EFO:0003959	cleft lip	MeSH:D002971	0.490000	Cleft Lip
+EFO:0000195	metabolic syndrome	MeSH:D024821	0.490000	Metabolic Syndrome X
+EFO:0000195	metabolic syndrome	MeSH:C535554	0.000000	Abdominal obesity metabolic syndrome
+EFO:1001132	pseudotumor cerebri	MeSH:D011559	0.490000	Pseudotumor Cerebri
+EFO:0000094	B-cell acute lymphoblastic leukemia	MeSH:D015452	0.490000	Precursor B-Cell Lymphoblastic Leukemia-Lymphoma
+EFO:0000094	B-cell acute lymphoblastic leukemia	MeSH:D002051	0.000000	Burkitt Lymphoma
+EFO:0000341	chronic obstructive pulmonary disease	MeSH:D029424	0.490000	Pulmonary Disease, Chronic Obstructive
+EFO:0003885	multiple sclerosis	MeSH:D009103	0.490000	Multiple Sclerosis
+EFO:0000685	rheumatoid arthritis	MeSH:D001172	0.490000	Arthritis, Rheumatoid
+EFO:0000685	rheumatoid arthritis	MeSH:C565798	0.000000	Rheumatoid Arthritis, Systemic Juvenile
+EFO:0000685	rheumatoid arthritis	MeSH:D001171	0.000000	Arthritis, Juvenile
+EFO:0000729	ulcerative colitis	MeSH:D003093	0.490000	Colitis, Ulcerative
+EFO:0000729	ulcerative colitis	MeSH:D003424	0.000000	Crohn Disease
+EFO:0001071	lung carcinoma	MeSH:D008175	0.490000	Lung Neoplasms
+EFO:0001071	lung carcinoma	MeSH:C538231	0.000000	Adenocarcinoma of lung
+EFO:0002506	osteoarthritis	MeSH:D010003	0.490000	Osteoarthritis
+EFO:0002506	osteoarthritis	MeSH:D007592	0.000000	Joint Diseases
+EFO:0002506	osteoarthritis	MeSH:D015207	0.000000	Osteoarthritis, Hip
+EFO:1002000	Takotsubo cardiomyopathy	MeSH:D054549	0.490000	Takotsubo Cardiomyopathy
+EFO:0004228	drug-induced liver injury	MeSH:D056486	0.490000	Chemical and Drug Induced Liver Injury
+EFO:0001054	leprosy	MeSH:D007918	0.490000	Leprosy
+EFO:0004286	venous thromboembolism	MeSH:D054556	0.490000	Venous Thromboembolism
+EFO:0003767	inflammatory bowel disease	MeSH:D015212	0.490000	Inflammatory Bowel Diseases
+EFO:0003767	inflammatory bowel disease	MeSH:C567021	0.000000	Inflammatory Bowel Disease 10
+EFO:0003767	inflammatory bowel disease	MeSH:C563926	0.000000	Inflammatory Bowel Disease 9
+EFO:0003767	inflammatory bowel disease	MeSH:C567372	0.000000	Inflammatory Bowel Disease 19
+EFO:0003767	inflammatory bowel disease	MeSH:C567378	0.000000	Inflammatory Bowel Disease 17
+EFO:0003767	inflammatory bowel disease	MeSH:C567383	0.000000	Inflammatory Bowel Disease 14
+EFO:0003767	inflammatory bowel disease	MeSH:C567384	0.000000	Inflammatory Bowel Disease 13
+EFO:0003785	allergy	MeSH:D006967	0.490000	Hypersensitivity
+EFO:0001645	coronary heart disease	MeSH:D003327	0.490000	Coronary Disease
+EFO:0001645	coronary heart disease	MeSH:D017202	0.000391	Myocardial Ischemia
+EFO:0001645	coronary heart disease	MeSH:D003324	0.000391	Coronary Artery Disease
+EFO:0003892	pulmonary function measurement	MeSH:D012129	0.490000	Respiratory Function Tests
+EFO:0003898	ankylosing spondylitis	MeSH:D013167	0.343000	Spondylitis, Ankylosing
+EFO:0001359	type I diabetes mellitus	MeSH:D003922	0.343000	Diabetes Mellitus, Type 1
+EFO:0001359	type I diabetes mellitus	MeSH:C567818	0.000000	Diabetes Mellitus, Insulin-Dependent, 24
+EFO:0001359	type I diabetes mellitus	MeSH:C567284	0.000000	Diabetes Mellitus, Insulin-Dependent, 22
+EFO:0001359	type I diabetes mellitus	MeSH:C565100	0.000000	Diabetes Mellitus, Insulin-Dependent, 2
+EFO:0001359	type I diabetes mellitus	MeSH:C563352	0.000000	Diabetes Mellitus, Insulin-Dependent, 13
+EFO:0001359	type I diabetes mellitus	MeSH:C563957	0.000000	Diabetes Mellitus, Insulin-Dependent, 7
+EFO:0001359	type I diabetes mellitus	MeSH:C567285	0.000000	Diabetes Mellitus, Insulin-Dependent, 21
+EFO:0001359	type I diabetes mellitus	MeSH:D000690	0.000000	Amyotrophic Lateral Sclerosis
+EFO:0001359	type I diabetes mellitus	MeSH:C565315	0.000000	Diabetes Mellitus, Insulin-Dependent, 18
+EFO:0001359	type I diabetes mellitus	MeSH:C563371	0.000000	Diabetes Mellitus, Insulin-Dependent, 11
+EFO:0001359	type I diabetes mellitus	MeSH:C565715	0.000000	Diabetes Mellitus, Insulin-Dependent, 19
+EFO:0001359	type I diabetes mellitus	MeSH:C566603	0.000000	Diabetes Mellitus, Insulin-Dependent, 6
+EFO:0001359	type I diabetes mellitus	MeSH:C567286	0.000000	Diabetes Mellitus, Insulin-Dependent, 20
+EFO:0001359	type I diabetes mellitus	MeSH:C567499	0.000000	Amyotrophic Lateral Sclerosis 9
+EFO:0001359	type I diabetes mellitus	MeSH:C566602	0.000000	Diabetes Mellitus, Insulin-Dependent, 10
+EFO:0001359	type I diabetes mellitus	MeSH:C563326	0.000000	Diabetes Mellitus, Insulin-Dependent, 12
+EFO:0001359	type I diabetes mellitus	MeSH:C536739	0.000000	Wolcott-Rallison syndrome
+EFO:0001359	type I diabetes mellitus	MeSH:C563433	0.000000	Diabetes Mellitus, Insulin-Dependent, 8
+EFO:0001359	type I diabetes mellitus	MeSH:C566645	0.000000	Diabetes Mellitus, Insulin-Dependent, 15
+EFO:0001359	type I diabetes mellitus	MeSH:C567233	0.000000	Diabetes Mellitus, Insulin-Dependent, 23
+EFO:0001359	type I diabetes mellitus	MeSH:C538111	0.000000	Pancreatic beta cell agenesis with neonatal diabetes mellitus
+EFO:0001359	type I diabetes mellitus	MeSH:C563960	0.000000	Diabetes Mellitus, Insulin-Dependent, 3
+EFO:0001359	type I diabetes mellitus	MeSH:C563959	0.000000	Diabetes Mellitus, Insulin-Dependent, 4
+EFO:0001359	type I diabetes mellitus	MeSH:C566395	0.000000	Diabetes Mellitus, Insulin-Dependent, 17
+EFO:0001359	type I diabetes mellitus	MeSH:C563958	0.000000	Diabetes Mellitus, Insulin-Dependent, 5
+EFO:0000378	coronary artery disease	MeSH:D003324	0.343000	Coronary Artery Disease
+EFO:0000378	coronary artery disease	MeSH:D003327	0.000274	Coronary Disease
+EFO:0000378	coronary artery disease	MeSH:D017202	0.000274	Myocardial Ischemia
+EFO:0000378	coronary artery disease	MeSH:D006952	0.000000	Hyperlipoproteinemia Type III
+EFO:0000378	coronary artery disease	MeSH:C564258	0.000000	Coronary Artery Disease, Autosomal Dominant, 1
+EFO:0002508	Parkinson's disease	MeSH:D010300	0.343000	Parkinson Disease
+EFO:0002508	Parkinson's disease	MeSH:C538104	0.000000	Pallidopyramidal syndrome
+EFO:0002508	Parkinson's disease	MeSH:C565324	0.000000	Parkinson Disease 4, Autosomal Dominant Lewy Body
+EFO:0002508	Parkinson's disease	MeSH:C537179	0.000000	Parkinsonism, early onset with mental retardation
+EFO:0003884	chronic kidney disease	MeSH:D051436	0.343000	Renal Insufficiency, Chronic
+EFO:0003884	chronic kidney disease	MeSH:D007676	0.343000	Kidney Failure, Chronic
+EFO:0003884	chronic kidney disease	MeSH:D004194	0.000000	Disease
+EFO:0000253	amyotrophic lateral sclerosis	MeSH:D000690	0.343000	Amyotrophic Lateral Sclerosis
+EFO:0000253	amyotrophic lateral sclerosis	MeSH:C531617	0.000000	Amyotrophic lateral sclerosis 1
+EFO:0001365	age-related macular degeneration	MeSH:D008268	0.343000	Macular Degeneration
+EFO:0001365	age-related macular degeneration	MeSH:D057135	0.000274	Wet Macular Degeneration
+EFO:0001365	age-related macular degeneration	MeSH:C567450	0.000000	Macular Degeneration, Age-Related, 11
+EFO:0001365	age-related macular degeneration	MeSH:D002607	0.000000	Charcot-Marie-Tooth Disease
+EFO:0001365	age-related macular degeneration	MeSH:C565196	0.000000	Macular Degeneration, Age-Related, 4
+EFO:0001365	age-related macular degeneration	MeSH:C566411	0.000000	Macular Degeneration, Age-Related, 1
+EFO:0001365	age-related macular degeneration	MeSH:C563674	0.000000	Macular Degeneration, Age-Related, 6
+EFO:0001365	age-related macular degeneration	MeSH:C566935	0.000000	Macular Degeneration, Age-Related, 10
+EFO:0001365	age-related macular degeneration	MeSH:C562479	0.000000	Macular Degeneration, Age-Related, 2
+EFO:0001365	age-related macular degeneration	MeSH:C566958	0.000000	Macular Degeneration, Age-Related, 9
+EFO:0001365	age-related macular degeneration	MeSH:C565718	0.000000	Macular Degeneration, Age-Related, 7
+EFO:0001365	age-related macular degeneration	MeSH:C563838	0.000000	Macular Degeneration, Age-Related, 3
+EFO:0004683	wet macular degeneration	MeSH:D057135	0.343000	Wet Macular Degeneration
+EFO:0004683	wet macular degeneration	MeSH:D008268	0.000000	Macular Degeneration
+EFO:0003888	attention deficit hyperactivity disorder	MeSH:D001289	0.343000	Attention Deficit Disorder with Hyperactivity
+EFO:1000786	osteoarthritis, hip	MeSH:D015207	0.343000	Osteoarthritis, Hip
+EFO:0004616	osteoarthritis, knee	MeSH:D020370	0.343000	Osteoarthritis, Knee
+EFO:0005611	opioid dependence	MeSH:D009293	0.343000	Opioid-Related Disorders
+EFO:0004266	primary ovarian insufficiency	MeSH:D016649	0.343000	Primary Ovarian Insufficiency
+EFO:0004266	primary ovarian insufficiency	MeSH:D008594	0.000000	Menopause, Premature
+EFO:0004266	primary ovarian insufficiency	MeSH:C567838	0.000000	Premature Ovarian Failure 7
+EFO:0004266	primary ovarian insufficiency	MeSH:C564476	0.000000	Premature Ovarian Failure 2b
+EFO:0004266	primary ovarian insufficiency	MeSH:C563816	0.000000	Premature Ovarian Failure 3
+EFO:0004266	primary ovarian insufficiency	MeSH:C566921	0.000000	Premature Ovarian Failure 5
+EFO:0004266	primary ovarian insufficiency	MeSH:C567652	0.000000	Bile Acid Malabsorption, Primary
+EFO:0004266	primary ovarian insufficiency	MeSH:C567351	0.000000	Premature Ovarian Failure 6
+EFO:0004266	primary ovarian insufficiency	MeSH:C564498	0.000000	Premature Ovarian Failure 2a
+EFO:0004190	open-angle glaucoma	MeSH:D005902	0.343000	Glaucoma, Open-Angle
+EFO:0004190	open-angle glaucoma	MeSH:C567753	0.000000	Glaucoma 1, Open Angle, O
+EFO:0004190	open-angle glaucoma	MeSH:C566383	0.000000	Glaucoma 1, Open Angle, F
+EFO:0004190	open-angle glaucoma	MeSH:C563692	0.000000	Glaucoma 1, Open Angle, G
+EFO:0004190	open-angle glaucoma	MeSH:C562750	0.000000	Glaucoma, Primary Open Angle
+EFO:0006790	cerebral amyloid angiopathy	MeSH:D016657	0.343000	Cerebral Amyloid Angiopathy
+EFO:0006790	cerebral amyloid angiopathy	MeSH:D028243	0.000274	Cerebral Amyloid Angiopathy, Familial
+EFO:0002618	pancreatic carcinoma	MeSH:C562463	0.343000	Pancreatic Carcinoma
+EFO:0002618	pancreatic carcinoma	MeSH:D010190	0.000000	Pancreatic Neoplasms
+EFO:0002618	pancreatic carcinoma	MeSH:C535837	0.000000	Pancreatic carcinoma, familial
+EFO:0004268	sclerosing cholangitis	MeSH:D015209	0.240100	Cholangitis, Sclerosing
+EFO:0005221	cholangiocarcinoma	MeSH:D018281	0.240100	Cholangiocarcinoma
+EFO:0005221	cholangiocarcinoma	MeSH:D001650	0.000000	Bile Duct Neoplasms
+EFO:0000266	aortic stenosis	MeSH:D001024	0.240100	Aortic Valve Stenosis
+EFO:0000266	aortic stenosis	MeSH:C563178	0.000000	Aortic Valve Disease 1
+EFO:0003923	bone density	MeSH:D015519	0.240100	Bone Density
+EFO:0000537	hypertension	MeSH:D006973	0.240100	Hypertension
+EFO:0000537	hypertension	MeSH:C562386	0.000000	Hypertension, Essential
+EFO:0000537	hypertension	MeSH:D000075222	0.000000
+EFO:1001909	Plantar Fasciitis	MeSH:D036981	0.240100	Fasciitis, Plantar
+EFO:0007887	autosomal dominant compelling helio-ophthalmic outburst syndrome	MeSH:C535300	0.240100	Autosomal dominant compelling helio ophthalmic outburst syndrome
+EFO:0000400	diabetes mellitus	MeSH:D003920	0.240100	Diabetes Mellitus
+EFO:0000400	diabetes mellitus	MeSH:C536739	0.000000	Wolcott-Rallison syndrome
+EFO:0000400	diabetes mellitus	MeSH:D003922	0.000000	Diabetes Mellitus, Type 1
+EFO:0000400	diabetes mellitus	MeSH:D056731	0.000000	Donohue Syndrome
+EFO:0000400	diabetes mellitus	MeSH:C562710	0.000000	Diabetes Mellitus, Insulin-Resistant, with Acanthosis Nigricans
+EFO:0000400	diabetes mellitus	MeSH:D016883	0.000000	Diabetic Ketoacidosis
+EFO:1001267	Aortic Coarctation	MeSH:D001017	0.240100	Aortic Coarctation
+EFO:1001267	Aortic Coarctation	MeSH:C531623	0.000000
+EFO:1000971	hyperemesis gravidarum	MeSH:D006939	0.240100	Hyperemesis Gravidarum
+EFO:0003870	brain aneurysm	MeSH:D002532	0.240100	Intracranial Aneurysm
+EFO:0000717	systemic scleroderma	MeSH:D012595	0.240100	Scleroderma, Systemic
+EFO:0000717	systemic scleroderma	MeSH:D045743	0.000000	Scleroderma, Diffuse
+EFO:0000717	systemic scleroderma	MeSH:D012594	0.000000	Scleroderma, Localized
+EFO:0004276	Stevens-Johnson syndrome	MeSH:D013262	0.240100	Stevens-Johnson Syndrome
+EFO:0004276	Stevens-Johnson syndrome	MeSH:D004816	0.000000
+EFO:0004233	leukopenia	MeSH:D007970	0.240100	Leukopenia
+EFO:0000292	bladder carcinoma	MeSH:D001749	0.240100	Urinary Bladder Neoplasms
+EFO:0000326	central nervous system cancer	MeSH:D005910	0.240100	Glioma
+EFO:0000326	central nervous system cancer	MeSH:D016543	0.000192	Central Nervous System Neoplasms
+EFO:0004280	movement disorder	MeSH:D009069	0.240100	Movement Disorders
+EFO:0004237	Graves disease	MeSH:D006111	0.240100	Graves Disease
+EFO:0004224	Coronary Restenosis	MeSH:D023903	0.240100	Coronary Restenosis
+EFO:0003829	alcohol dependence	MeSH:D019973	0.240100	Alcohol-Related Disorders
+EFO:0003829	alcohol dependence	MeSH:D000437	0.240100	Alcoholism
+EFO:0003829	alcohol dependence	MeSH:D020751	0.240100	Alcohol-Induced Disorders
+EFO:0003829	alcohol dependence	MeSH:D010610	0.000192	Pharyngeal Neoplasms
+EFO:0001073	obesity	MeSH:D009765	0.240100	Obesity
+EFO:0004282	thoracic aortic aneurysm	MeSH:D017545	0.240100	Aortic Aneurysm, Thoracic
+EFO:0003914	atherosclerosis	MeSH:D050197	0.240100	Atherosclerosis
+EFO:0003914	atherosclerosis	MeSH:D050379	0.000000	Arteriolosclerosis
+EFO:0003914	atherosclerosis	MeSH:D001161	0.000000	Arteriosclerosis
+EFO:0000756	melanoma	MeSH:D008545	0.240100	Melanoma
+EFO:0000756	melanoma	MeSH:C536149	0.000000	Melanoma astrocytoma syndrome
+EFO:0003819	dental caries	MeSH:D003731	0.240100	Dental Caries
+EFO:0000681	renal cell carcinoma	MeSH:D002292	0.240100	Carcinoma, Renal Cell
+EFO:0000681	renal cell carcinoma	MeSH:C538614	0.000000	Papillary renal cell carcinoma, sporadic
+EFO:0004273	scoliosis	MeSH:D012600	0.240100	Scoliosis
+EFO:0004273	scoliosis	MeSH:D013121	0.000000	Spinal Curvatures
+EFO:0004214	Abdominal Aortic Aneurysm	MeSH:D017544	0.240100	Aortic Aneurysm, Abdominal
+EFO:0004246	mucocutaneous lymph node syndrome	MeSH:D009080	0.240100	Mucocutaneous Lymph Node Syndrome
+EFO:0003956	seasonal allergic rhinitis	MeSH:D006255	0.168070	Rhinitis, Allergic, Seasonal
+EFO:0003956	seasonal allergic rhinitis	MeSH:D065631	0.000134	Rhinitis, Allergic
+EFO:0004220	Chronic Hepatitis C infection	MeSH:D019698	0.168070	Hepatitis C, Chronic
+EFO:0004220	Chronic Hepatitis C infection	MeSH:D006526	0.000000	Hepatitis C
+EFO:0004705	hypothyroidism	MeSH:D007037	0.168070	Hypothyroidism
+EFO:0000474	epilepsy	MeSH:D004827	0.168070	Epilepsy
+EFO:0000474	epilepsy	MeSH:D012640	0.000000	Seizures
+EFO:0004770	ovarian reserve	MeSH:D065851	0.168070	Ovarian Reserve
+EFO:0004226	Creutzfeldt Jacob Disease	MeSH:D007562	0.168070	Creutzfeldt-Jakob Syndrome
+EFO:0004226	Creutzfeldt Jacob Disease	MeSH:D016643	0.000000	Encephalopathy, Bovine Spongiform
+EFO:0003778	psoriatic arthritis	MeSH:D015535	0.168070	Arthritis, Psoriatic
+EFO:0004194	IGA glomerulonephritis	MeSH:D005922	0.168070	Glomerulonephritis, IGA
+EFO:0003963	freckles	MeSH:D008548	0.168070	Melanosis
+EFO:0004291	braces	MeSH:D001915	0.168070	Braces
+EFO:0003889	functional laterality	MeSH:D007839	0.168070	Functional Laterality
+EFO:0003924	hair color	MeSH:D006200	0.168070	Hair Color
+EFO:0003947	personality	MeSH:D010551	0.168070	Personality
+EFO:0000096	neoplasm of mature B-cells	MeSH:D008224	0.168070	Lymphoma, Follicular
+EFO:0000096	neoplasm of mature B-cells	MeSH:D016393	0.000134	Lymphoma, B-Cell
+EFO:0003086	kidney disease	MeSH:D007674	0.168070	Kidney Diseases
+EFO:0003086	kidney disease	MeSH:D009401	0.000000	Nephrosis
+EFO:0004265	peripheral arterial disease	MeSH:D058729	0.168070	Peripheral Arterial Disease
+EFO:0004265	peripheral arterial disease	MeSH:D016491	0.000000	Peripheral Vascular Diseases
+EFO:0004192	alopecia areata	MeSH:D000506	0.168070	Alopecia Areata
+EFO:0004272	anemia	MeSH:D000740	0.168070	Anemia
+EFO:0004272	anemia	MeSH:C567533	0.000000	Anemia, Nonspherocytic Hemolytic, Due To G6pd Deficiency
+EFO:0004272	anemia	MeSH:D000746	0.000000	Anemia, Hemolytic, Congenital Nonspherocytic
+EFO:0003758	autism	MeSH:D001321	0.168070	Autistic Disorder
+EFO:0003758	autism	MeSH:D038901	0.000000	Mental Retardation, X-Linked
+EFO:0003758	autism	MeSH:D002659	0.000000	Child Development Disorders, Pervasive
+EFO:0004236	focal segmental glomerulosclerosis	MeSH:D005923	0.168070	Glomerulosclerosis, Focal Segmental
+EFO:0004236	focal segmental glomerulosclerosis	MeSH:C565831	0.000000	Focal Segmental Glomerulosclerosis 2
+EFO:0004236	focal segmental glomerulosclerosis	MeSH:C567687	0.000000	Focal Segmental Glomerulosclerosis 5
+EFO:0000614	narcolepsy with cataplexy	MeSH:D009290	0.168070	Narcolepsy
+EFO:0000614	narcolepsy with cataplexy	MeSH:C563534	0.000000	Narcolepsy 1
+EFO:0004249	meningococcal infection	MeSH:D008589	0.168070	Meningococcal Infections
+EFO:0004212	Keloid	MeSH:D007627	0.168070	Keloid
+EFO:0000464	emphysema	MeSH:D004646	0.168070	Emphysema
+EFO:0000464	emphysema	MeSH:D011656	0.000134	Pulmonary Emphysema
+EFO:0000677	mental or behavioural disorder	MeSH:D011618	0.168070	Psychotic Disorders
+EFO:0000677	mental or behavioural disorder	MeSH:D001523	0.168070	Mental Disorders
+EFO:0004257	neurotic disorder	MeSH:C564323	0.168070	Neuroticism
+EFO:0004257	neurotic disorder	MeSH:D009497	0.168070	Neurotic Disorders
+EFO:0004257	neurotic disorder	MeSH:D000275	0.000134	Adjustment Disorders
+EFO:0004257	neurotic disorder	MeSH:D003866	0.000134	Depressive Disorder
+EFO:0004211	Hypertriglyceridemia	MeSH:D015228	0.168070	Hypertriglyceridemia
+EFO:0002916	esophageal carcinoma	MeSH:D004938	0.168070	Esophageal Neoplasms
+EFO:0003821	migraine disorder	MeSH:D008881	0.168070	Migraine Disorders
+EFO:0000571	lung adenocarcinoma	MeSH:C538231	0.168070	Adenocarcinoma of lung
+EFO:0000571	lung adenocarcinoma	MeSH:D008175	0.000000	Lung Neoplasms
+EFO:0003095	non-alcoholic fatty liver disease	MeSH:D065626	0.168070	Non-alcoholic Fatty Liver Disease
+EFO:0001422	cirrhosis of liver	MeSH:D008103	0.168070	Liver Cirrhosis
+EFO:0001422	cirrhosis of liver	MeSH:C566123	0.000000	Cirrhosis, Familial
+EFO:0001075	ovarian carcinoma	MeSH:D010051	0.168070	Ovarian Neoplasms
+EFO:0001075	ovarian carcinoma	MeSH:C538090	0.000134	Ovarian epithelial cancer
+EFO:0004234	erectile dysfunction	MeSH:D007172	0.168070	Erectile Dysfunction
+EFO:0004229	Dupuytren Contracture	MeSH:D004387	0.168070	Dupuytren Contracture
+EFO:0000183	Hodgkins lymphoma	MeSH:D006689	0.168070	Hodgkin Disease
+EFO:0002690	systemic lupus erythematosus	MeSH:D008180	0.168070	Lupus Erythematosus, Systemic
+EFO:0004215	anorexia nervosa	MeSH:D000856	0.168070	Anorexia Nervosa
+EFO:0004215	anorexia nervosa	MeSH:D052018	0.000000	Bulimia Nervosa
+EFO:0004215	anorexia nervosa	MeSH:D002032	0.000000	Bulimia
+EFO:0000612	myocardial infarction	MeSH:D009203	0.168070	Myocardial Infarction
+EFO:0000702	small cell lung carcinoma	MeSH:D055752	0.168070	Small Cell Lung Carcinoma
+EFO:0000702	small cell lung carcinoma	MeSH:D018288	0.000134	Carcinoma, Small Cell
+EFO:0000621	neuroblastoma	MeSH:D009447	0.168070	Neuroblastoma
+EFO:0000621	neuroblastoma	MeSH:C538119	0.000000	Hirschsprung disease ganglioneuroblastoma
+EFO:0000621	neuroblastoma	MeSH:C536408	0.000000	Neural crest tumor
+EFO:0000095	chronic lymphocytic leukemia	MeSH:D015451	0.168070	Leukemia, Lymphocytic, Chronic, B-Cell
+EFO:0004243	carcinoid tumor	MeSH:D002276	0.168070	Carcinoid Tumor
+EFO:0004243	carcinoid tumor	MeSH:C562842	0.000000	Carcinoid Tumors, Intestinal
+EFO:0000660	polycystic ovary syndrome	MeSH:D011085	0.168070	Polycystic Ovary Syndrome
+EFO:0003757	Asperger syndrome	MeSH:D020817	0.168070	Asperger Syndrome
+EFO:0004242	obsessive-compulsive disorder	MeSH:D009771	0.168070	Obsessive-Compulsive Disorder
+EFO:0004242	obsessive-compulsive disorder	MeSH:D003192	0.000000	Compulsive Behavior
+EFO:0000401	diabetic nephropathy	MeSH:D003928	0.168070	Diabetic Nephropathies
+EFO:0004298	cardiovascular measurement	MeSH:D003935	0.168070	Diagnostic Techniques, Cardiovascular
+EFO:0003896	left ventricular hypertrophy	MeSH:D017379	0.168070	Hypertrophy, Left Ventricular
+EFO:0001060	celiac disease	MeSH:D002446	0.117649	Celiac Disease
+EFO:0000279	azoospermia	MeSH:D053713	0.117649	Azoospermia
+EFO:0003912	ankle brachial index	MeSH:D055109	0.117649	Ankle Brachial Index
+EFO:0003890	drug dependence	MeSH:D019966	0.117649	Substance-Related Disorders
+EFO:0004269	cardiac arrhythmia	MeSH:D001145	0.117649	Arrhythmias, Cardiac
+EFO:0004269	cardiac arrhythmia	MeSH:C562490	0.000000	Cardiac Conduction Defect
+EFO:0000714	survival time	MeSH:D013534	0.117649	Survival
+EFO:0004587	lymphocyte count	MeSH:D018655	0.117649	Lymphocyte Count
+EFO:0000712	stroke	MeSH:D020521	0.117649	Stroke
+EFO:0000712	stroke	MeSH:D002561	0.000094	Cerebrovascular Disorders
+EFO:0000712	stroke	MeSH:D002544	0.000000	Cerebral Infarction
+EFO:0000174	Ewing sarcoma	MeSH:D012512	0.117649	Sarcoma, Ewing
+EFO:0000174	Ewing sarcoma	MeSH:D018241	0.000000	Neuroectodermal Tumors, Primitive, Peripheral
+EFO:0000174	Ewing sarcoma	MeSH:C563168	0.000000	Askin Tumor
+EFO:0002609	chronic childhood arthritis	MeSH:D001171	0.117649	Arthritis, Juvenile
+EFO:0004253	nephrolithiasis	MeSH:D053040	0.117649	Nephrolithiasis
+EFO:0004253	nephrolithiasis	MeSH:C563477	0.000000	Nephrolithiasis, Calcium Oxalate
+EFO:0004607	duodenal ulcer	MeSH:D004381	0.117649	Duodenal Ulcer
+EFO:0004584	mean platelet volume	MeSH:D063847	0.117649	Mean Platelet Volume
+EFO:0000519	glioblastoma multiforme	MeSH:D005909	0.117649	Glioblastoma
+EFO:0003768	nicotine dependence	MeSH:D014029	0.117649	Tobacco Use Disorder
+EFO:0003768	nicotine dependence	MeSH:D012907	0.117649	Smoking
+EFO:0002608	AIDS dementia	MeSH:D015526	0.117649	AIDS Dementia Complex
+EFO:0004208	Vitiligo	MeSH:D014820	0.117649	Vitiligo
+EFO:0004799	cholelithiasis	MeSH:D002769	0.117649	Cholelithiasis
+EFO:0004799	cholelithiasis	MeSH:C566936	0.000000	Gallbladder Disease 4
+EFO:0004799	cholelithiasis	MeSH:D005705	0.000000	Gallbladder Diseases
+EFO:0004225	Coronary Vasospasm	MeSH:D003329	0.117649	Coronary Vasospasm
+EFO:0003784	skin pigmentation	MeSH:D012880	0.117649	Skin Pigmentation
+EFO:0004285	albuminuria	MeSH:D000419	0.117649	Albuminuria
+EFO:0003144	heart failure	MeSH:D006333	0.117649	Heart Failure
+EFO:0000319	cardiovascular disease	MeSH:D002318	0.117649	Cardiovascular Diseases
+EFO:0000319	cardiovascular disease	MeSH:D018376	0.000000	Cardiovascular Abnormalities
+EFO:0000319	cardiovascular disease	MeSH:C567088	0.000000	Angiopathy, Hereditary, With Nephropathy, Aneurysms, And Muscle Cramps
+EFO:0000319	cardiovascular disease	MeSH:D006331	0.000000	Heart Diseases
+EFO:0000409	disease free survival	MeSH:D018572	0.117649	Disease-Free Survival
+EFO:0003926	neuropsychological test	MeSH:D009483	0.117649	Neuropsychological Tests
+EFO:0004295	left ventricular function	MeSH:D016277	0.117649	Ventricular Function, Left
+EFO:0004210	gallstones	MeSH:D042882	0.117649	Gallstones
+EFO:0003958	sunburn	MeSH:D013471	0.117649	Sunburn
+EFO:0004259	osteonecrosis	MeSH:D010020	0.117649	Osteonecrosis
+EFO:0004294	left atrial function	MeSH:D016279	0.117649	Atrial Function, Left
+EFO:0004193	basal cell carcinoma	MeSH:D002280	0.082354	Carcinoma, Basal Cell
+EFO:0004193	basal cell carcinoma	MeSH:D018295	0.000066	Neoplasms, Basal Cell
+EFO:0000768	idiopathic pulmonary fibrosis	MeSH:D054990	0.082354	Idiopathic Pulmonary Fibrosis
+EFO:0000768	idiopathic pulmonary fibrosis	MeSH:D011658	0.000000	Pulmonary Fibrosis
+EFO:0000768	idiopathic pulmonary fibrosis	MeSH:C538494	0.000000	Aplastic anemia, idiopathic
+EFO:0004216	conduct disorder	MeSH:D019955	0.082354	Conduct Disorder
+EFO:0000765	AIDS	MeSH:D000163	0.082354	Acquired Immunodeficiency Syndrome
+EFO:0000765	AIDS	MeSH:D015658	0.000000	HIV Infections
+EFO:0000220	acute lymphoblastic leukemia	MeSH:D054198	0.082354	Precursor Cell Lymphoblastic Leukemia-Lymphoma
+EFO:0003108	essential tremor	MeSH:D020329	0.082354	Essential Tremor
+EFO:0003108	essential tremor	MeSH:D014202	0.000000	Tremor
+EFO:0003108	essential tremor	MeSH:C536545	0.000000	Tremor hereditary essential, 1
+EFO:0003843	pain	MeSH:D010146	0.082354	Pain
+EFO:0004262	panic disorder	MeSH:D016584	0.082354	Panic Disorder
+EFO:0004213	otosclerosis	MeSH:D010040	0.082354	Otosclerosis
+EFO:0004279	suntan	MeSH:D055107	0.082354	Suntan
+EFO:0001068	malaria	MeSH:D008288	0.082354	Malaria
+EFO:0004252	nasopharyngeal neoplasm	MeSH:C538339	0.082354	Nasopharyngeal carcinoma
+EFO:0004252	nasopharyngeal neoplasm	MeSH:D009303	0.082354	Nasopharyngeal Neoplasms
+EFO:0004248	male infertility	MeSH:D007248	0.082354	Infertility, Male
+EFO:0004248	male infertility	MeSH:C536718	0.000000	Young Syndrome
+EFO:0004248	male infertility	MeSH:C562903	0.000000	Male Infertility with Large-Headed, Multiflagellar, Polyploid Spermatozoa
+EFO:0003845	kidney stone	MeSH:D007669	0.082354	Kidney Calculi
+EFO:0003845	kidney stone	MeSH:D053040	0.000000	Nephrolithiasis
+EFO:0003845	kidney stone	MeSH:C563477	0.000000	Nephrolithiasis, Calcium Oxalate
+EFO:0000625	nevus	MeSH:D009506	0.082354	Nevus
+EFO:0000625	nevus	MeSH:D009508	0.000000	Nevus, Pigmented
+EFO:0000625	nevus	MeSH:C580062	0.000000	Epidermal Nevus
+EFO:0003882	osteoporosis	MeSH:D010024	0.082354	Osteoporosis
+EFO:0003882	osteoporosis	MeSH:D015663	0.000066	Osteoporosis, Postmenopausal
+EFO:0000483	exercise	MeSH:D015444	0.082354	Exercise
+EFO:0003770	diabetic retinopathy	MeSH:D003930	0.082354	Diabetic Retinopathy
+EFO:0000540	immune system disease	MeSH:D001327	0.082354	Autoimmune Diseases
+EFO:0000540	immune system disease	MeSH:D007154	0.000066	Immune System Diseases
+EFO:0000540	immune system disease	MeSH:C537778	0.000000	Antisynthetase syndrome
+EFO:0000540	immune system disease	MeSH:C565027	0.000000	Complement Factor D Deficiency
+EFO:0000540	immune system disease	MeSH:C538273	0.000000	Autoimmune enteropathy
+EFO:0000540	immune system disease	MeSH:D000069281	0.000000	Autoimmune Hypophysitis
+EFO:0000540	immune system disease	MeSH:D016736	0.000000	Antiphospholipid Syndrome
+EFO:0000540	immune system disease	MeSH:C563602	0.000000	Mannose-Binding Protein Deficiency
+EFO:0000540	immune system disease	MeSH:C537241	0.000000	Properdin deficiency, X-linked
+EFO:0000540	immune system disease	MeSH:C562875	0.000000	Complement Factor H Deficiency
+EFO:0000540	immune system disease	MeSH:C562876	0.000000	Carboxypeptidase N Deficiency
+EFO:0003867	rhabdomyolysis	MeSH:D012206	0.082354	Rhabdomyolysis
+EFO:0002503	cardiac hypertrophy	MeSH:D006332	0.082354	Cardiomegaly
+EFO:0004255	nephrotic syndrome	MeSH:D009404	0.082354	Nephrotic Syndrome
+EFO:0004255	nephrotic syndrome	MeSH:C535761	0.000000	Nephrosis, congenital
+EFO:0004255	nephrotic syndrome	MeSH:D009402	0.000000	Nephrosis, Lipoid
+EFO:0004284	upper aerodigestive tract neoplasm	MeSH:D006258	0.082354	Head and Neck Neoplasms
+EFO:0004284	upper aerodigestive tract neoplasm	MeSH:D002294	0.000000	Carcinoma, Squamous Cell
+EFO:0004254	membranous glomerulonephritis	MeSH:D015433	0.082354	Glomerulonephritis, Membranous
+EFO:0000731	uterine fibroid	MeSH:D007889	0.082354	Leiomyoma
+EFO:0000731	uterine fibroid	MeSH:D047708	0.082354	Myofibroma
+EFO:0000403	diffuse large B-cell lymphoma	MeSH:D016403	0.082354	Lymphoma, Large B-Cell, Diffuse
+EFO:0000403	diffuse large B-cell lymphoma	MeSH:D008228	0.000000	Lymphoma, Non-Hodgkin
+EFO:0004230	endometrial neoplasm	MeSH:D016889	0.082354	Endometrial Neoplasms
+EFO:0004230	endometrial neoplasm	MeSH:D018269	0.000066	Carcinoma, Endometrioid
+EFO:0000407	dilated cardiomyopathy	MeSH:D002311	0.082354	Cardiomyopathy, Dilated
+EFO:0000516	glaucoma	MeSH:D005901	0.082354	Glaucoma
+EFO:0000339	chronic myelogenous leukemia	MeSH:D015464	0.082354	Leukemia, Myelogenous, Chronic, BCR-ABL Positive
+EFO:0000339	chronic myelogenous leukemia	MeSH:D015466	0.082354	Leukemia, Myeloid, Chronic-Phase
+EFO:0004261	osteitis deformans	MeSH:D010001	0.082354	Osteitis Deformans
+EFO:0004278	sudden cardiac arrest	MeSH:D016757	0.082354	Death, Sudden, Cardiac
+EFO:0004278	sudden cardiac arrest	MeSH:C562490	0.000000	Cardiac Conduction Defect
+EFO:0004244	interstitial lung disease	MeSH:D017563	0.057648	Lung Diseases, Interstitial
+EFO:0004239	chronic hepatitis B infection	MeSH:D019694	0.057648	Hepatitis B, Chronic
+EFO:0004239	chronic hepatitis B infection	MeSH:D006509	0.000000	Hepatitis B
+EFO:1000657	rectum cancer	MeSH:D012004	0.057648	Rectal Neoplasms
+EFO:0004288	colonic neoplasm	MeSH:D003110	0.057648	Colonic Neoplasms
+EFO:0004247	mood disorder	MeSH:D019964	0.057648	Mood Disorders
+EFO:0000203	monoclonal gammopathy	MeSH:D008998	0.057648	Monoclonal Gammopathy of Undetermined Significance
+EFO:0000203	monoclonal gammopathy	MeSH:D010265	0.000046	Paraproteinemias
+EFO:0000707	squamous cell carcinoma	MeSH:D002294	0.057648	Carcinoma, Squamous Cell
+EFO:0000707	squamous cell carcinoma	MeSH:D018307	0.000046	Neoplasms, Squamous Cell
+EFO:0000707	squamous cell carcinoma	MeSH:D009062	0.000000	Mouth Neoplasms
+EFO:0000707	squamous cell carcinoma	MeSH:D006258	0.000000	Head and Neck Neoplasms
+EFO:0000707	squamous cell carcinoma	MeSH:D014062	0.000000	Tongue Neoplasms
+EFO:0003961	hormone replacement therapy	MeSH:D020249	0.057648	Hormone Replacement Therapy
+EFO:0003918	obstructive sleep apnea	MeSH:D020181	0.057648	Sleep Apnea, Obstructive
+EFO:0003918	obstructive sleep apnea	MeSH:D012891	0.000046	Sleep Apnea Syndromes
+EFO:0004820	sex ratio	MeSH:D012744	0.040354	Sex Ratio
+EFO:0005208	glomerular filtration rate	MeSH:D005919	0.040354	Glomerular Filtration Rate
+EFO:0004710	pelvic organ prolapse	MeSH:D056887	0.040354	Pelvic Organ Prolapse
+EFO:0003948	gastroesophageal reflux disease	MeSH:D005764	0.040354	Gastroesophageal Reflux
+EFO:0003948	gastroesophageal reflux disease	MeSH:D006356	0.000000	Heartburn
+EFO:0003948	gastroesophageal reflux disease	MeSH:C562730	0.000000	Adenocarcinoma Of Esophagus
+EFO:0000699	Sjogren syndrome	MeSH:D012859	0.040354	Sjogren's Syndrome
+EFO:0000699	Sjogren syndrome	MeSH:D008882	0.000032	Mikulicz' Disease
+EFO:1001293	collagenous colitis	MeSH:D046729	0.040354	Colitis, Collagenous
+EFO:1000881	coronary aneurysm	MeSH:D003323	0.040354	Coronary Aneurysm
+EFO:1000881	coronary aneurysm	MeSH:C565153	0.000000	Coronary Artery Dissection, Spontaneous
+EFO:0000783	myositis	MeSH:D009220	0.040354	Myositis
+EFO:0000783	myositis	MeSH:C000598745	0.000000	Juvenile dermatomyositis
+EFO:1000802	alcoholic liver cirrhosis	MeSH:D008104	0.040354	Liver Cirrhosis, Alcoholic
+EFO:0000478	esophageal adenocarcinoma	MeSH:C562730	0.040354	Adenocarcinoma Of Esophagus
+EFO:0000478	esophageal adenocarcinoma	MeSH:D005764	0.000000	Gastroesophageal Reflux
+EFO:0000280	Barrett's esophagus	MeSH:D001471	0.040354	Barrett Esophagus
+EFO:1001466	Graves ophthalmopathy	MeSH:D049970	0.028248	Graves Ophthalmopathy
+EFO:1001926	pathological gambling	MeSH:D005715	0.028248	Gambling
+EFO:0006788	anxiety disorder	MeSH:D001008	0.028248	Anxiety Disorders
+EFO:0000649	periodontitis	MeSH:D010518	0.028248	Periodontitis
+EFO:0000649	periodontitis	MeSH:D010520	0.000000	Aggressive Periodontitis
+EFO:0000649	periodontitis	MeSH:D055113	0.000000	Chronic Periodontitis
+EFO:0000649	periodontitis	MeSH:D010510	0.000000	Periodontal Diseases
+EFO:0000649	periodontitis	MeSH:D005882	0.000000	Gingival Diseases
+EFO:0005531	urticaria	MeSH:D014581	0.028248	Urticaria
+EFO:0005532	angioedema	MeSH:D000799	0.028248	Angioedema
+EFO:0005532	angioedema	MeSH:C535293	0.000000	Reactive angioendotheliomatosis
+EFO:0005532	angioedema	MeSH:C538173	0.000000	Acquired angioedema
+EFO:0005424	dyslexia	MeSH:D004410	0.028248	Dyslexia
+EFO:0005424	dyslexia	MeSH:D004411	0.000000	Dyslexia, Acquired
+EFO:0004994	lumbar disc degeneration	MeSH:C535531	0.028248	Intervertebral disc disease
+EFO:0004994	lumbar disc degeneration	MeSH:D055959	0.000000	Intervertebral Disc Degeneration
+EFO:0000405	digestive system disease	MeSH:D004066	0.028248	Digestive System Diseases
+EFO:0000405	digestive system disease	MeSH:D005767	0.028248	Gastrointestinal Diseases
+EFO:0000405	digestive system disease	MeSH:D007410	0.028248	Intestinal Diseases
+EFO:0000405	digestive system disease	MeSH:D012002	0.000000	Rectal Diseases
+EFO:0000405	digestive system disease	MeSH:D011349	0.000000	Proctitis
+EFO:0005230	anxiety	MeSH:D001007	0.028248	Anxiety
+EFO:0003894	acne	MeSH:D000152	0.028248	Acne Vulgaris
+EFO:0001059	cataract	MeSH:D002386	0.028248	Cataract
+EFO:0001059	cataract	MeSH:C535341	0.000000
+EFO:0000278	pancreatitis	MeSH:D010195	0.028248	Pancreatitis
+EFO:0000574	lymphoma	MeSH:D008223	0.028248	Lymphoma
+EFO:0000574	lymphoma	MeSH:D008228	0.000000	Lymphoma, Non-Hodgkin
+EFO:0005922	esophageal squamous cell carcinoma	MeSH:C562729	0.028248	Esophageal Squamous Cell Carcinoma
+EFO:0005922	esophageal squamous cell carcinoma	MeSH:D004938	0.000023	Esophageal Neoplasms
+EFO:0005229	reading	MeSH:D011932	0.028248	Reading
+EFO:0004804	birth rate	MeSH:D001723	0.028248	Birth Rate
+EFO:0006789	typhoid fever	MeSH:D014435	0.028248	Typhoid Fever
+EFO:0004232	eosinophilic esophagitis	MeSH:D057765	0.028248	Eosinophilic Esophagitis
+EFO:0003779	Hashimoto's thyroiditis	MeSH:D050031	0.028248	Hashimoto Disease
+EFO:0003779	Hashimoto's thyroiditis	MeSH:D013967	0.000023	Thyroiditis, Autoimmune
+EFO:0006865	urgency urinary incontinence	MeSH:D053202	0.019773	Urinary Incontinence, Urge
+EFO:0006511	Kashin-Beck disease	MeSH:D057767	0.019773	Kashin-Beck Disease
+EFO:0003106	pneumonia	MeSH:D011014	0.019773	Pneumonia
+EFO:0006510	Herpes Zoster	MeSH:D006562	0.019773	Herpes Zoster
+EFO:0000217	gastritis	MeSH:D005756	0.019773	Gastritis
+EFO:0005204	bulimia nervosa	MeSH:D052018	0.019773	Bulimia Nervosa
+EFO:0005204	bulimia nervosa	MeSH:D002032	0.000016	Bulimia
+EFO:0005204	bulimia nervosa	MeSH:D000856	0.000000	Anorexia Nervosa
+EFO:0005297	Granulomatosis with Polyangiitis	MeSH:D014890	0.019773	Granulomatosis with Polyangiitis
+EFO:0005297	Granulomatosis with Polyangiitis	MeSH:C536901	0.000000	Thrombotic thrombocytopenic purpura, acquired
+EFO:0005244	gastric bypass	MeSH:D015390	0.019773	Gastric Bypass
+EFO:0003939	energy intake	MeSH:D002149	0.019773	Energy Intake
+EFO:0000668	preeclampsia	MeSH:D014115	0.019773	Toxemia
+EFO:0000668	preeclampsia	MeSH:D011225	0.019773	Pre-Eclampsia
+EFO:0000668	preeclampsia	MeSH:D046110	0.000016	Hypertension, Pregnancy-Induced
+EFO:0000668	preeclampsia	MeSH:D017359	0.000000	HELLP Syndrome
+EFO:0000668	preeclampsia	MeSH:C563724	0.000000	Preeclampsia Eclampsia 4
+EFO:0005529	Chagas cardiomyopathy	MeSH:D002598	0.019773	Chagas Cardiomyopathy
+EFO:0000555	irritable bowel syndrome	MeSH:D043183	0.019773	Irritable Bowel Syndrome
+EFO:0004992	Otitis media	MeSH:D010033	0.019773	Otitis Media
+EFO:0000398	dermatomyositis	MeSH:D003882	0.019773	Dermatomyositis
+EFO:0000553	invasive lobular carcinoma	MeSH:D018275	0.019773	Carcinoma, Lobular
+EFO:0005295	migraine with aura	MeSH:D020325	0.019773	Migraine with Aura
+EFO:0005296	migraine without aura	MeSH:D020326	0.019773	Migraine without Aura
+EFO:0005307	torsades de pointes	MeSH:D016171	0.013841	Torsades de Pointes
+EFO:0004699	gambling behaviour	MeSH:D005715	0.013841	Gambling
+EFO:0004895	Tourette syndrome	MeSH:D005879	0.013841	Tourette Syndrome
+EFO:0004238	hearing loss	MeSH:D034381	0.013841	Hearing Loss
+EFO:0004238	hearing loss	MeSH:D003638	0.000000	Deafness
+EFO:0004263	partial epilepsy	MeSH:D004828	0.013841	Epilepsies, Partial
+EFO:0003762	vitamin D deficiency	MeSH:D014808	0.013841	Vitamin D Deficiency
+EFO:0003925	cognition	MeSH:D003071	0.013841	Cognition
+EFO:0005761	lupus nephritis	MeSH:D008181	0.013841	Lupus Nephritis
+EFO:0005846	cryoglobulinemia	MeSH:D003449	0.013841	Cryoglobulinemia
+EFO:0005895	ossification of the posterior longitudinal ligament of the spine	MeSH:C537143	0.013841	Ossification of the posterior longitudinal ligament of the spine
+EFO:0005895	ossification of the posterior longitudinal ligament of the spine	MeSH:D017887	0.000000	Ossification of Posterior Longitudinal Ligament
+EFO:0004209	hypospadias	MeSH:D007021	0.013841	Hypospadias
+EFO:0006342	aggressive periodontitis	MeSH:D010520	0.013841	Aggressive Periodontitis
+EFO:0006342	aggressive periodontitis	MeSH:D010518	0.000000	Periodontitis
+EFO:0006344	medication adherence behavior	MeSH:D055118	0.013841	Medication Adherence
+EFO:0003940	physical activity	MeSH:D009043	0.013841	Motor Activity
+EFO:0001062	cytomegalovirus infection	MeSH:D003586	0.013841	Cytomegalovirus Infections
+EFO:0000769	Epstein-Barr virus infection	MeSH:D020031	0.013841	Epstein-Barr Virus Infections
+EFO:0001361	pulmonary arterial hypertension	MeSH:D006976	0.013841	Hypertension, Pulmonary
+EFO:0001361	pulmonary arterial hypertension	MeSH:D065627	0.000000	Familial Primary Pulmonary Hypertension
+EFO:0001382	puberty	MeSH:D011627	0.013841	Puberty
+EFO:1001434	Tendinopathy	MeSH:D052256	0.009689	Tendinopathy
+EFO:0006792	Lewy body dementia	MeSH:D020961	0.009689	Lewy Body Disease
+EFO:0006792	Lewy body dementia	MeSH:D016631	0.000000	Lewy Bodies
+EFO:0004991	Myasthenia gravis	MeSH:D009157	0.009689	Myasthenia Gravis
+EFO:1001929	selective IgA deficiency disease	MeSH:D017098	0.009689	IgA Deficiency
+EFO:0005112	gestational age	MeSH:D005865	0.009689	Gestational Age
+EFO:0001421	liver disease	MeSH:D008107	0.009689	Liver Diseases
+EFO:1001022	low tension glaucoma	MeSH:D057066	0.009689	Low Tension Glaucoma
+EFO:0003827	pulmonary embolism	MeSH:D011655	0.009689	Pulmonary Embolism
+EFO:0000764	HIV infection	MeSH:D015658	0.006782	HIV Infections
+EFO:0000764	HIV infection	MeSH:D006678	0.000000	HIV
+EFO:0002689	antiphospholipid syndrome	MeSH:D016736	0.006782	Antiphospholipid Syndrome
+EFO:1001209	temporal arteritis	MeSH:D013700	0.006782	Giant Cell Arteritis
+EFO:1001931	oropharynx cancer	MeSH:D009959	0.006782	Oropharyngeal Neoplasms
+EFO:0004240	heroin dependence	MeSH:D006556	0.006782	Heroin Dependence
+EFO:1001459	diabetic foot	MeSH:D017719	0.006782	Diabetic Foot
+EFO:0003931	bone fracture	MeSH:D050723	0.006782	Fractures, Bone
+EFO:1001050	multiple system atrophy	MeSH:D019578	0.004748	Multiple System Atrophy
+EFO:1001050	multiple system atrophy	MeSH:D012791	0.004748	Shy-Drager Syndrome
+EFO:1001161	rheumatic heart disease	MeSH:D012214	0.004748	Rheumatic Heart Disease
+EFO:0008008	lower urinary tract symptom	MeSH:D059411	0.004748	Lower Urinary Tract Symptoms
+EFO:0000284	benign prostatic hyperplasia	MeSH:D011470	0.004748	Prostatic Hyperplasia
+EFO:1000965	Henoch-Schoenlein purpura	MeSH:D011695	0.001628	Purpura, Schoenlein-Henoch
+EFO:0003917	premature birth	MeSH:D047928	0.001628	Premature Birth
+EFO:0000404	diffuse scleroderma	MeSH:D045743	0.001140	Scleroderma, Diffuse
+EFO:0000404	diffuse scleroderma	MeSH:D012595	0.000000	Scleroderma, Systemic
+EFO:1001017	limited scleroderma	MeSH:D045745	0.001140	Scleroderma, Limited
+EFO:0003902	spinal fracture	MeSH:D016103	0.001140	Spinal Fractures
+EFO:0003928	necrotizing enterocolitis	MeSH:D020345	0.001140	Enterocolitis, Necrotizing
+EFO:0004256	neuromyelitis optica	MeSH:D009471	0.001140	Neuromyelitis Optica
+EFO:1001436	thyroid nodule	MeSH:D016606	0.000798	Thyroid Nodule
+EFO:0007537	vestibular neuronitis	MeSH:D020338	0.000798	Vestibular Neuronitis
+EFO:1001754	Abruptio Placentae	MeSH:D000037	0.000798	Abruptio Placentae
+EFO:1001754	Abruptio Placentae	MeSH:D000033	0.000001	Abortion, Threatened
+EFO:1001231	uveitis	MeSH:D014605	0.000798	Uveitis
+EFO:1001460	diverticulitis	MeSH:D004238	0.000798	Diverticulitis
+EFO:1001857	Takayasu arteritis	MeSH:D013625	0.000798	Takayasu Arteritis
+EFO:1001857	Takayasu arteritis	MeSH:D001015	0.000001	Aortic Arch Syndromes
+EFO:0005842	colorectal cancer	MeSH:D015179	0.000559	Colorectal Neoplasms
+EFO:0005842	colorectal cancer	MeSH:C538265	0.000000	Attenuated familial adenomatous polyposis
+EFO:1001486	primary biliary cirrhosis	MeSH:D008105	0.000391	Liver Cirrhosis, Biliary
+EFO:1001512	endometrial carcinoma	MeSH:D018269	0.000391	Carcinoma, Endometrioid
+EFO:1001512	endometrial carcinoma	MeSH:D016889	0.000391	Endometrial Neoplasms
+EFO:0000311	cancer	MeSH:D009369	0.000391	Neoplasms
+EFO:0000311	cancer	MeSH:D009371	0.000000	Neoplasms by Site
+EFO:0001061	cervical carcinoma	MeSH:D002583	0.000391	Uterine Cervical Neoplasms
+EFO:0005672	acute coronary syndrome	MeSH:D054058	0.000391	Acute Coronary Syndrome
+EFO:0005411	schizoaffective disorder	MeSH:D011618	0.000274	Psychotic Disorders
+EFO:0005425	language impairment	MeSH:D007806	0.000274	Language Disorders
+EFO:1000764	seborrheic dermatitis	MeSH:D012628	0.000274	Dermatitis, Seborrheic
+EFO:0009130	clostridium difficile infection	MeSH:D004761	0.000274	Enterocolitis, Pseudomembranous
+EFO:0005924	binge eating	MeSH:D002032	0.000274	Bulimia
+EFO:0005924	binge eating	MeSH:D052018	0.000000	Bulimia Nervosa
+EFO:0003047	hepatitis C infection	MeSH:D006526	0.000274	Hepatitis C
+EFO:0003047	hepatitis C infection	MeSH:D019698	0.000274	Hepatitis C, Chronic
+EFO:0005410	tooth agenesis	MeSH:D000848	0.000274	Anodontia
+EFO:0005676	Autoimmune Hepatitis	MeSH:D019693	0.000192	Hepatitis, Autoimmune
+EFO:0004698	insomnia	MeSH:D007319	0.000192	Sleep Initiation and Maintenance Disorders
+EFO:0009104	hyperuricemia	MeSH:D033461	0.000192	Hyperuricemia
+EFO:0003060	non-small cell lung carcinoma	MeSH:D002289	0.000192	Carcinoma, Non-Small-Cell Lung
+EFO:0004227	Dengue Hemorrhagic Fever	MeSH:D019595	0.000192	Severe Dengue
+EFO:0004267	biliary liver cirrhosis	MeSH:D008105	0.000134	Liver Cirrhosis, Biliary
+EFO:0004207	pathological myopia	MeSH:D047728	0.000134	Myopia, Degenerative
+EFO:0002892	thyroid carcinoma	MeSH:D013964	0.000134	Thyroid Neoplasms
+EFO:0004720	prion disease	MeSH:D017096	0.000094	Prion Diseases
+EFO:0004720	prion disease	MeSH:C564678	0.000000	Spongiform Encephalopathy with Neuropsychiatric Features
+EFO:0004593	gestational diabetes	MeSH:D016640	0.000094	Diabetes, Gestational
+EFO:0004707	infantile hypertrophic pyloric stenosis	MeSH:D046248	0.000094	Pyloric Stenosis, Hypertrophic
+EFO:0004606	gallbladder neoplasm	MeSH:D005706	0.000094	Gallbladder Neoplasms
+EFO:0004714	sexual dysfunction	MeSH:D012735	0.000094	Sexual Dysfunction, Physiological
+EFO:0005088	testicular carcinoma	MeSH:D013736	0.000066	Testicular Neoplasms
+EFO:0005088	testicular carcinoma	MeSH:C563236	0.000000	Testicular Germ Cell Tumor
+EFO:1000648	developmental dysplasia of the hip	MeSH:D006618	0.000046	Hip Dislocation, Congenital
+EFO:1000566	Testicular Germ Cell Tumor	MeSH:C563236	0.000046	Testicular Germ Cell Tumor
+EFO:1000566	Testicular Germ Cell Tumor	MeSH:D018239	0.000000	Seminoma
+EFO:1000566	Testicular Germ Cell Tumor	MeSH:D013736	0.000000	Testicular Neoplasms
+EFO:0006812	autoimmune thyroid disease	MeSH:D013967	0.000046	Thyroiditis, Autoimmune
+EFO:1000478	Pituitary Gland Adenoma	MeSH:D010911	0.000046	Pituitary Neoplasms
+EFO:0005203	eating disorder	MeSH:D001068	0.000046	Feeding and Eating Disorders
+EFO:0000389	cutaneous melanoma	MeSH:C562393	0.000032	Melanoma, Cutaneous Malignant
+EFO:0000389	cutaneous melanoma	MeSH:D008545	0.000000	Melanoma
+EFO:0005140	autoimmune disease	MeSH:D001327	0.000032	Autoimmune Diseases
+EFO:0002610	cocaine dependence	MeSH:D019970	0.000023	Cocaine-Related Disorders
+EFO:0005537	triple-negative breast cancer	MeSH:D064726	0.000023	Triple Negative Breast Neoplasms
+EFO:0005045	visceral Leishmaniasis	MeSH:D007898	0.000023	Leishmaniasis, Visceral
+EFO:0005045	visceral Leishmaniasis	MeSH:D007896	0.000000	Leishmaniasis
+EFO:0005207	congenital heart disease	MeSH:D006330	0.000016	Heart Defects, Congenital
+EFO:0005207	congenital heart disease	MeSH:D012587	0.000000	Scimitar Syndrome
+EFO:0005279	temporomandibular joint disorder	MeSH:D013705	0.000016	Temporomandibular Joint Disorders
+EFO:0005669	intracerebral hemorrhage	MeSH:D002543	0.000011	Cerebral Hemorrhage
+EFO:0005854	allergic rhinitis	MeSH:D065631	0.000011	Rhinitis, Allergic
+EFO:0005854	allergic rhinitis	MeSH:D006255	0.000000	Rhinitis, Allergic, Seasonal
+EFO:0005917	generalised epilepsy	MeSH:D004829	0.000011	Epilepsy, Generalized
+EFO:0004718	vascular dementia	MeSH:D015140	0.000011	Dementia, Vascular
+EFO:0004718	vascular dementia	MeSH:D015161	0.000000	Dementia, Multi-Infarct
+EFO:0003839	retinopathy	MeSH:D012164	0.000011	Retinal Diseases
+EFO:0006791	vascular brain injury	MeSH:D020214	0.000008	Cerebrovascular Trauma
+EFO:0006835	pyoderma gangrenosum	MeSH:D017511	0.000008	Pyoderma Gangrenosum
+EFO:0006928	motion sickness	MeSH:D009041	0.000008	Motion Sickness
+EFO:0000181	head and neck squamous cell carcinoma	MeSH:C535575	0.000008	Carcinoma, squamous cell of head and neck
+EFO:0003033	bacteriemia	MeSH:D016470	0.000008	Bacteremia
+EFO:0005577	pharynx cancer	MeSH:D010610	0.000008	Pharyngeal Neoplasms
+EFO:0006859	head and neck malignant neoplasia	MeSH:D006258	0.000005	Head and Neck Neoplasms
+EFO:1000616	Uveal Melanoma	MeSH:C536494	0.000004	Uveal melanoma
+EFO:1002013	alcoholic pancreatitis	MeSH:D019512	0.000004	Pancreatitis, Alcoholic
+EFO:0000641	papillary thyroid carcinoma	MeSH:C536915	0.000001	Thyroid cancer, papillary
+EFO:0000641	papillary thyroid carcinoma	MeSH:D000231	0.000000	Adenocarcinoma, Papillary
+EFO:1002021	ankle injury	MeSH:D016459	0.000001	Prosthesis-Related Infections
+EFO:1002019	oligoarticular juvenile idiopathic arthritis	MeSH:C536312	0.000001	Juvenile pauciarticular chronic arthritis
+EFO:1000039	meningeal tuberculosis	MeSH:D014390	0.000001	Tuberculosis, Meningeal
+EFO:0009267	delirium	MeSH:D003693	0.000001	Delirium
+EFO:0003063	polymyositis	MeSH:D017285	0.000001	Polymyositis
+EFO:0000557	juvenile dermatomyositis	MeSH:C000598745	0.000001	Juvenile dermatomyositis
+EFO:0000557	juvenile dermatomyositis	MeSH:D003882	0.000001	Dermatomyositis
+EFO:0000557	juvenile dermatomyositis	MeSH:C538250	0.000000	Amyopathic dermatomyositis
+EFO:0009373	edema	MeSH:D004487	0.000001	Edema
+EFO:0008601	pemphigus foliaceus	MeSH:D010392	0.000001	Pemphigus
+EFO:0009441	Waldenstrom macroglobulinemia	MeSH:D008258	0.000001	Waldenstrom Macroglobulinemia
+EFO:0009189	Hyperthyroidism	MeSH:D006980	0.000001	Hyperthyroidism
+EFO:0009189	Hyperthyroidism	MeSH:C566384	0.000000	Hyperthyroidism, Familial Gestational
+EFO:0005246	hypersomnia	MeSH:D006970	0.000000	Disorders of Excessive Somnolence
+EFO:0000180	HIV-1 infection	MeSH:D000163	0.000000	Acquired Immunodeficiency Syndrome
+EFO:0000180	HIV-1 infection	MeSH:D015497	0.000000	HIV-1
+EFO:0001663	prostate carcinoma	MeSH:D011471	0.000000	Prostatic Neoplasms
+EFO:0001663	prostate carcinoma	MeSH:C537243	0.000000	Prostate cancer, familial
+EFO:0006335	systolic blood pressure	MeSH:D001794	0.000000	Blood Pressure
+EFO:0006336	diastolic blood pressure	MeSH:D001794	0.000000	Blood Pressure
+EFO:0001072	memory impairment	MeSH:D000647	0.000000	Amnesia
+EFO:0001072	memory impairment	MeSH:D008569	0.000000	Memory Disorders
+EFO:0003100	peripheral neuropathy	MeSH:D010523	0.000000	Peripheral Nervous System Diseases
+EFO:1000481	Plantar Fibromatosis	MeSH:D000071380	0.000000	Fibromatosis, Plantar
+EFO:0005239	aortic valve calcification	MeSH:C562942	0.000000	Aortic Valve, Calcification of
+EFO:0004741	blood urea nitrogen measurement	MeSH:D001806	0.000000	Blood Urea Nitrogen
+EFO:0004775	toxic epidermal necrolysis	MeSH:D004816	0.000000
+EFO:0004775	toxic epidermal necrolysis	MeSH:D013262	0.000000	Stevens-Johnson Syndrome
+EFO:0006340	mean arterial pressure	MeSH:D062186	0.000000	Arterial Pressure
+EFO:0000178	gastric carcinoma	MeSH:D013274	0.000000	Stomach Neoplasms
+EFO:0004537	neonatal systemic lupus erthematosus	MeSH:C536397	0.000000	Neonatal Systemic lupus erythematosus
+EFO:0001357	sporadic amyotrophic lateral sclerosis	MeSH:C531617	0.000000	Amyotrophic lateral sclerosis 1
+EFO:0001357	sporadic amyotrophic lateral sclerosis	MeSH:D000690	0.000000	Amyotrophic Lateral Sclerosis
+EFO:0001357	sporadic amyotrophic lateral sclerosis	MeSH:C567699	0.000000	Amyotrophic Lateral Sclerosis 6, Autosomal Recessive
+EFO:0005767	rheumatoid factor measurement	MeSH:D012217	0.000000	Rheumatoid Factor
+EFO:1001250	rotator cuff tear	MeSH:D000070636	0.000000	Rotator Cuff Injuries
+EFO:0005938	congenital left-sided heart lesions	MeSH:D018636	0.000000	Hypoplastic Left Heart Syndrome
+EFO:0001372	neonate	MeSH:D007231	0.000000	Infant, Newborn
+EFO:0006505	chronic bronchitis	MeSH:D001991	0.000000	Bronchitis
+EFO:0006505	chronic bronchitis	MeSH:D029481	0.000000	Bronchitis, Chronic
+EFO:0005624	ileocolitis	MeSH:D003424	0.000000	Crohn Disease
+EFO:0005269	congenital heart malformation	MeSH:C538116	0.000000	Heterotaxy, visceral, X-linked
+EFO:0006338	pit and fissure surface dental caries	MeSH:D003731	0.000000	Dental Caries
+EFO:0006339	smooth surface dental caries	MeSH:D003731	0.000000	Dental Caries
+EFO:0005252	orthostatic hypotension	MeSH:D007024	0.000000	Hypotension, Orthostatic
+EFO:0005407	psychosis	MeSH:D011618	0.000000	Psychotic Disorders
+EFO:0006513	hereditary hemochromatosis type 1	MeSH:D006432	0.000000	Hemochromatosis
+EFO:0005109	energy expenditure	MeSH:D004734	0.000000	Energy Metabolism
+EFO:0005241	employment status	MeSH:D004651	0.000000	Employment
+EFO:0005543	glioma	MeSH:D005910	0.000000	Glioma
+EFO:0005543	glioma	MeSH:D005909	0.000000	Glioblastoma
+EFO:0005543	glioma	MeSH:D064726	0.000000	Triple Negative Breast Neoplasms
+EFO:1001999	systemic juvenile idiopathic arthritis	MeSH:D001172	0.000000	Arthritis, Rheumatoid
+EFO:1001999	systemic juvenile idiopathic arthritis	MeSH:D001171	0.000000	Arthritis, Juvenile
+EFO:1001999	systemic juvenile idiopathic arthritis	MeSH:C565798	0.000000	Rheumatoid Arthritis, Systemic Juvenile
+EFO:0005570	oral cavity cancer	MeSH:D009062	0.000000	Mouth Neoplasms
+EFO:1001506	primary angle closure glaucoma	MeSH:D015812	0.000000	Glaucoma, Angle-Closure
+EFO:0003907	deep vein thrombosis	MeSH:D020246	0.000000	Venous Thrombosis
+EFO:0007934	creatinine clearance measurement	MeSH:D003404	0.000000	Creatinine
+EFO:0004149	neuropathy	MeSH:D010523	0.000000	Peripheral Nervous System Diseases
+EFO:0008387	caudate nucleus measurement	MeSH:A08.186.211.730.885.105.487.550.184	0.000000
+EFO:0008387	caudate nucleus measurement	MeSH:D002421	0.000000	Caudate Nucleus
+EFO:1001249	non-alcoholic steatohepatitis	MeSH:D065626	0.000000	Non-alcoholic Fatty Liver Disease
+EFO:1001249	non-alcoholic steatohepatitis	MeSH:D005234	0.000000	Fatty Liver
+EFO:0004719	pemphigus vulgaris	MeSH:D010392	0.000000	Pemphigus

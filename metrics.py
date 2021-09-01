@@ -6,12 +6,14 @@ The ${ETL_PARQUET_OUTPUT_ROOT} is gs://ot-snapshots/etl/outputs/${RELEASE}/parqu
 progress), and gs://open-targets-data-releases/${RELEASE}/output/etl-parquet/ for the completed releases."""
 
 import argparse
+from collections import namedtuple
 from functools import reduce
 import logging
 import logging.config
 import os.path
 from typing import Iterable
 
+from pyspark.mllib.evaluation import BinaryClassificationMetrics
 from pyspark.sql import SparkSession, DataFrame
 import pyspark.sql.functions as f
 import pyspark.sql.types as t
@@ -59,7 +61,7 @@ def document_total_count(
         var_name: str
 ) -> DataFrame:
     """Count total documents."""
-    out = df.groupBy().count().alias('count')
+    out = df.groupBy().count().withColumnRenamed('count', 'value')
     out = out.withColumn('datasourceId', f.lit('all'))
     out = out.withColumn('variable', f.lit(var_name))
     out = out.withColumn('field', f.lit(None).cast(t.StringType()))
@@ -72,7 +74,7 @@ def document_count_by(
         var_name: str
 ) -> DataFrame:
     """Count documents by grouping column."""
-    out = df.groupBy(column).count().alias('count')
+    out = df.groupBy(column).count().withColumnRenamed('count', 'value')
     out = out.withColumn('variable', f.lit(var_name))
     out = out.withColumn('field', f.lit(None).cast(t.StringType()))
     return out
@@ -110,7 +112,7 @@ def not_null_fields_count(
             id_vars=['datasourceId'] if group_by_datasource else [],
             var_name='field',
             value_vars=df_cleaned.drop('datasourceId').columns if group_by_datasource else df_cleaned.columns,
-            value_name='count'
+            value_name='value'
         )
         .withColumn('variable', f.lit(var_name))
     )
@@ -141,14 +143,73 @@ def evidence_distinct_fields_count(
                   id_vars=['datasourceId'],
                   var_name='field',
                   value_vars=cols,
-                  value_name='count')
+                  value_name='value')
     melted = melted.withColumn('variable', f.lit(var_name))
     return melted
 
 
+def auc(associations, score_column_name):
+    return BinaryClassificationMetrics(
+        associations.select(score_column_name, 'gold_standard').rdd.map(list)
+    ).areaUnderROC
+
+
+def odds_ratio(associations, datasource):
+    a = associations.filter((f.col('gold_standard') == 1.0) & (f.col('datasourceId') == datasource)).count()
+    b = associations.filter((f.col('gold_standard') == 0.0) & (f.col('datasourceId') == datasource)).count()
+    c = associations.filter((f.col('gold_standard') == 1.0) & (f.col('datasourceId') != datasource)).count()
+    d = associations.filter((f.col('gold_standard') == 0.0) & (f.col('datasourceId') != datasource)).count()
+    return a * d / (b * c)
+
+
+def gold_standard_benchmark(
+        spark,
+        associations: DataFrame,
+        associations_type: str
+) -> list:
+    """Run a benchmark of associations against a known gold standard.
+
+    Args:
+        associations: A Spark dataframe with associations for all datasets.
+        associations_type: Can be either "Direct" or "Indirect", used to compute the names of metrics.
+
+    Returns:
+        A list containing two sets of metrics, AUC and OR, both for each dataframe and overall."""
+
+    if 'Overall' in associations_type:
+        auc_metrics = [{
+            'value': auc(associations, 'score'),
+            'datasourceId': 'all',
+            'variable': f'associations{associations_type}AUC',
+            'field': '',
+        }]
+        or_metrics = [{
+            'value': 1.0,
+            'datasourceId': 'all',
+            'variable': f'associations{associations_type}OR',
+            'field': '',
+        }]
+    else:
+        datasource_names = associations.select('datasourceId').distinct().toPandas()['datasourceId'].unique()
+        auc_metrics = [{
+            'value': auc(associations.filter(f.col('datasourceId') == datasource), 'score'),
+            'datasourceId': datasource,
+            'variable': f'associations{associations_type}AUC',
+            'field': '',
+        } for datasource in datasource_names]
+        or_metrics = [{
+            'value': odds_ratio(associations, datasource),
+            'datasourceId': datasource,
+            'variable': f'associations{associations_type}OR',
+            'field': '',
+        } for datasource in datasource_names]
+
+    return spark.createDataFrame(auc_metrics + or_metrics)
+
+
 def read_path_if_provided(spark, path):
     """Automatically detect the format of the input data and read it into the Spark dataframe. The supported formats
-    are: a single JSON file; a directory with JSON files; a directory with Parquet files."""
+    are: a single TSV file; a single JSON file; a directory with JSON files; a directory with Parquet files."""
     # All datasets are optional.
     if path is None:
         return None
@@ -160,8 +221,9 @@ def read_path_if_provided(spark, path):
 
     # Case 1: We are provided with a single file.
     if os.path.isfile(path):
-        # In this case, this must be a (possibly compressed) JSON.
-        if path.endswith(('.json', '.json.gz', '.jsonl', '.jsonl.gz')):
+        if path.endswith('.tsv'):
+            return spark.read.csv(path, sep='\t', header=True)
+        elif path.endswith(('.json', '.json.gz', '.jsonl', '.jsonl.gz')):
             return spark.read.json(path)
         else:
             raise AssertionError(f'The format of the provided file {path} is not supported.')
@@ -215,6 +277,12 @@ def parse_args():
         '--evidence-failed', required=False, metavar='<path>', type=str, help=(
             'Failed evidence files from ${ETL_PARQUET_OUTPUT_ROOT}/evidenceFailed.'))
     dataset_arguments.add_argument(
+        '--associations-overall-indirect', required=False, metavar='<path>', type=str, help=(
+            'Indirect association files from ${ETL_PARQUET_OUTPUT_ROOT}/associationByOverallIndirect.'))
+    dataset_arguments.add_argument(
+        '--associations-overall-direct', required=False, metavar='<path>', type=str, help=(
+            'Direct association files from ${ETL_PARQUET_OUTPUT_ROOT}/associationByOverallDirect.'))
+    dataset_arguments.add_argument(
         '--associations-direct', required=False, metavar='<path>', type=str, help=(
             'Direct association files from ${ETL_PARQUET_OUTPUT_ROOT}/associationByDatasourceDirect.'))
     dataset_arguments.add_argument(
@@ -230,12 +298,26 @@ def parse_args():
         '--drugs', required=False, metavar='<path>', type=str, help=(
             'ChEMBL dataset from ${ETL_INPUT_ROOT}/annotation-files/chembl/chembl_*molecule*.jsonl.'))
 
+    gold_standard_group = parser.add_argument_group(
+        'gold standard arguments (optional, but must be either all present or all absent)')
+    gold_standard_group.add_argument(
+        '--gold-standard-associations', required=False, metavar='<path>', type=str, help=(
+            'Target-disease associations to be considered gold standard.'))
+    gold_standard_group.add_argument(
+        '--gold-standard-mappings', required=False, metavar='<path>', type=str, help=(
+            'MeSH to EFO mappings for the gold standard dataset.'))
+
     # General optional arguments.
     parser.add_argument(
         '--log-file', required=False, type=str, help=(
             'Destination of the logs generated by this script.'))
 
-    return parser.parse_args()
+    args = parser.parse_args()
+    gold_standard_args = [args.gold_standard_associations, args.gold_standard_mappings]
+    if any(gold_standard_args) and not all(gold_standard_args):
+        raise ValueError('Gold standard arguments must be either all present or all absent.')
+
+    return args
 
 
 def get_columns_to_report(dataset_columns):
@@ -268,9 +350,26 @@ def main(args):
     evidence_failed = read_path_if_provided(spark, args.evidence_failed)
     associations_direct = read_path_if_provided(spark, args.associations_direct)
     associations_indirect = read_path_if_provided(spark, args.associations_indirect)
+    associations_overall_direct = read_path_if_provided(spark, args.associations_overall_direct)
+    associations_overall_indirect = read_path_if_provided(spark, args.associations_overall_indirect)
     diseases = read_path_if_provided(spark, args.diseases)
     targets = read_path_if_provided(spark, args.targets)
     drugs = read_path_if_provided(spark, args.drugs)
+    gold_standard_associations = read_path_if_provided(spark, args.gold_standard_associations)
+    gold_standard_mappings = read_path_if_provided(spark, args.gold_standard_mappings)
+
+    gold_standard = None
+    if gold_standard_associations and gold_standard_mappings:
+        logging.info(f'Processing gold standard information from {args.gold_standard_associations} '
+                     f'and {args.gold_standard_mappings}')
+        gold_standard = (
+            gold_standard_associations
+            .join(gold_standard_mappings, on=gold_standard_associations.MSH == gold_standard_mappings.mesh_label)
+            .filter(f.col('`Phase.Latest`') == 'Approved')
+            .select(f.col('ensembl_id').alias('targetId'), f.col('efo_id').alias('diseaseId'))
+            .withColumn('diseaseId', f.regexp_replace('diseaseId', ':', '_'))
+            .withColumn('gold_standard', f.lit(1.0))
+        )
 
     datasets = []
 
@@ -338,31 +437,39 @@ def main(args):
                                            'evidenceUnresolvedDiseaseDistinctFieldsCountByDatasource'),
         ])
 
-    if associations_direct:
-        logging.info(f'Running metrics from {args.associations_direct}.')
-        datasets.extend([
-            # Total association count.
-            document_total_count(associations_direct.select("diseaseId", "targetId").distinct(), 'associationsDirectTotalCount'),
-            # Associations by datasource.
-            document_count_by(
-                associations_direct,
-                'datasourceId',
-                'associationsDirectByDatasource'
-            ),
-        ])
-
-    if associations_indirect:
-        logging.info(f'Running metrics from {args.associations_indirect}.')
-        datasets.extend([
-            # Total association count.
-            document_total_count(associations_indirect.select("diseaseId", "targetId").distinct(),
-                                 'associationsIndirectTotalCount'),
-            # Associations by datasource.
-            document_count_by(
-                associations_indirect,
-                'datasourceId',
-                'associationsIndirectByDatasource'),
-        ])
+    AssociationsDataset = namedtuple('AssociationsDataset', 'kind df filename')
+    for associations in (
+        AssociationsDataset(kind='Direct', df=associations_direct, filename=args.associations_direct),
+        AssociationsDataset(kind='Indirect', df=associations_indirect, filename=args.associations_indirect),
+        AssociationsDataset(kind='Direct', df=associations_overall_direct, filename=args.associations_overall_direct),
+        AssociationsDataset(kind='Indirect', df=associations_overall_indirect, filename=args.associations_overall_indirect),
+    ):
+        if not associations.df:
+            continue
+        logging.info(f'Running metrics from {associations.filename}.')
+        associations_df = associations.df
+        if gold_standard:
+            associations_df = (
+                associations_df
+                .join(gold_standard, on=['targetId', 'diseaseId'], how='left')
+                .fillna({'gold_standard': 0.0})
+            )
+        if "Overall" not in associations.filename:
+            datasets.extend([
+                # Total association count.
+                document_total_count(associations_df.select("diseaseId", "targetId").distinct(), f'associations{associations.kind}TotalCount'),
+                # Associations by datasource.
+                document_count_by(associations_df, 'datasourceId',
+                                f'associations{associations.kind}ByDatasource'),
+                # Associations by datasource benchmark.
+                gold_standard_benchmark(spark, associations_df, f'{associations.kind}ByDatasource') if gold_standard else None
+            ])
+        else:
+            datasets.extend([
+                # Total association benchmark.
+                gold_standard_benchmark(spark, associations_df,
+                                        f'{associations.kind}Overall') if gold_standard else None,
+            ])
 
     if diseases:
         logging.info(f'Running metrics from {args.diseases}.')

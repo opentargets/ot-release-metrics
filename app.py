@@ -45,7 +45,7 @@ if page == "Explore metrics":
     if select_run != "All":
         mask_run = data["runId"] == select_run
         data = data[mask_run]
-    
+
     # Refine the query
     st.markdown("## Filter the data")
     select_variables = st.multiselect(
@@ -102,82 +102,92 @@ if page == "Compare metrics":
         # Compute variables
         # EVIDENCE
         old_evidence_count = (data
-            .query('runId == @previous_run & variable == "evidenceCountByDatasource"')[["count", "datasourceId"]]
-            .rename({"count" : f"Nr of evidence strings in {previous_run.split('-')[0]}"}, axis=1)
+            .query('runId == @previous_run & variable == "evidenceCountByDatasource"')[["value", "datasourceId"]]
+            .rename({"value" : f"Nr of evidence strings in {previous_run.split('-')[0]}"}, axis=1)
         )
         new_evidence_count = (data
-            .query('runId == @latest_run & variable == "evidenceCountByDatasource"')[["count", "datasourceId"]]
-            .rename({"count" : f"Nr of evidence strings in {latest_run.split('-')[0]}"}, axis=1)
+            .query('runId == @latest_run & variable == "evidenceCountByDatasource"')[["value", "datasourceId"]]
+            .rename({"value" : f"Nr of evidence strings in {latest_run.split('-')[0]}"}, axis=1)
         )
         old_evidence_invalid = (data
-            .query('runId == @previous_run & variable == "evidenceInvalidCountByDatasource"')[["count", "datasourceId"]]
-            .rename({"count" : f"Nr of invalid evidence strings in {previous_run.split('-')[0]}"}, axis=1)
+            .query('runId == @previous_run & variable == "evidenceInvalidCountByDatasource"')[["value", "datasourceId"]]
+            .rename({"value" : f"Nr of invalid evidence strings in {previous_run.split('-')[0]}"}, axis=1)
         )
         new_evidence_invalid = (data
-            .query('runId == @latest_run & variable == "evidenceInvalidCountByDatasource"')[["count", "datasourceId"]]
-            .rename({"count" : f"Nr of invalid evidence strings in {latest_run.split('-')[0]}"}, axis=1)
+            .query('runId == @latest_run & variable == "evidenceInvalidCountByDatasource"')[["value", "datasourceId"]]
+            .rename({"value" : f"Nr of invalid evidence strings in {latest_run.split('-')[0]}"}, axis=1)
         )
         old_evidence_duplicates = (data
-            .query('runId == @previous_run & variable == "evidenceDuplicateCountByDatasource"')[["count", "datasourceId"]]
-            .rename({"count" : f"Nr of evidence strings dropped due to duplication in {previous_run.split('-')[0]}"}, axis=1)
+            .query('runId == @previous_run & variable == "evidenceDuplicateCountByDatasource"')[["value", "datasourceId"]]
+            .rename({"value" : f"Nr of evidence strings dropped due to duplication in {previous_run.split('-')[0]}"}, axis=1)
         )
         new_evidence_duplicates = (data
-            .query('runId == @latest_run & variable == "evidenceDuplicateCountByDatasource"')[["count", "datasourceId"]]
-            .rename({"count" : f"Nr of evidence strings dropped due to duplication in {latest_run.split('-')[0]}"}, axis=1)
+            .query('runId == @latest_run & variable == "evidenceDuplicateCountByDatasource"')[["value", "datasourceId"]]
+            .rename({"value" : f"Nr of evidence strings dropped due to duplication in {latest_run.split('-')[0]}"}, axis=1)
         )
         old_evidence_unresolved_target = (data
-            .query('runId == @previous_run & variable == "evidenceUnresolvedTargetCountByDatasource"')[["count", "datasourceId"]]
-            .rename({"count" : f"Nr of evidence strings dropped due to unresolved target in {previous_run.split('-')[0]}"}, axis=1)
+            .query('runId == @previous_run & variable == "evidenceUnresolvedTargetCountByDatasource"')[["value", "datasourceId"]]
+            .rename({"value" : f"Nr of evidence strings dropped due to unresolved target in {previous_run.split('-')[0]}"}, axis=1)
         )
         new_evidence_unresolved_target = (data
-            .query('runId == @latest_run & variable == "evidenceUnresolvedTargetCountByDatasource"')[["count", "datasourceId"]]
-            .rename({"count" : f"Nr of evidence strings dropped due to unresolved target in {latest_run.split('-')[0]}"}, axis=1)
+            .query('runId == @latest_run & variable == "evidenceUnresolvedTargetCountByDatasource"')[["value", "datasourceId"]]
+            .rename({"value" : f"Nr of evidence strings dropped due to unresolved target in {latest_run.split('-')[0]}"}, axis=1)
         )
         old_evidence_unresolved_disease = (data
-            .query('runId == @previous_run & variable == "evidenceUnresolvedDiseaseCountByDatasource"')[["count", "datasourceId"]]
-            .rename({"count" : f"Nr of evidence strings dropped due to unresolved disease in {previous_run.split('-')[0]}"}, axis=1)
+            .query('runId == @previous_run & variable == "evidenceUnresolvedDiseaseCountByDatasource"')[["value", "datasourceId"]]
+            .rename({"value" : f"Nr of evidence strings dropped due to unresolved disease in {previous_run.split('-')[0]}"}, axis=1)
         )
         new_evidence_unresolved_disease = (data
-            .query('runId == @latest_run & variable == "evidenceUnresolvedDiseaseCountByDatasource"')[["count", "datasourceId"]]
-            .rename({"count" : f"Nr of evidence strings dropped due to unresolved disease in {latest_run.split('-')[0]}"}, axis=1)
+            .query('runId == @latest_run & variable == "evidenceUnresolvedDiseaseCountByDatasource"')[["value", "datasourceId"]]
+            .rename({"value" : f"Nr of evidence strings dropped due to unresolved disease in {latest_run.split('-')[0]}"}, axis=1)
         )
-        
+
         # ASSOCIATION
         old_indirect_association = (data
-            .query('runId == @previous_run & variable == "associationsIndirectByDatasource"')[["count", "datasourceId"]]
-            .rename({"count" : f"Nr of indirect associations in {previous_run.split('-')[0]}"}, axis=1)
+            .query('runId == @previous_run & variable == "associationsIndirectByDatasource"')[["value", "datasourceId"]]
+            .rename({"value" : f"Nr of indirect associations in {previous_run.split('-')[0]}"}, axis=1)
         )
         new_indirect_association = (data
-            .query('runId == @latest_run & variable == "associationsIndirectByDatasource"')[["count", "datasourceId"]]
-            .rename({"count" : f"Nr of indirect associations in {latest_run.split('-')[0]}"}, axis=1)
+            .query('runId == @latest_run & variable == "associationsIndirectByDatasource"')[["value", "datasourceId"]]
+            .rename({"value" : f"Nr of indirect associations in {latest_run.split('-')[0]}"}, axis=1)
         )
         old_direct_association = (data
-            .query('runId == @previous_run & variable == "associationsDirectByDatasource"')[["count", "datasourceId"]]
-            .rename({"count" : f"Nr of direct associations in {previous_run.split('-')[0]}"}, axis=1)
+            .query('runId == @previous_run & variable == "associationsDirectByDatasource"')[["value", "datasourceId"]]
+            .rename({"value" : f"Nr of direct associations in {previous_run.split('-')[0]}"}, axis=1)
         )
         new_direct_association = (data
-            .query('runId == @latest_run & variable == "associationsDirectByDatasource"')[["count", "datasourceId"]]
-            .rename({"count" : f"Nr of direct associations in {latest_run.split('-')[0]}"}, axis=1)
+            .query('runId == @latest_run & variable == "associationsDirectByDatasource"')[["value", "datasourceId"]]
+            .rename({"value" : f"Nr of direct associations in {latest_run.split('-')[0]}"}, axis=1)
         )
 
         # DISEASES
         old_diseases_count = (data
-            .query('runId == @previous_run & variable == "diseasesTotalCount"')[["count"]]
-            .rename({"count" : f"Nr of diseases in {previous_run.split('-')[0]}"}, axis=1)
+            .query('runId == @previous_run & variable == "targetsTotalCount"')[["value"]]
+            .rename({"value" : f"Nr of targets in {previous_run.split('-')[0]}"}, axis=1)
         )
         new_diseases_count = (data
-            .query('runId == @latest_run & variable == "diseasesTotalCount"')[["count"]]
-            .rename({"count" : f"Nr of diseases in {latest_run.split('-')[0]}"}, axis=1)
+            .query('runId == @latest_run & variable == "targetsTotalCount"')[["value"]]
+            .rename({"value" : f"Nr of targets in {latest_run.split('-')[0]}"}, axis=1)
         )
 
         # DRUGS
         old_drugs_count = (data
-            .query('runId == @previous_run & variable == "drugsTotalCount"')["count"]
-            .rename({"count" : f"Nr of drugs in {previous_run.split('-')[0]}"}, axis=1)
+            .query('runId == @previous_run & variable == "drugsTotalCount"')["value"]
+            .rename({"value" : f"Nr of drugs in {previous_run.split('-')[0]}"}, axis=1)
         )
         new_drugs_count = (data
-            .query('runId == @latest_run & variable == "drugsTotalCount"')["count"]
-            .rename({"count" : f"Nr of drugs in {latest_run.split('-')[0]}"}, axis=1)
+            .query('runId == @latest_run & variable == "drugsTotalCount"')["value"]
+            .rename({"value" : f"Nr of drugs in {latest_run.split('-')[0]}"}, axis=1)
+        )
+        
+        # TARGETS
+        old_targets_count = (data
+            .query('runId == @previous_run & variable == "diseasesTotalCount"')[["value"]]
+            .rename({"value" : f"Nr of diseases in {previous_run.split('-')[0]}"}, axis=1)
+        )
+        new_targets_count = (data
+            .query('runId == @latest_run & variable == "diseasesTotalCount"')[["value"]]
+            .rename({"value" : f"Nr of diseases in {latest_run.split('-')[0]}"}, axis=1)
         )
 
         # Aggregate metrics
@@ -195,9 +205,12 @@ if page == "Compare metrics":
             old_direct_association, new_direct_association,
         ]
         association = reduce(lambda x, y: pd.merge(x, y, on="datasourceId"), association_datasets).set_index("datasourceId")
-        
+
         disease_datasets = [old_diseases_count, new_diseases_count]
-        disease = pd.concat(disease_datasets, axis=0, ignore_index=True).T.rename(columns={0: "count"})
+        disease = pd.concat(disease_datasets, axis=0, ignore_index=True).T.rename(columns={0: "value"})
+        
+        target_datasets = [old_targets_count, new_targets_count]
+        target = pd.concat(target_datasets, axis=0, ignore_index=True).T.rename(columns={0: "value"})
 
         drug_datasets = [old_drugs_count, new_drugs_count]
         drug = pd.concat(drug_datasets, axis=0, ignore_index=True).T
@@ -209,6 +222,10 @@ if page == "Compare metrics":
             disease_comparison = compare_disease(disease, latest_run, previous_run)
         except KeyError:
             disease_comparison = disease.copy()
+        try:
+            target_comparison = compare_target(target, latest_run, previous_run)
+        except KeyError:
+            target_comparison = target.copy()
         try:
             drug_comparison = compare_drug(drug, latest_run, previous_run)
         except KeyError:

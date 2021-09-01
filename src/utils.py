@@ -50,6 +50,14 @@ def compare_disease(
     add_delta(disease, "diseases", previous_run, latest_run)
     return disease
 
+def compare_target(
+    target: pd.DataFrame,
+    latest_run: str,
+    previous_run: str
+) -> pd.DataFrame:
+    add_delta(target, "targets", previous_run, latest_run)
+    return target
+
 def compare_drug(
     drug: pd.DataFrame,
     latest_run: str,
