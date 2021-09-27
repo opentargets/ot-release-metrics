@@ -74,7 +74,7 @@ gsutil -m cp -r \
   ${ETL_PARQUET_OUTPUT_ROOT}/associationByDatasourceIndirect \
   ${ETL_PARQUET_OUTPUT_ROOT}/diseases \
   ${ETL_PARQUET_OUTPUT_ROOT}/targets \
-  ${ETL_INPUT_ROOT}/annotation-files/chembl/chembl_*molecule*.jsonl \
+  ${ETL_INPUT_ROOT}/chembl-inputs/chembl_*molecule*.jsonl \
   post-pipeline
 ```
 
@@ -90,7 +90,7 @@ python3 metrics.py \
   --associations-indirect post-pipeline/associationByDatasourceIndirect \
   --diseases post-pipeline/diseases \
   --targets post-pipeline/targets \
-  --drugs post-pipeline/molecule \
+  --drugs post-pipeline/*molecule*.jsonl \
   --gold-standard-associations gold-standard/informa_abbvie.tsv \
   --gold-standard-mappings gold-standard/mesh_mappings.tsv
 ```
