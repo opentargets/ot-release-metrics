@@ -53,11 +53,15 @@ python3 metrics.py \
 ```
 
 ### Post-pipeline run
-First specify the ETL input and output roots. Note that there are two options for the output root depending on whether the script is being run on a completed release or on a snapshot (pick one option accordingly):
+First specify the run identifier, ETL input and output roots. Note that there are two options for input/output roots depending on whether the script is being run on a completed release or on a snapshot (pick one option accordingly):
 ```bash
-export ETL_PARQUET_OUTPUT_ROOT=gs://ot-snapshots/etl/outputs/21.04.2/parquet  # For snapshots.
-export ETL_PARQUET_OUTPUT_ROOT=gs://open-targets-data-releases/21.04/output/etl/parquet  # For completed releases.
-export ETL_INPUT_ROOT=gs://open-targets-data-releases/21.04/input
+# For completed releases.
+export ETL_INPUT_ROOT=gs://open-targets-data-releases/21.09/input
+export ETL_PARQUET_OUTPUT_ROOT=gs://open-targets-data-releases/21.09/output/etl/parquet
+
+# For snapshots.
+export ETL_INPUT_ROOT=gs://open-targets-pre-data-releases/21.09.2/input
+export ETL_PARQUET_OUTPUT_ROOT=gs://open-targets-pre-data-releases/21.09.2/output/etl/parquet
 ```
 
 Now download the files:
