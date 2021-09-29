@@ -15,6 +15,7 @@ import os
 import os.path
 from typing import Iterable
 
+from pyspark.conf import SparkConf
 from pyspark.mllib.evaluation import BinaryClassificationMetrics
 from pyspark.sql import SparkSession, DataFrame
 import pyspark.sql.functions as f
@@ -334,12 +335,18 @@ def get_columns_to_report(dataset_columns):
 
 def main(args):
     # Initialise a Spark session.
-    # spark_mem_limit = detect_spark_memory_limit()
+    sparkConf = (
+        SparkConf()
+        .set('spark.driver.memory', '15g')
+        .set('spark.executor.memory', '15g')
+        .set('spark.driver.maxResultSize', '0')
+        .set('spark.debug.maxToStringFields', '2000')
+        .set('spark.sql.execution.arrow.maxRecordsPerBatch', '500000')
+    )
     spark = (
-        SparkSession
-        .builder
-        #.config("spark.executor.memory", f'{spark_mem_limit}G')
-        #.config("spark.driver.memory", f'{spark_mem_limit}G')
+        SparkSession.builder
+        .config(conf=sparkConf)
+        .master('local[*]')
         .getOrCreate()
     )
 
