@@ -32,6 +32,10 @@ files = glob.glob("data/*.csv")
 dfs = [pd.read_csv(f) for f in files]
 data = pd.concat(dfs, ignore_index=True)
 
+# Improve interpretability by hiding source enrichment metrics from the UI
+mask_variable_significant = (~data['variable'].str.contains('AUC')) & (~data['variable'].str.contains('OR'))
+data = data[mask_variable_significant]
+
 if page == "Explore metrics":
     # Select a dataset to explore
     runs = sorted(list(data.runId.unique()), reverse=True)
@@ -53,8 +57,8 @@ if page == "Explore metrics":
         data.variable.unique()
     )
     if select_variables:
-        mask_variable = data["variable"].isin(select_variables)
-        data = data[mask_variable]
+        mask_variable_selection = data["variable"].isin(select_variables)
+        data = data[mask_variable_selection]
         if any("Field" in variable for variable in select_variables):
             select_fields = st.multiselect(
                 "You can also filter by your field of interest:",
