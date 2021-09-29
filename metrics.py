@@ -10,7 +10,6 @@ from collections import namedtuple
 from functools import reduce
 import logging
 import logging.config
-import math
 import os
 import os.path
 from typing import Iterable
