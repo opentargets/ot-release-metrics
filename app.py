@@ -72,7 +72,10 @@ if page == "Explore metrics":
                 data
                     .set_index(["variable", "field", "datasourceId"])
                     .unstack("datasourceId", fill_value=0)
-                    .drop("runId", axis=1))
+                    .drop("runId", axis=1)
+                    # There is a current bug where the data source columns are duplicated with NaN values
+                    # These will be temporarily removed to improve the metrics exploration in the UI
+                    .dropna(axis='columns', how='any'))
             output.columns = output.columns.get_level_values(1)
         except ValueError:
             st.write("Please, indicate a specific pipeline run to group and explore the data.")
