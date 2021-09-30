@@ -32,10 +32,6 @@ files = glob.glob("data2/*.csv")
 dfs = [pd.read_csv(f, dtype={'runId':'string'}) for f in files]
 data = pd.concat(dfs, ignore_index=True)
 
-# Improve interpretability by hiding source enrichment metrics from the UI
-mask_variable_significant = (~data['variable'].str.contains('AUC')) & (~data['variable'].str.contains('OR'))
-data = data[mask_variable_significant]
-
 if page == "Explore metrics":
     # Select a dataset to explore
     runs = sorted(list(data.runId.unique()), reverse=True)
