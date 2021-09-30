@@ -28,8 +28,8 @@ page = st.sidebar.radio(
           "allows you to compare the main metrics between two releases."))
 
 # Load data
-files = glob.glob("data/*.csv")
-dfs = [pd.read_csv(f) for f in files]
+files = glob.glob("data2/*.csv")
+dfs = [pd.read_csv(f, dtype={'runId':'string'}) for f in files]
 data = pd.concat(dfs, ignore_index=True)
 
 # Improve interpretability by hiding source enrichment metrics from the UI
@@ -93,6 +93,7 @@ if page == "Explore metrics":
 if page == "Compare metrics":
     # Select two datasets to compare
     st.sidebar.header("What do you want to compare?")
+    print(data.runId.unique())
     select_runs = st.sidebar.multiselect(
         "Select two datasets:",
         sorted(data.runId.unique(), reverse=True),
