@@ -14,6 +14,7 @@ import os
 import os.path
 from typing import Iterable
 
+from psutil import virtual_memory
 from pyspark.conf import SparkConf
 from pyspark.mllib.evaluation import BinaryClassificationMetrics
 from pyspark.sql import SparkSession, DataFrame
@@ -332,20 +333,21 @@ def get_columns_to_report(dataset_columns):
         'literature'
     ]
 
+def detect_spark_memory_limit():
+    """Spark does not automatically use all available memory on a machine. When working on large datasets, this may
+    cause Java heap space errors, even though there is plenty of RAM available. To fix this, we detect the total amount
+    of physical memory and allow Spark to use (almost) all of it."""
+    mem_gib = virtual_memory().total >> 30
+    return int(mem_gib * 0.9)
+
 def main(args):
     # Initialise a Spark session.
-    sparkConf = (
-        SparkConf()
-        .set('spark.driver.memory', '15g')
-        .set('spark.executor.memory', '15g')
-        .set('spark.driver.maxResultSize', '0')
-        .set('spark.debug.maxToStringFields', '2000')
-        .set('spark.sql.execution.arrow.maxRecordsPerBatch', '500000')
-    )
+    spark_mem_limit = detect_spark_memory_limit()
     spark = (
-        SparkSession.builder
-        .config(conf=sparkConf)
-        .master('local[*]')
+        SparkSession
+        .builder
+        .config("spark.driver.memory", f'{spark_mem_limit}G')
+        .config("spark.executor.memory", f'{spark_mem_limit}G')
         .getOrCreate()
     )
 
