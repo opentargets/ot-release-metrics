@@ -28,7 +28,7 @@ page = st.sidebar.radio(
           "allows you to compare the main metrics between two releases."))
 
 # Load data
-files = glob.glob("data2/*.csv")
+files = glob.glob("data/*.csv")
 dfs = [pd.read_csv(f, dtype={'runId':'string'}) for f in files]
 data = pd.concat(dfs, ignore_index=True)
 
