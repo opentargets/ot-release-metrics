@@ -29,7 +29,7 @@ page = st.sidebar.radio(
 
 # Load data
 files = glob.glob("data/*.csv")
-dfs = [pd.read_csv(f) for f in files]
+dfs = [pd.read_csv(f, dtype={'runId':'string'}) for f in files]
 data = pd.concat(dfs, ignore_index=True)
 
 if page == "Explore metrics":
@@ -53,8 +53,8 @@ if page == "Explore metrics":
         data.variable.unique()
     )
     if select_variables:
-        mask_variable = data["variable"].isin(select_variables)
-        data = data[mask_variable]
+        mask_variable_selection = data["variable"].isin(select_variables)
+        data = data[mask_variable_selection]
         if any("Field" in variable for variable in select_variables):
             select_fields = st.multiselect(
                 "You can also filter by your field of interest:",
@@ -72,7 +72,10 @@ if page == "Explore metrics":
                 data
                     .set_index(["variable", "field", "datasourceId"])
                     .unstack("datasourceId", fill_value=0)
-                    .drop("runId", axis=1))
+                    .drop("runId", axis=1)
+                    # There is a current bug where the data source columns are duplicated with NaN values
+                    # These will be temporarily removed to improve the metrics exploration in the UI
+                    .dropna(axis='columns', how='any'))
             output.columns = output.columns.get_level_values(1)
         except ValueError:
             st.write("Please, indicate a specific pipeline run to group and explore the data.")
@@ -86,6 +89,7 @@ if page == "Explore metrics":
 if page == "Compare metrics":
     # Select two datasets to compare
     st.sidebar.header("What do you want to compare?")
+    print(data.runId.unique())
     select_runs = st.sidebar.multiselect(
         "Select two datasets:",
         sorted(data.runId.unique(), reverse=True),

@@ -10,11 +10,12 @@ from collections import namedtuple
 from functools import reduce
 import logging
 import logging.config
-import math
 import os
 import os.path
 from typing import Iterable
 
+from psutil import virtual_memory
+from pyspark.conf import SparkConf
 from pyspark.mllib.evaluation import BinaryClassificationMetrics
 from pyspark.sql import SparkSession, DataFrame
 import pyspark.sql.functions as f
@@ -332,15 +333,12 @@ def get_columns_to_report(dataset_columns):
         'literature'
     ]
 
-
 def detect_spark_memory_limit():
     """Spark does not automatically use all available memory on a machine. When working on large datasets, this may
     cause Java heap space errors, even though there is plenty of RAM available. To fix this, we detect the total amount
     of physical memory and allow Spark to use (almost) all of it."""
-    mem_bytes = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')
-    mem_gib = math.floor(mem_bytes/(1024**3) * 0.90)
-    return mem_gib
-
+    mem_gib = virtual_memory().total >> 30
+    return int(mem_gib * 0.9)
 
 def main(args):
     # Initialise a Spark session.
@@ -348,8 +346,8 @@ def main(args):
     spark = (
         SparkSession
         .builder
-        .config("spark.executor.memory", f'{spark_mem_limit}G')
         .config("spark.driver.memory", f'{spark_mem_limit}G')
+        .config("spark.executor.memory", f'{spark_mem_limit}G')
         .getOrCreate()
     )
 
