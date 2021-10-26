@@ -123,3 +123,8 @@ python3 metrics.py \
   --gold-standard-associations gold-standard/informa_abbvie.tsv \
   --gold-standard-mappings gold-standard/mesh_mappings.tsv
 ```
+
+## Running the web app to visualise and compare the metrics
+To start the app locally, run `streamlit run app.py`.
+
+If you encounter a `TomlDecodeError`, this can be resolved by removing the `~/.streamlit` folder.
