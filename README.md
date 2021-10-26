@@ -2,24 +2,50 @@
 
 Contains modules to calculate and visualise Open Targets release metrics.
 
-## Installation
-As system level dependencies, the modules require Python3 with the `venv` module and Java. In Ubuntu, they can be installed using `sudo apt install -y python3-venv openjdk-14-jre-headless`.
+## Set up
+This will create a Google Cloud instance, SSH into it and install the necessary dependencies. Tweak the commands as necessary.
 
-After that, create and prepare the environment:
 ```bash
+# Set parameters.
+export INSTANCE_NAME=evidence-metrics
+export INSTANCE_ZONE=europe-west1-d
+
+# Create the instance and SSH.
+gcloud compute instances create \
+  ${INSTANCE_NAME} \
+  --project=open-targets-eu-dev \
+  --zone=${INSTANCE_ZONE} \
+  --machine-type=e2-highcpu-16 \
+  --service-account=426265110888-compute@developer.gserviceaccount.com \
+  --scopes=https://www.googleapis.com/auth/cloud-platform \
+  --create-disk=auto-delete=yes,boot=yes,device-name=${INSTANCE_NAME},image=projects/ubuntu-os-cloud/global/images/ubuntu-2004-focal-v20210927,mode=rw,size=1000,type=projects/open-targets-eu-dev/zones/europe-west1-d/diskTypes/pd-balanced
+gcloud compute ssh --zone ${INSTANCE_ZONE} ${INSTANCE_NAME}
+
+# Set up the instance.
+sudo apt update
+sudo apt install -y \
+  docker.io \
+  openjdk-13-jre-headless \
+  python3-pip python3-venv
+git clone https://github.com/opentargets/ot-release-metrics
+cd ot-release-metrics
 python3 -m venv env
 source env/bin/activate
 python3 -m pip install -r requirements.txt
 ```
 
-## Running
+When logging to the same machine again or opening a new shell, you only need to activate the environment again:
+```bash
+cd ot-release-metrics
+source env/bin/activate
+```
 
-The modules can be run locally or in the Google Cloud (in this case, a `e2-highcpu-8` instance is recommended).
+## Run
 
 ### Pre-pipeline run
-You will first need to collect the latest evidence string JSON files for all sources. This can be done using the [`platform-input-support`](https://github.com/opentargets/platform-input-support) module. The easiest way is to run it is through Docker.
-
 Before running, obtain a JSON credentials file for Google Cloud (someone from the backend team can generate one for you). Set the `GOOGLE_APPLICATION_CREDENTIALS` environment variable to point to the location of this file.
+
+The commands below will collect the latest evidence string JSON files for all sources. This is done using the [`platform-input-support`](https://github.com/opentargets/platform-input-support) module, which is being run through Docker.
 
 ```bash
 # I recommend that you *do not* attempt to simplify the commands below, as the way PIS writes the output files can be a
@@ -45,12 +71,14 @@ The process will fail when attempting to upload the files to the Google Cloud bu
 The evidence strings will be collected in `platform-input-support/output/evidence-files/` relative to the current working directory. Now the script is ready to be run:
 
 ```bash
-source env/bin/activate
-python3 metrics.py \
-  --run-id 21.02.2-pre \
-  --out data/21.02.2-pre.csv \
+export RUN_ID=21.11.1
+time python3 metrics.py \
+  --run-id ${RUN_ID}-pre \
+  --out data/${RUN_ID}-pre.csv \
   --evidence platform-input-support/output/evidence-files/
 ```
+
+Transfer the generated metrics file from the machine and commit it to the repository.
 
 ### Post-pipeline run
 First specify the run identifier, ETL input and output roots. Note that there are two options for input/output roots depending on whether the script is being run on a completed release or on a snapshot (pick one option accordingly):
@@ -82,7 +110,6 @@ gsutil -m cp -r \
 
 Next run the script to generate the metrics:
 ```bash
-source env/bin/activate
 python3 metrics.py \
   --run-id ${ETL_RUN} \
   --out data/${ETL_RUN}.csv \
@@ -96,3 +123,8 @@ python3 metrics.py \
   --gold-standard-associations gold-standard/informa_abbvie.tsv \
   --gold-standard-mappings gold-standard/mesh_mappings.tsv
 ```
+
+## Running the web app to visualise and compare the metrics
+To start the app locally, run `streamlit run app.py`.
+
+If you encounter a `TomlDecodeError`, this can be resolved by removing the `~/.streamlit` folder.
