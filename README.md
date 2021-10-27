@@ -2,6 +2,11 @@
 
 Contains modules to calculate and visualise Open Targets release metrics.
 
+<p class="callout info">
+Check it out here:
+https://share.streamlit.io/opentargets/ot-release-metrics/app.py
+</p>
+
 ## Set up
 This will create a Google Cloud instance, SSH into it and install the necessary dependencies. Tweak the commands as necessary.
 
@@ -128,3 +133,10 @@ python3 metrics.py \
 To start the app locally, run `streamlit run app.py`.
 
 If you encounter a `TomlDecodeError`, this can be resolved by removing the `~/.streamlit` folder.
+
+## Update the web app
+The application will be **automatically deployed** each time the `master` branch is updated.
+
+The hosting is served using Streamlit's native Cloud service.
+
+To make any changes, simply sign up at https://share.streamlit.io/signup with your personal GitHub account making sure access to the opentargets organisation repos is granted. You should be able to see and change the `ot-release-metrics` app configuration.
