@@ -23,6 +23,7 @@ gcloud compute instances create \
   --scopes=https://www.googleapis.com/auth/cloud-platform \
   --create-disk=auto-delete=yes,boot=yes,device-name=${INSTANCE_NAME},image=projects/ubuntu-os-cloud/global/images/ubuntu-2004-focal-v20210927,mode=rw,size=1000,type=projects/open-targets-eu-dev/zones/europe-west1-d/diskTypes/pd-balanced
 gcloud compute ssh --zone ${INSTANCE_ZONE} ${INSTANCE_NAME}
+screen
 
 # Set up the instance.
 sudo apt update
