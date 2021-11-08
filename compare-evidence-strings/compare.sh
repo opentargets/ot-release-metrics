@@ -1,21 +1,15 @@
 #!/bin/bash
-# A script to compare evidence strings. Please see README.md for details on using it.
+set -euo pipefail
 
 
 
 ########################################################################################################################
 echo "Defining functions"
 
-# A function to sort keys in the evidence strings. This makes them more readable and helps comparison through word diff.
-# Also removes several version- and date-related fields which are changed frequently, but do not reflect actual change:
-# * validated_aginst_schema_version
-# * date_asserted
+# Sort both the keys inside the evidence string, and the evidence strings themselves.
 # The two arguments are input and output JSON files.
 sort_keys () {
-  jq -c -S "." <"$1" \
-    | sed -e 's|,"validated_against_schema_version":"[0-9.]*"||g' \
-    | sed -e 's|"date_asserted":".\{19\}",||g' \
-  > "$2"
+  jq -c -S "." <"$1" | sort >"$2"
 }
 
 # A function to extract all unique identifying fields from the evidence strings. The fields being extracted are:
@@ -55,7 +49,7 @@ extract_functional_consequences () {
         -e 's|http://targetvalidation.org/sequence/||g'
 }
 
-export -f sort_keys extract_fields compute_git_diff extract_functional_consequences
+export -f sort_keys #extract_fields compute_git_diff extract_functional_consequences
 
 
 
@@ -75,20 +69,12 @@ mkdir comparison && cd comparison || exit 1
 ########################################################################################################################
 echo "Preprocess evidence strings"
 
-echo "  Sort keys and remove non-informative fields"
-sort_keys "${OLD_EVIDENCE_STRINGS}" 01.keys-sorted.old.json \
-  & sort_keys "${NEW_EVIDENCE_STRINGS}" 01.keys-sorted.new.json \
-  & wait
-
-echo "  Extract the unique association fields to pair old and new evidence strings together"
-extract_fields 01.keys-sorted.old.json 02.fields.old \
-  & extract_fields 01.keys-sorted.new.json 02.fields.new \
-  & wait
-
-echo "  Paste the unique association fields & original strings into the same table and sort"
-paste 02.fields.old 01.keys-sorted.old.json | sort -k1,1 > 03.fields-and-strings.old \
-  & paste 02.fields.new 01.keys-sorted.new.json | sort -k1,1 > 03.fields-and-strings.new \
-  & wait
+echo "  Sort the evidence strings and keys inside them"
+python3 preprocess.py \
+  --in-old "${OLD_EVIDENCE_STRINGS}" \
+  --in-new "${NEW_EVIDENCE_STRINGS}" \
+  --out-old 01.keys-sorted.old.json \
+  --out-new 01.keys-sorted.new.json
 
 
 

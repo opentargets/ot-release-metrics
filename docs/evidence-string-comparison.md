@@ -1,17 +1,13 @@
 # Protocol for comparing evidence strings
 
 ## Overview
-Comparing two sets of evidence strings is an important measure of control in several situations:
-* Running the same code on different inputs to see if the data changes make sense;
-* Running different versions of code on the same input to see if code changes do not cause regressions;
-* In case of Ensembl/VEP version changes: running the _same_ code on the _same_ inputs, but using different VEP releases, to see if it causes any breaking changes.
+Comparing two sets of evidence strings can be a useful control measure for validating changes in source data and/or processing code to ensure there are no regressions, such as unexpected losses of a subset of the evidence strings. However, since the evidence strings are in JSON format, they require some preprocessing to run a meaningful diff. This protocol performs it and generates user-friendly output files and summary statistics.
 
-Since evidence strings are in JSON format, running a naive diff on them will be close to meaningless. This protocol attempts to provide an improvement on that by performing pre- and postprocessing and generating user-friendly output files and summary statistics. The functionality supported by the current version of the protocol:
+The scripts for running this comparison are located in the [`compare-evidence-strings`](../compare-evidence-strings) subdirectory. The functionality supported by the current version of the protocol:
 
 * Preprocess to make the diffs less noisy
   - Ensure stable sort order
   - Sort keys lexicographically in each evidence string
-  - Remove uninformative fields which change frequently and do not constitute a meaningful difference (currently it's "validated_against_schema_version" and "date_asserted")
 * Classify the evidence string into categories
   - Using the association fields (currently it's association fields specific to our data), it splits the evidence strings into non-unique (in at least one comparison set) and unique.
   - For unique evidence strings, a one-to-one mapping between old and new sets is established, and they are separated into "deleted", "common", and "new".
@@ -23,24 +19,37 @@ Since evidence strings are in JSON format, running a naive diff on them will be 
   - Using the word diff mode, so that the changes inside an evidence string are highlighted
   - Presented in HTML format which is much easier to read than the console output
 
-Currently the values of fields used for preprocessing, comparison and computing summary metrics are hardcoded for the EVA use case, but if there's interest, in the future iterations of refactoring these values can be made customizable.
-
 ## Running the comparison
-
-### Install dependencies
-The protocol requires two tools to be present in PATH: [jq](https://stedolan.github.io/jq/) and [aha](https://github.com/theZiz/aha). They can be installed using the commands below:
 ```bash
-# Install JQ — a command line JSON processor"
-wget -q -O jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
-chmod a+x jq
+export INSTANCE_NAME=evidence-comparison
+export INSTANCE_ZONE=europe-west1-d
 
-# Install aha — HTML report generator
-wget -q https://github.com/theZiz/aha/archive/0.5.zip
-unzip -q 0.5.zip && cd aha-0.5 && make &>/dev/null && mv aha ../ && cd .. && rm -rf aha-0.5 0.5.zip
+# Create the instance and SSH.
+gcloud compute instances create \
+  ${INSTANCE_NAME} \
+  --project=open-targets-eu-dev \
+  --zone=${INSTANCE_ZONE} \
+  --machine-type=e2-highmem-4 \
+  --service-account=426265110888-compute@developer.gserviceaccount.com \
+  --scopes=https://www.googleapis.com/auth/cloud-platform \
+  --create-disk=auto-delete=yes,boot=yes,device-name=${INSTANCE_NAME},image=projects/ubuntu-os-cloud/global/images/ubuntu-2004-focal-v20210927,mode=rw,size=500,type=projects/open-targets-eu-dev/zones/europe-west1-d/diskTypes/pd-balanced
+gcloud compute ssh --zone ${INSTANCE_ZONE} ${INSTANCE_NAME}
+screen
 
-export PATH=$PATH:`pwd`
+# Set up the instance.
+sudo apt update
+sudo apt -y install aha jq python3-pip python3-venv
+git clone https://github.com/opentargets/ot-release-metrics
+cd ot-release-metrics
+python3 -m venv env
+source env/bin/activate
+python3 -m pip install -r requirements.txt
+
+# 
 ```
 
+
+### Run the comparison
 Two sets of evidence strings can be compared by running the command:
 ```bash
 bash compare.sh \
@@ -48,12 +57,12 @@ bash compare.sh \
   new_evidence_strings.json
 ```
 
-The script will take a few minutes to run and will create a `comparison/` subdirectory in the current working directory. It will contain several intermediate files, and a single final file under the name of **`report.zip`**. (You can download an example of this final file [here](report-example/report.zip).)
+Only uncompressed, plain JSON files are supported. The script will take a few minutes to run and will create a `comparison/` subdirectory in the current working directory. It will contain several intermediate files, and a single final file under the name of **`report.zip`**. (You can download an example of this final file [here](../compare-evidence-strings/report-example/report.zip).)
 
 ## Understanding the results
 Copy the `report.zip` to your local machine, unzip, and open `report.html` in any web browser. It contains an index page outlining the major statistics of differences between the evidence strings:
 
-![](report-example/01.index.png)
+![](../compare-evidence-strings/report-example/01.index.png)
 
 ### Association fields
 First two sections describe statistics per input file. The evidence strings are divided into two groups: those where the association fields are unique (the majority), and those where they are not.
@@ -79,18 +88,18 @@ Evidence strings which are present in both files (judging by the association fie
 
 Evidence strings which have changed some of their fields (but not the association fields) between files 1 and 2 are part of the previous category. They are counted and the diff is available over a link, for example:
 
-![](report-example/02.changed.png)
+![](../compare-evidence-strings/report-example/02.changed.png)
 
 Evidence strings for which the **functional consequence** specifically has changed are part of the _previous_ category. By clicking on their total count, you will see the frequency of transitions between different functional consequence types (from file 1 to file 2) to see if there are any patterns:
 
-![](report-example/03.consequences.png)
+![](../compare-evidence-strings/report-example/03.consequences.png)
 
 ## Future improvements
 
-### Support arbitrary association fields & fields to ignore
-Currently, the lists of fields are tailored to ClinVar/EVA use case and will not work for arbitrary evidence string sets. However, this can be easily rewritten as parameters.
+### Improve detection of identifying fields
+Currently, the evidence strings are just being sorted and compared as strings. This can be improved by specifying or, even better, detecting the identifying fields (such as study ID etc.)
 
-### Alternative library for producing diffs
+### Alternative library for rendering diffs
 The [diff2html-cli](https://github.com/rtfpessoa/diff2html-cli) is a more advanced library which can be used to replace `aha` in the future.
 
 ### json-diff
