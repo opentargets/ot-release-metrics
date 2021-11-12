@@ -1,9 +1,8 @@
 # Open Targets release metrics calculation
 
 Contains modules to calculate and visualise Open Targets release metrics.
-
-👉 **Check it out here:**
-https://share.streamlit.io/opentargets/ot-release-metrics/app.py
+Check it out here:
+<p class="callout info">Check it out here: `https://share.streamlit.io/opentargets/ot-release-metrics/app.py`</p>
 
 ## Set up
 This will create a Google Cloud instance, SSH into it and install the necessary dependencies. Tweak the commands as necessary.
@@ -23,7 +22,6 @@ gcloud compute instances create \
   --scopes=https://www.googleapis.com/auth/cloud-platform \
   --create-disk=auto-delete=yes,boot=yes,device-name=${INSTANCE_NAME},image=projects/ubuntu-os-cloud/global/images/ubuntu-2004-focal-v20210927,mode=rw,size=1000,type=projects/open-targets-eu-dev/zones/europe-west1-d/diskTypes/pd-balanced
 gcloud compute ssh --zone ${INSTANCE_ZONE} ${INSTANCE_NAME}
-screen
 
 # Set up the instance.
 sudo apt update
@@ -89,27 +87,30 @@ First specify the run identifier, ETL input and output roots. Note that there ar
 ```bash
 # For completed releases.
 export ETL_RUN=21.09
-export ETL_INPUT_ROOT=gs://open-targets-data-releases/21.09/input
 export ETL_PARQUET_OUTPUT_ROOT=gs://open-targets-data-releases/21.09/output/etl/parquet
 
 # For snapshots.
 export ETL_RUN=21.09.2
-export ETL_INPUT_ROOT=gs://open-targets-pre-data-releases/21.09.2/input
 export ETL_PARQUET_OUTPUT_ROOT=gs://open-targets-pre-data-releases/21.09.2/output/etl/parquet
 ```
 
 Now download the files:
 ```bash
 mkdir post-pipeline
+mkdir post-pipeline/evidenceFailed
 gsutil -m cp -r \
   ${ETL_PARQUET_OUTPUT_ROOT}/evidence \
-  ${ETL_PARQUET_OUTPUT_ROOT}/evidenceFailed \
   ${ETL_PARQUET_OUTPUT_ROOT}/associationByDatasourceDirect \
   ${ETL_PARQUET_OUTPUT_ROOT}/associationByDatasourceIndirect \
+  ${ETL_PARQUET_OUTPUT_ROOT}/associationByOverallDirect \
+  ${ETL_PARQUET_OUTPUT_ROOT}/associationByOverallIndirect \
   ${ETL_PARQUET_OUTPUT_ROOT}/diseases \
   ${ETL_PARQUET_OUTPUT_ROOT}/targets \
-  ${ETL_INPUT_ROOT}/chembl-inputs/chembl_*molecule*.jsonl \
+  ${ETL_PARQUET_OUTPUT_ROOT}/molecule \
   post-pipeline
+gsutil -m cp -r \
+  ${ETL_PARQUET_OUTPUT_ROOT}/errors/evidence \
+  post-pipeline/evidenceFailed
 ```
 
 Next run the script to generate the metrics:
