@@ -26,12 +26,27 @@ gcloud compute instances create \
 gcloud compute ssh --zone ${INSTANCE_ZONE} ${INSTANCE_NAME}
 screen
 
-# Set up the instance.
+# Install dependencies.
 sudo apt update
 sudo apt -y install aha jq python3-pip python3-venv
+
+# Configure smart diff.
 wget -q -O delta.tar.gz https://github.com/dandavison/delta/releases/download/0.9.1/delta-0.9.1-x86_64-unknown-linux-gnu.tar.gz
 tar --extract --gzip --file=delta.tar.gz
 sudo mv delta-*/delta /usr/bin
+cat << EOF >> ~/.gitconfig
+[pager]
+    diff = delta
+    show = delta
+    log = delta
+    blame = delta
+    reflog = delta
+
+[interactive]
+    diffFilter = delta --color-only
+EOF
+
+# Set up the repository.
 git clone https://github.com/opentargets/ot-release-metrics
 cd ot-release-metrics
 python3 -m venv env

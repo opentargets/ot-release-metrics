@@ -29,8 +29,8 @@ awk -F'\t' 'BEGIN {OFS = FS} {print $2}' 03.comm | grep -v '^$' > 04.filtered.ne
 awk -F'\t' 'BEGIN {OFS = FS} {print $3}' 03.comm | grep -v '^$' > 04.filtered.common.json
 
 echo "Compute the diff"
-git diff --no-index -U0 --text 02.sorted.old.json 02.sorted.new.json \
-  delta --light --max-line-length 0 \
+git diff --no-index -U0 --minimal --text 02.sorted.old.json 02.sorted.new.json \
+  | delta --light --max-line-length 0 \
   > 05.diff
 
 echo "Write report header and summary statistics"
@@ -41,10 +41,10 @@ cat << EOF > report.html
 </style>
 <code><b><big>Evidence string comparison report</big></b>
 
-<b>File 1</b> - ${OLD_EVIDENCE_STRINGS}
+<b>File 1</b> - $(echo ${OLD_EVIDENCE_STRINGS})
 Total unique evidence strings: <b>$(wc -l <02.sorted.old.json)</b>
 
-<b>File 2</b> - ${NEW_EVIDENCE_STRINGS}
+<b>File 2</b> - $(echo ${NEW_EVIDENCE_STRINGS})
 Total unique evidence strings: <b>$(wc -l <02.sorted.new.json)</b>
 
 <b>Summary counts</b>
