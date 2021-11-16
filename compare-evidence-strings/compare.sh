@@ -18,15 +18,15 @@ python3 ../preprocess.py \
   --out-new 01.keys-sorted.new.json
 
 echo "Sort and deduplicate the evidence string sets"
-LC_ALL=C sort -u 01.keys-sorted.old.json > 02.sorted.old.json \
-  & LC_ALL=C sort -u 01.keys-sorted.new.json > 02.sorted.new.json \
+sort -u 01.keys-sorted.old.json > 02.sorted.old.json \
+  & sort -u 01.keys-sorted.new.json > 02.sorted.new.json \
   & wait
 
 echo "Separate evidence strings which are exactly the same between the sets"
-LC_ALL=C comm 02.sorted.old.json 02.sorted.new.json > 03.comm
-cut -f1 03.comm | grep -v '^$' > 04.filtered.old.json
-cut -f2 03.comm | grep -v '^$' > 04.filtered.new.json
-cut -f3 03.comm | grep -v '^$' > 04.filtered.common.json
+comm 02.sorted.old.json 02.sorted.new.json > 03.comm
+cut -d$'\t' -f1 03.comm | grep -v '^$' > 04.filtered.old.json
+cut -d$'\t' -f2 03.comm | grep -v '^$' > 04.filtered.new.json
+cut -d$'\t' -f3 03.comm | grep -v '^$' > 04.filtered.common.json
 
 echo "Write report header and summary statistics"
 cat << EOF > report.html
