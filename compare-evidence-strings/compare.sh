@@ -30,7 +30,7 @@ awk -F'\t' 'BEGIN {OFS = FS} {print $3}' 03.comm | grep -v '^$' > 04.filtered.co
 
 echo "Compute the diff"
 git diff --no-index -U0 --minimal --text 02.sorted.old.json 02.sorted.new.json \
-  | delta --light --max-line-length 0 \
+  | delta --light --max-line-length 0 --max-line-distance 0.2 \
   > 05.diff
 
 echo "Write report header and summary statistics"
