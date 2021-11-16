@@ -24,9 +24,9 @@ sort -u 01.keys-sorted.old.json > 02.sorted.old.json \
 
 echo "Separate evidence strings which are exactly the same between the sets"
 comm 02.sorted.old.json 02.sorted.new.json > 03.comm
-cut -d$'\t' -f1 03.comm | grep -v '^$' > 04.filtered.old.json
-cut -d$'\t' -f2 03.comm | grep -v '^$' > 04.filtered.new.json
-cut -d$'\t' -f3 03.comm | grep -v '^$' > 04.filtered.common.json
+awk -F'\t' 'BEGIN {OFS = FS} {print $1}' 03.comm | grep -v '^$' > 04.filtered.old.json
+awk -F'\t' 'BEGIN {OFS = FS} {print $2}' 03.comm | grep -v '^$' > 04.filtered.new.json
+awk -F'\t' 'BEGIN {OFS = FS} {print $3}' 03.comm | grep -v '^$' > 04.filtered.common.json
 
 echo "Write report header and summary statistics"
 cat << EOF > report.html
