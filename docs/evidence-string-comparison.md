@@ -29,6 +29,9 @@ screen
 # Set up the instance.
 sudo apt update
 sudo apt -y install aha jq python3-pip python3-venv
+wget -q -O delta.tar.gz https://github.com/dandavison/delta/releases/download/0.9.1/delta-0.9.1-x86_64-unknown-linux-gnu.tar.gz
+tar --extract --gzip --file=delta.tar.gz
+sudo mv delta-*/delta /usr/bin
 git clone https://github.com/opentargets/ot-release-metrics
 cd ot-release-metrics
 python3 -m venv env

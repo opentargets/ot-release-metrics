@@ -28,6 +28,11 @@ awk -F'\t' 'BEGIN {OFS = FS} {print $1}' 03.comm | grep -v '^$' > 04.filtered.ol
 awk -F'\t' 'BEGIN {OFS = FS} {print $2}' 03.comm | grep -v '^$' > 04.filtered.new.json
 awk -F'\t' 'BEGIN {OFS = FS} {print $3}' 03.comm | grep -v '^$' > 04.filtered.common.json
 
+echo "Compute the diff"
+git diff --no-index -U0 --text 02.sorted.old.json 02.sorted.new.json \
+  delta --light --max-line-length 0 \
+  > 05.diff
+
 echo "Write report header and summary statistics"
 cat << EOF > report.html
 <html>
@@ -51,24 +56,13 @@ Evidence strings which only appear in file 2: $(wc -l 04.filtered.new.json)
 </code>
 EOF
 
-echo "Compute the diff"
-git diff \
-  --no-index \
-  --text                  `# To force text (not binary) comparison mode`                       \
-  -U0                     `# Do not output context (the evidence strings which are unchanged)` \
-  --color=always          `# Use colours even if the output is redirected to a file`           \
-  --word-diff=color \
-  --word-diff-regex=, \
-  -- \
-  04.filtered.old.json \
-  04.filtered.new.json \
-  > 05.diff
-
 echo "Produce the report"
 tail -n+5 05.diff \
-  | awk '{if ($0 !~ /@@/) {print $0 "\n"}}') \
+  | awk '{if ($0 !~ /@@/) {print $0 "\n"}}' \
   | aha --word-wrap \
   >>report.html
 gzip -9 report.html
 cd ..
+
+echo "All done"
 exit 0
