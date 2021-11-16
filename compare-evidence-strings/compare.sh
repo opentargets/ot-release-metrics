@@ -1,5 +1,5 @@
 #!/bin/bash
-set -euo pipefail
+set -eu
 
 echo "Set up environment and parse parameters"
 # To ensure that the sort results are consistent, set the sort order locale explicitly.
