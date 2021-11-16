@@ -56,10 +56,9 @@ git diff \
   --no-index \
   --text                  `# To force text (not binary) comparison mode`                       \
   -U0                     `# Do not output context (the evidence strings which are unchanged)` \
-  --minimal \
   --color=always          `# Use colours even if the output is redirected to a file`           \
   --word-diff=color \
-  --word-diff-regex=. \
+  --word-diff-regex=, \
   -- \
   04.filtered.old.json \
   04.filtered.new.json \
