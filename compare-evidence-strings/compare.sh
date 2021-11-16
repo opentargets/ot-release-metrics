@@ -8,6 +8,7 @@ export LC_ALL=C
 # realpath is required to make the paths work after the working directory change.
 OLD_EVIDENCE_STRINGS=$(realpath "$1")
 NEW_EVIDENCE_STRINGS=$(realpath "$2")
+export OLD_EVIDENCE_STRINGS NEW_EVIDENCE_STRINGS
 mkdir comparison && cd comparison || exit 1
 
 echo "Sort the columns in the order of decreasing uniqueness"
@@ -29,7 +30,7 @@ awk -F'\t' 'BEGIN {OFS = FS} {print $2}' 03.comm | grep -v '^$' > 04.filtered.ne
 awk -F'\t' 'BEGIN {OFS = FS} {print $3}' 03.comm | grep -v '^$' > 04.filtered.common.json
 
 echo "Compute the diff"
-git diff --no-index -U0 --minimal --text 02.sorted.old.json 02.sorted.new.json \
+git diff --no-index -U0 --text 02.sorted.old.json 02.sorted.new.json \
   | delta --light --max-line-length 0 --max-line-distance 0.2 \
   > 05.diff
 
@@ -49,8 +50,8 @@ Total unique evidence strings: <b>$(wc -l <02.sorted.new.json)</b>
 
 <b>Summary counts</b>
 Evidence strings which appear in both files and are exactly the same: $(wc -l 04.filtered.common.json)
-Evidence strings which only appear in file 1: $(wc -l 04.filtered.old.json)
-Evidence strings which only appear in file 2: $(wc -l 04.filtered.new.json)
+Evidence strings which only appear in file 1: $(wc -l <04.filtered.old.json)
+Evidence strings which only appear in file 2: $(wc -l <04.filtered.new.json)
 
 <b>Diff for the non-common evidence strings</b>
 </code>
