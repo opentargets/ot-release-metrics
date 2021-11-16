@@ -49,7 +49,7 @@ Total unique evidence strings: <b>$(wc -l <02.sorted.old.json)</b>
 Total unique evidence strings: <b>$(wc -l <02.sorted.new.json)</b>
 
 <b>Summary counts</b>
-Evidence strings which appear in both files and are exactly the same: $(wc -l 04.filtered.common.json)
+Evidence strings which appear in both files and are exactly the same: $(wc -l <04.filtered.common.json)
 Evidence strings which only appear in file 1: $(wc -l <04.filtered.old.json)
 Evidence strings which only appear in file 2: $(wc -l <04.filtered.new.json)
 
