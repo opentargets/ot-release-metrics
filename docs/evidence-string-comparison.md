@@ -29,7 +29,7 @@ gcloud compute instances create \
   ${INSTANCE_NAME} \
   --project=open-targets-eu-dev \
   --zone=${INSTANCE_ZONE} \
-  --machine-type=e2-highmem-4 \
+  --machine-type=e2-highmem-2 \
   --service-account=426265110888-compute@developer.gserviceaccount.com \
   --scopes=https://www.googleapis.com/auth/cloud-platform \
   --create-disk=auto-delete=yes,boot=yes,device-name=${INSTANCE_NAME},image=projects/ubuntu-os-cloud/global/images/ubuntu-2004-focal-v20210927,mode=rw,size=500,type=projects/open-targets-eu-dev/zones/europe-west1-d/diskTypes/pd-balanced

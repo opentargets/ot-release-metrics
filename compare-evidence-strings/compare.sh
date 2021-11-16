@@ -9,33 +9,38 @@ OLD_EVIDENCE_STRINGS=$(realpath "$1")
 NEW_EVIDENCE_STRINGS=$(realpath "$2")
 mkdir comparison && cd comparison || exit 1
 
-echo "Sort the columns in the order of decreased uniqueness"
-python3 preprocess.py \
+echo "Sort the columns in the order of decreasing uniqueness"
+python3 ../preprocess.py \
   --in-old "${OLD_EVIDENCE_STRINGS}" \
   --in-new "${NEW_EVIDENCE_STRINGS}" \
   --out-old 01.keys-sorted.old.json \
   --out-new 01.keys-sorted.new.json
 
-echo "Sort the evidence string sets"
+echo "Sort and deduplicate the evidence string sets"
 sort -u 01.keys-sorted.old.json > 02.sorted.old.json \
   & sort -u 01.keys-sorted.new.json > 02.sorted.new.json \
   & wait
 
 echo "Compute the diff"
-# The --no-index option is important, because otherwise git will refuse to compare the files if you're running this
-# script from right inside the repository (because the files are untracked).
 git diff \
-  --minimal \
-  -U0 \
-  --color=always \
-  --word-diff=color \
   --no-index \
+  --text                  `# To force text (not binary) comparison mode`                       \
+  -U0                     `# Do not output context (the evidence strings which are unchanged)` \
+  --minimal \
+  --color=always          `# Use colours even if the output is redirected to a file`           \
+  --word-diff=color \
+  --word-diff-regex=. \
+  -- \
   02.sorted.old.json \
   02.sorted.new.json \
   > 03.diff
 
 echo "Produce the report"
-aha --word-wrap <diff > report.html
+tail -n+5 03.diff \
+  | awk '{if ($0 !~ /@@/) {print $0 "\n"}}') \
+  | aha --word-wrap \
+  >report.html
+cd ..
 exit 0
 
 # The remaining code still needs to be cleared up.
@@ -73,7 +78,5 @@ EOF
 parallel 'aha --word-wrap <99.{} > {}.html' ::: non-unique deleted added changed consequences-transition-frequency
 rm -rf report.zip
 zip report.zip ./*.html
-
-cd ..
 
 echo "All done"
