@@ -4,6 +4,7 @@ set -euo pipefail
 echo "Set up environment and parse parameters"
 # To ensure that the sort results are consistent, set the sort order locale explicitly.
 export LC_COLLATE=C
+export LC_ALL=C
 # realpath is required to make the paths work after the working directory change.
 OLD_EVIDENCE_STRINGS=$(realpath "$1")
 NEW_EVIDENCE_STRINGS=$(realpath "$2")
@@ -17,12 +18,12 @@ python3 ../preprocess.py \
   --out-new 01.keys-sorted.new.json
 
 echo "Sort and deduplicate the evidence string sets"
-sort -u 01.keys-sorted.old.json > 02.sorted.old.json \
-  & sort -u 01.keys-sorted.new.json > 02.sorted.new.json \
+LC_ALL=C sort -u 01.keys-sorted.old.json > 02.sorted.old.json \
+  & LC_ALL=C sort -u 01.keys-sorted.new.json > 02.sorted.new.json \
   & wait
 
 echo "Separate evidence strings which are exactly the same between the sets"
-comm 02.sorted.old.json 02.sorted.new.json > 03.comm
+LC_ALL=C comm 02.sorted.old.json 02.sorted.new.json > 03.comm
 cut -f1 03.comm | grep -v '^$' > 04.filtered.old.json
 cut -f2 03.comm | grep -v '^$' > 04.filtered.new.json
 cut -f3 03.comm | grep -v '^$' > 04.filtered.common.json
@@ -65,11 +66,10 @@ git diff \
   > 05.diff
 
 echo "Produce the report"
-tail -n+5 03.diff \
+tail -n+5 05.diff \
   | awk '{if ($0 !~ /@@/) {print $0 "\n"}}') \
   | aha --word-wrap \
   >>report.html
+gzip -9 report.html
 cd ..
 exit 0
-
-gzip -9 report.html
