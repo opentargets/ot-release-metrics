@@ -59,4 +59,5 @@ def compare_entity(
                 'Δ in number of direct associations'
             ]
         )
+    
     return df
