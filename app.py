@@ -202,7 +202,6 @@ if page == "Compare metrics":
             old_evidence_unresolved_disease, new_evidence_unresolved_disease
         ]
         evidence = reduce(lambda x, y: pd.merge(x, y, on="datasourceId", how="outer"), evidence_datasets).set_index("datasourceId").fillna(0)
-        print(evidence)
         association_datasets = [
             old_indirect_association, new_indirect_association,
             old_direct_association, new_direct_association,
@@ -222,15 +221,15 @@ if page == "Compare metrics":
         evidence_comparison = compare_evidence(evidence, latest_run, previous_run)
         association_comparison = compare_association(association, latest_run, previous_run)
         try:
-            disease_comparison = compare_disease(disease, latest_run, previous_run)
+            disease_comparison = compare_entity(disease, 'diseases', latest_run, previous_run)
         except KeyError:
             disease_comparison = disease.copy()
         try:
-            target_comparison = compare_target(target, latest_run, previous_run)
+            target_comparison = compare_entity(target, 'targets', latest_run, previous_run)
         except KeyError:
             target_comparison = target.copy()
         try:
-            drug_comparison = compare_drug(drug, latest_run, previous_run)
+            drug_comparison = compare_entity(drug, 'drugs', latest_run, previous_run)
         except KeyError:
             drug_comparison = drug.copy()
 
@@ -241,6 +240,8 @@ if page == "Compare metrics":
         st.table(association_comparison)
         st.header("Disease related metrics:")
         st.table(disease_comparison)
+        st.header("Target related metrics:")
+        st.table(target_comparison)
         st.header("Drug related metrics: WIP")
         st.table(drug_comparison)
 

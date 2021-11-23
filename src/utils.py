@@ -41,6 +41,7 @@ def compare_evidence(
         ]
     )
     return evidence
+
 def compare_association(
     association: pd.DataFrame,
     latest_run: str,
@@ -82,3 +83,12 @@ def compare_drug(
 ) -> pd.DataFrame:
     add_delta(drug, "drugs", previous_run, latest_run)
     return drug
+
+def compare_entity(
+    dataset: pd.DataFrame,
+    entity_name: str,
+    latest_run: str,
+    previous_run: str
+) -> pd.DataFrame:
+    add_delta(dataset, entity_name, previous_run, latest_run)
+    return dataset
