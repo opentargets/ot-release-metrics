@@ -89,7 +89,6 @@ if page == "Explore metrics":
 if page == "Compare metrics":
     # Select two datasets to compare
     st.sidebar.header("What do you want to compare?")
-    print(data.runId.unique())
     select_runs = st.sidebar.multiselect(
         "Select two datasets:",
         sorted(data.runId.unique(), reverse=True),
