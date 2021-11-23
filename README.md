@@ -122,9 +122,11 @@ python3 metrics.py \
   --evidence-failed post-pipeline/evidenceFailed \
   --associations-direct post-pipeline/associationByDatasourceDirect \
   --associations-indirect post-pipeline/associationByDatasourceIndirect \
+  --associations-overall-direct post-pipeline/associationByOverallDirect \
+  --associations-overall-indirect post-pipeline/associationByOverallIndirect \
   --diseases post-pipeline/diseases \
   --targets post-pipeline/targets \
-  --drugs post-pipeline/*molecule*.jsonl \
+  --drugs post-pipeline/molecule \
   --gold-standard-associations gold-standard/informa_abbvie.tsv \
   --gold-standard-mappings gold-standard/mesh_mappings.tsv
 ```

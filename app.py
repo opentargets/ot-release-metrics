@@ -203,7 +203,7 @@ if page == "Compare metrics":
             old_evidence_unresolved_disease, new_evidence_unresolved_disease
         ]
         evidence = reduce(lambda x, y: pd.merge(x, y, on="datasourceId", how="outer"), evidence_datasets).set_index("datasourceId").fillna(0)
-
+        print(evidence)
         association_datasets = [
             old_indirect_association, new_indirect_association,
             old_direct_association, new_direct_association,
