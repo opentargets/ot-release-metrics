@@ -90,7 +90,7 @@ if page == "Compare metrics":
     # Select two datasets to compare
     st.sidebar.header("What do you want to compare?")
     select_runs = st.sidebar.multiselect(
-        "To compare the metrics between a new release and the one in production, first select the production dataset and then the new one:",
+        "Select two datasets:",
         sorted(data.runId.unique(), reverse=True),
         help="First indicate the run with which you wish to make the comparison."
     )
@@ -218,8 +218,8 @@ if page == "Compare metrics":
         drug = pd.concat(drug_datasets, axis=0, ignore_index=True).T
 
         # Compare datasets
-        evidence_comparison = compare_evidence(evidence, latest_run, previous_run)
-        association_comparison = compare_association(association, latest_run, previous_run)
+        evidence_comparison = compare_entity(evidence, 'evidence', latest_run, previous_run)
+        association_comparison = compare_entity(association, 'associations', latest_run, previous_run)
         try:
             disease_comparison = compare_entity(disease, 'diseases', latest_run, previous_run)
         except KeyError:
