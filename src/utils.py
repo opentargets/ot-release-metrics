@@ -34,7 +34,6 @@ def compare_entity(
         add_delta(df, "evidence strings dropped due to duplication", previous_run, latest_run)
         add_delta(df, "evidence strings dropped due to unresolved target", previous_run, latest_run)
         add_delta(df, "evidence strings dropped due to unresolved disease", previous_run, latest_run)
-        df = df.iloc[:-1]  # Delete row with NaN
         df.loc['Total'] = df.sum()
         df = df.filter(
             items=[
