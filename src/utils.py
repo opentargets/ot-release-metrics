@@ -60,30 +60,6 @@ def compare_association(
     )
     return association
 
-def compare_disease(
-    disease: pd.DataFrame,
-    latest_run: str,
-    previous_run: str
-) -> pd.DataFrame:
-    add_delta(disease, "diseases", previous_run, latest_run)
-    return disease
-
-def compare_target(
-    target: pd.DataFrame,
-    latest_run: str,
-    previous_run: str
-) -> pd.DataFrame:
-    add_delta(target, "targets", previous_run, latest_run)
-    return target
-
-def compare_drug(
-    drug: pd.DataFrame,
-    latest_run: str,
-    previous_run: str
-) -> pd.DataFrame:
-    add_delta(drug, "drugs", previous_run, latest_run)
-    return drug
-
 def compare_entity(
     dataset: pd.DataFrame,
     entity_name: str,
