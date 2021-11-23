@@ -27,7 +27,6 @@ def compare_entity(
 
     if entity_name in ['diseases', 'drugs', 'targets']:
         add_delta(df, entity_name, previous_run, latest_run)
-        return df
 
     if entity_name == 'evidence':
         add_delta(df, "evidence strings", previous_run, latest_run)
@@ -47,7 +46,6 @@ def compare_entity(
                 'Δ in number of evidence strings dropped due to unresolved disease'
             ]
         )
-        return df
 
     if entity_name == 'associations':
         add_delta(df, "direct associations", previous_run, latest_run)
@@ -61,4 +59,4 @@ def compare_entity(
                 'Δ in number of direct associations'
             ]
         )
-        return df
+    return df
