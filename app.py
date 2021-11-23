@@ -90,7 +90,7 @@ if page == "Compare metrics":
     # Select two datasets to compare
     st.sidebar.header("What do you want to compare?")
     select_runs = st.sidebar.multiselect(
-        "Select two datasets:",
+        "To compare the metrics between a new release and the one in production, first select the production dataset and then the new one:",
         sorted(data.runId.unique(), reverse=True),
         help="First indicate the run with which you wish to make the comparison."
     )
