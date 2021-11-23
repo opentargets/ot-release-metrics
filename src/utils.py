@@ -30,8 +30,17 @@ def compare_evidence(
     add_delta(evidence, "evidence strings dropped due to unresolved disease", previous_run, latest_run)
     evidence = evidence.iloc[:-1]  # Delete row with NaN
     evidence.loc['Total'] = evidence.sum()
-    return evidence[evidence.columns[-5:]]
-
+    evidence = evidence.filter(
+        items=[
+            f'Nr of evidence strings in {latest_run}',
+            'Δ in number of evidence strings',
+            'Δ in number of invalid evidence strings',
+            'Δ in number of evidence strings dropped due to duplication',
+            'Δ in number of evidence strings dropped due to unresolved target',
+            'Δ in number of evidence strings dropped due to unresolved disease'
+        ]
+    )
+    return evidence
 def compare_association(
     association: pd.DataFrame,
     latest_run: str,
@@ -40,7 +49,15 @@ def compare_association(
     add_delta(association, "direct associations", previous_run, latest_run)
     add_delta(association, "indirect associations", previous_run, latest_run)
     association.loc['Total'] = association.sum()
-    return association[association.columns[-2:]]
+    association = association.filter(
+        items=[
+            f'Nr of indirect associations in {latest_run}',
+            'Δ in number of indirect associations',
+            f'Nr of direct associations in {latest_run}',
+            'Δ in number of direct associations'
+        ]
+    )
+    return association
 
 def compare_disease(
     disease: pd.DataFrame,
