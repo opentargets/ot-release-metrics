@@ -128,11 +128,11 @@ EFO:0001359	type I diabetes mellitus	MeSH:C563960	0.000000	Diabetes Mellitus, In
 EFO:0001359	type I diabetes mellitus	MeSH:C563959	0.000000	Diabetes Mellitus, Insulin-Dependent, 4
 EFO:0001359	type I diabetes mellitus	MeSH:C566395	0.000000	Diabetes Mellitus, Insulin-Dependent, 17
 EFO:0001359	type I diabetes mellitus	MeSH:C563958	0.000000	Diabetes Mellitus, Insulin-Dependent, 5
-EFO:0000378	coronary artery disease	MeSH:D003324	0.343000	Coronary Artery Disease
-EFO:0000378	coronary artery disease	MeSH:D003327	0.000274	Coronary Disease
-EFO:0000378	coronary artery disease	MeSH:D017202	0.000274	Myocardial Ischemia
-EFO:0000378	coronary artery disease	MeSH:D006952	0.000000	Hyperlipoproteinemia Type III
-EFO:0000378	coronary artery disease	MeSH:C564258	0.000000	Coronary Artery Disease, Autosomal Dominant, 1
+EFO:0001645	coronary artery disease	MeSH:D003324	0.343000	Coronary Artery Disease
+EFO:0001645	coronary artery disease	MeSH:D003327	0.000274	Coronary Disease
+EFO:0001645	coronary artery disease	MeSH:D017202	0.000274	Myocardial Ischemia
+EFO:0001645	coronary artery disease	MeSH:D006952	0.000000	Hyperlipoproteinemia Type III
+EFO:0001645	coronary artery disease	MeSH:C564258	0.000000	Coronary Artery Disease, Autosomal Dominant, 1
 EFO:0002508	Parkinson's disease	MeSH:D010300	0.343000	Parkinson Disease
 EFO:0002508	Parkinson's disease	MeSH:C538104	0.000000	Pallidopyramidal syndrome
 EFO:0002508	Parkinson's disease	MeSH:C565324	0.000000	Parkinson Disease 4, Autosomal Dominant Lewy Body
