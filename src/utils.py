@@ -1,5 +1,7 @@
 import base64
+
 import pandas as pd
+import plotly.express as px
 
 def get_table_download_link_csv(df):
     csv = df.to_csv().encode()
@@ -60,3 +62,31 @@ def compare_entity(
         )
     
     return df
+
+def plot_enrichment(data:pd.DataFrame):
+    """Creates scatter plot that displays the different OR/AUC values per runId across data sources."""
+
+    # Filter data per variables of interest
+    masks_variable = (data["variable"] == "associationsIndirectByDatasourceAUC") | (data["variable"] == "associationsIndirectByDatasourceOR")
+    data = data[masks_variable].drop(['field', 'count'], axis=1)
+
+    # Convert df from long to wide so that the variables (rows) become features (columns)
+    data_unstacked = (
+        data.set_index(['datasourceId', 'runId', 'variable'])
+        .value.unstack().reset_index()
+    )
+
+    # Design plot
+    enrichment_plot = px.scatter(
+        data_unstacked,
+        x='associationsIndirectByDatasourceOR', 
+        y='associationsIndirectByDatasourceAUC',
+        log_x=True, log_y=False,
+        color='runId', hover_data=['datasourceId'], template='plotly_white',
+        title='Enrichment (AUC&OR) per data source between releases'
+    )
+    enrichment_plot.add_hline(y=0.5, line_dash="dash", opacity=0.2)
+    enrichment_plot.add_vline(x=1, line_dash="dash", opacity=0.2)
+    enrichment_plot.update_yaxes(range=(0.35, 1), constrain='domain')
+
+    return enrichment_plot
