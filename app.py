@@ -250,8 +250,7 @@ if page == "Visualise metrics":
     st.sidebar.header("What do you want to compare?")
     select_runs = st.sidebar.multiselect(
         "Select two datasets to see the level of enrichment per data source:",
-        sorted(data.runId.unique(), reverse=True),
-        help="First indicate the run with which you wish to make the comparison."
+        sorted(data.runId.unique(), reverse=True)
     )
 
     # Apply masks

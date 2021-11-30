@@ -126,7 +126,8 @@ def plot_enrichment(data:pd.DataFrame):
         y='associationsIndirectByDatasourceAUC',
         log_x=True, log_y=False,
         color='runId', hover_data=['datasourceId'], template='plotly_white',
-        title='Enrichment (AUC&OR) per data source between releases'
+        title='Enrichment of indirect associations between releases across data sources',
+        labels={'associationsIndirectByDatasourceOR': 'OR', 'associationsIndirectByDatasourceAUC':'AUC'}
     )
     enrichment_plot.add_hline(y=0.5, line_dash="dash", opacity=0.2)
     enrichment_plot.add_vline(x=1, line_dash="dash", opacity=0.2)
