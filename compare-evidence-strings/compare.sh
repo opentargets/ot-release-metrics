@@ -1,5 +1,5 @@
 #!/bin/bash
-set -eu
+set -euo pipefail
 
 echo "Set up environment and parse parameters"
 # To ensure that the sort results are consistent, set the sort order locale explicitly.
@@ -25,9 +25,9 @@ sort -u 01.keys-sorted.old.json > 02.sorted.old.json \
 
 echo "Separate evidence strings which are exactly the same between the sets"
 comm 02.sorted.old.json 02.sorted.new.json > 03.comm
-awk -F'\t' 'BEGIN {OFS = FS} {print $1}' 03.comm | grep -v '^$' > 04.filtered.old.json
-awk -F'\t' 'BEGIN {OFS = FS} {print $2}' 03.comm | grep -v '^$' > 04.filtered.new.json
-awk -F'\t' 'BEGIN {OFS = FS} {print $3}' 03.comm | grep -v '^$' > 04.filtered.common.json
+awk -F'\t' 'BEGIN {OFS = FS} {print $1}' 03.comm | { grep -v '^$' || true; } > 04.filtered.old.json
+awk -F'\t' 'BEGIN {OFS = FS} {print $2}' 03.comm | { grep -v '^$' || true; } > 04.filtered.new.json
+awk -F'\t' 'BEGIN {OFS = FS} {print $3}' 03.comm | { grep -v '^$' || true; } > 04.filtered.common.json
 
 echo "Compute the diff"
 git diff --no-index -U0 --text 02.sorted.old.json 02.sorted.new.json \
