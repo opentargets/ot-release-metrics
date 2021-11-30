@@ -47,7 +47,8 @@ Now, to compare two sets of evidence strings, download and uncompress them, then
 ```bash
 bash compare.sh \
   old_evidence_strings.json \
-  new_evidence_strings.json
+  new_evidence_strings.json \
+  report.html.gz
 ```
 
-Only uncompressed, plain JSON files are supported. The script will take a few minutes to run and will create a `comparison/` subdirectory in the current working directory. It will contain several intermediate files, and a single final file under the name of **`report.html.gz`**. It contains a number of summary statistics, as well as the cleared up diff for the evidence strings. Download it locally and open in a web browser to examine.
+Only uncompressed, plain JSON files are supported. The script will take a few minutes to run and will create a gzipped HTML report. It contains a number of summary statistics, as well as the cleared up diff for the evidence strings. Download it locally and open in a web browser to examine.
