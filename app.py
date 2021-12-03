@@ -96,7 +96,7 @@ if page == "Compare metrics":
     )
 
     # Apply masks
-    if len(select_runs) >= 2:
+    if len(select_runs) == 2:
         previous_run = select_runs[0]
         latest_run = select_runs[1]
         masks_run = (data["runId"] == previous_run) | (data["runId"] == latest_run)
@@ -244,6 +244,26 @@ if page == "Compare metrics":
         st.table(target_comparison)
         st.header("Drug related metrics: WIP")
         st.table(drug_comparison)
+
+if page == "Visualise metrics":
+    # Select two datasets to compare 
+    st.sidebar.header("What do you want to compare?")
+    select_runs = st.sidebar.multiselect(
+        "Select two datasets to see the level of enrichment per data source:",
+        sorted(data.runId.unique(), reverse=True)
+    )
+
+    # Apply masks
+    if len(select_runs) == 2:
+        previous_run = select_runs[0]
+        latest_run = select_runs[1]
+
+        # Filter data per selected runIds and variables of interest
+        masks_run = (data["runId"] == previous_run) | (data["runId"] == latest_run)
+        data = data[masks_run]
+
+        # Plot
+        st.plotly_chart(plot_enrichment(data), use_container_width=True)
 
 st.markdown('###')
 st.image(Image.open("img/OT logo.png"), width = 150)
