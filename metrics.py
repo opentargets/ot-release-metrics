@@ -6,20 +6,17 @@ The ${ETL_PARQUET_OUTPUT_ROOT} is gs://ot-snapshots/etl/outputs/${RELEASE}/parqu
 progress), and gs://open-targets-data-releases/${RELEASE}/output/etl-parquet/ for the completed releases."""
 
 import argparse
-from collections import namedtuple
-from functools import reduce
 import logging
 import logging.config
-import os
-import os.path
+from collections import namedtuple
+from functools import reduce
 from typing import Iterable
 
-from psutil import virtual_memory
-from pyspark.conf import SparkConf
-from pyspark.mllib.evaluation import BinaryClassificationMetrics
-from pyspark.sql import SparkSession, DataFrame
 import pyspark.sql.functions as f
 import pyspark.sql.types as t
+from psutil import virtual_memory
+from pyspark.mllib.evaluation import BinaryClassificationMetrics
+from pyspark.sql import DataFrame, SparkSession
 
 from src.utils import read_path_if_provided
 
