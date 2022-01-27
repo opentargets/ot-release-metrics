@@ -138,7 +138,6 @@ def evidence_distinct_fields_count(
     out = df.groupBy(f.col('datasourceId')).agg(*exprs)
     # Clean column names
     out_cleaned = out.toDF(*(c.replace('.', '_') for c in out.columns))
-    # Clean  column names
     cols = [c.name for c in filter(lambda x: x.name != 'datasourceId',
                                    out_cleaned.schema.fields)]
     melted = melt(out_cleaned,
@@ -285,7 +284,8 @@ def get_columns_to_report(dataset_columns):
         'diseaseFromSourceMappedId' if 'diseaseFromSourceMappedId' in dataset_columns else 'diseaseFromSourceId',
         'drugId',
         'variantId',
-        'literature'
+        'literature',
+        'studyId'
     ]
 
 def detect_spark_memory_limit():
