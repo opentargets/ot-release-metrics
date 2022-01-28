@@ -66,9 +66,24 @@ sudo docker run --rm \
   -e GOOGLE_BUCKET=null/null \
   quay.io/opentargets/platform-input-support:master \
   -steps evidence
+
+# In case Docker is failing, the module can also be started using conda
+wget https://repo.anaconda.com/miniconda/Miniconda3-py37_4.10.3-Linux-x86_64.sh
+bash Miniconda3-py37_4.10.3-Linux-x86_64.sh
+rm Miniconda3-py37_4.10.3-Linux-x86_64.sh
+
+conda env create -f platform-input-support/environment.yaml
+conda activate pis-py3.8
+python platform-input-support/platform-input-support.py \
+  -gkey CREDENTIALS_PATH
+  -steps evidence
+  -output platform-input-support/output
+conda deactivate
 ```
 
 The process will fail when attempting to upload the files to the Google Cloud bucket, **which is expected** (we do not want to do that upload). A pull request to platform-input-support to make the upload step optional is pending.
+
+
 
 The evidence strings will be collected in `platform-input-support/output/evidence-files/` relative to the current working directory. Now the script is ready to be run:
 
