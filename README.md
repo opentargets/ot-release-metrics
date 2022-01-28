@@ -75,7 +75,7 @@ rm Miniconda3-py37_4.10.3-Linux-x86_64.sh
 conda env create -f platform-input-support/environment.yaml
 conda activate pis-py3.8
 python platform-input-support/platform-input-support.py \
-  -gkey CREDENTIALS_PATH
+  -gkey ${CREDENTIALS_PATH}
   -steps evidence
   -output platform-input-support/output
 conda deactivate
@@ -92,7 +92,7 @@ export RUN_ID=21.11.1
 time python3 metrics.py \
   --run-id ${RUN_ID}-pre \
   --out data/${RUN_ID}-pre.csv \
-  --evidence platform-input-support/output/evidence-files/
+  --evidence platform-input-support/output/prod/evidence-files/
 ```
 
 Transfer the generated metrics file from the machine and commit it to the repository.
