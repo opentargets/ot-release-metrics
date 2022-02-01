@@ -220,6 +220,7 @@ if page == "Compare metrics":
         # Compare datasets
         evidence_comparison = compare_entity(evidence, 'evidence', latest_run, previous_run)
         association_comparison = compare_entity(association, 'associations', latest_run, previous_run)
+        # TODO: All comparisons are failing, executing the except block. compare_entity must be fixed
         try:
             disease_comparison = compare_entity(disease, 'diseases', latest_run, previous_run)
         except KeyError:
@@ -231,7 +232,10 @@ if page == "Compare metrics":
         try:
             drug_comparison = compare_entity(drug, 'drugs', latest_run, previous_run)
         except KeyError:
-            drug_comparison = drug.copy()
+            drug_comparison = drug.copy().reindex([
+                f"Nr of drugs in {previous_run}",
+                f"Nr of drugs in {latest_run}"
+            ])
 
         # Display tables
         st.header("Evidence related metrics:")
@@ -242,7 +246,7 @@ if page == "Compare metrics":
         st.table(disease_comparison)
         st.header("Target related metrics:")
         st.table(target_comparison)
-        st.header("Drug related metrics: WIP")
+        st.header("Drug related metrics:")
         st.table(drug_comparison)
 
 if page == "Visualise metrics":
