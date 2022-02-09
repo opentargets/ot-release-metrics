@@ -46,45 +46,54 @@ if page == "Explore metrics":
         mask_run = data["runId"] == select_run
         data = data[mask_run]
 
-    # Refine the query
-    st.markdown("## Filter the data")
-    select_variables = st.multiselect(
-        "Filter by your variables of interest to refine your analysis. You can select as many as you want:",
-        data.variable.unique()
-    )
-    if select_variables:
-        mask_variable_selection = data["variable"].isin(select_variables)
-        data = data[mask_variable_selection]
-        if any("Field" in variable for variable in select_variables):
-            select_fields = st.multiselect(
-                "You can also filter by your field of interest:",
-                data.field.unique()
-            )
-            mask_field = data["field"].isin(select_fields)
-            data = data[mask_field] if select_fields else data.copy()
 
-    # Generate pivot table
-    select_pivot = st.checkbox("See pivot table.")
-    if select_pivot:
-        try:
-            # Custom pivot table to avoid loss of data when field == NaN
-            output = (
-                data
-                    .set_index(["variable", "field", "datasourceId"])
-                    .unstack("datasourceId", fill_value=0)
-                    .drop("runId", axis=1)
-                    # There is a current bug where the data source columns are duplicated with NaN values
-                    # These will be temporarily removed to improve the metrics exploration in the UI
-                    .dropna(axis='columns', how='any'))
-            output.columns = output.columns.get_level_values(1)
-        except ValueError:
-            st.write("Please, indicate a specific pipeline run to group and explore the data.")
-    else:
-        output = data.copy()
+        st.markdown("## Key metrics")
+        col1, col2, col3, col4, col5 = st.columns(5)
+        col1.metric(label='Evidence', value=data.query('variable == "evidenceTotalCount"')['value'].values[0])
+        col2.metric(label='Associations', value=data.query('variable == "associationsIndirectTotalCount"')['value'].values[0])
+        col3.metric(label='Targets', value=data.query('variable == "targetsTotalCount"')['value'].values[0])
+        col4.metric(label='Diseases', value=data.query('variable == "diseasesTotalCount"')['value'].values[0])
+        col5.metric(label='Drugs', value=data.query('variable == "drugsTotalCount"')['value'].values[0])
 
-    # Display table
-    st.write(output)
-    st.markdown(get_table_download_link_csv(output), unsafe_allow_html=True)
+        # Refine the query
+        st.markdown("## Filter the data")
+        select_variables = st.multiselect(
+            "Filter by your variables of interest to refine your analysis. You can select as many as you want:",
+            data.variable.unique()
+        )
+        if select_variables:
+            mask_variable_selection = data["variable"].isin(select_variables)
+            data = data[mask_variable_selection]
+            if any("Field" in variable for variable in select_variables):
+                select_fields = st.multiselect(
+                    "You can also filter by your field of interest:",
+                    data.field.unique()
+                )
+                mask_field = data["field"].isin(select_fields)
+                data = data[mask_field] if select_fields else data.copy()
+
+        # Generate pivot table
+        select_pivot = st.checkbox("See pivot table.")
+        if select_pivot:
+            try:
+                # Custom pivot table to avoid loss of data when field == NaN
+                output = (
+                    data
+                        .set_index(["variable", "field", "datasourceId"])
+                        .unstack("datasourceId", fill_value=0)
+                        .drop("runId", axis=1)
+                        # There is a current bug where the data source columns are duplicated with NaN values
+                        # These will be temporarily removed to improve the metrics exploration in the UI
+                        .dropna(axis='columns', how='any'))
+                output.columns = output.columns.get_level_values(1)
+            except ValueError:
+                st.write("Please, indicate a specific pipeline run to group and explore the data.")
+        else:
+            output = data.copy()
+
+        # Display table
+        st.dataframe(output)
+        st.markdown(get_table_download_link_csv(output), unsafe_allow_html=True)
 
 if page == "Compare metrics":
     # Select two datasets to compare
