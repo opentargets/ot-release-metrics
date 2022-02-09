@@ -165,12 +165,12 @@ if page == "Compare metrics":
 
         # DISEASES
         old_diseases_count = (data
-            .query('runId == @previous_run & variable == "targetsTotalCount"')[["value"]]
-            .rename({"value" : f"Nr of targets in {previous_run.split('-')[0]}"}, axis=1)
+            .query('runId == @previous_run & variable == "diseasesTotalCount"')[["value"]]
+            .rename({"value" : f"Nr of diseases in {previous_run.split('-')[0]}"}, axis=1)
         )
         new_diseases_count = (data
-            .query('runId == @latest_run & variable == "targetsTotalCount"')[["value"]]
-            .rename({"value" : f"Nr of targets in {latest_run.split('-')[0]}"}, axis=1)
+            .query('runId == @latest_run & variable == "diseasesTotalCount"')[["value"]]
+            .rename({"value" : f"Nr of diseases in {latest_run.split('-')[0]}"}, axis=1)
         )
 
         # DRUGS
@@ -185,12 +185,12 @@ if page == "Compare metrics":
         
         # TARGETS
         old_targets_count = (data
-            .query('runId == @previous_run & variable == "diseasesTotalCount"')[["value"]]
-            .rename({"value" : f"Nr of diseases in {previous_run.split('-')[0]}"}, axis=1)
+            .query('runId == @previous_run & variable == "targetsTotalCount"')[["value"]]
+            .rename({"value" : f"Nr of targets in {previous_run.split('-')[0]}"}, axis=1)
         )
         new_targets_count = (data
-            .query('runId == @latest_run & variable == "diseasesTotalCount"')[["value"]]
-            .rename({"value" : f"Nr of diseases in {latest_run.split('-')[0]}"}, axis=1)
+            .query('runId == @latest_run & variable == "targetsTotalCount"')[["value"]]
+            .rename({"value" : f"Nr of targets in {latest_run.split('-')[0]}"}, axis=1)
         )
 
         # Aggregate metrics
