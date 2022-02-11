@@ -202,6 +202,7 @@ if page == "Compare metrics":
             .rename({"value" : f"Nr of targets in {latest_run.split('-')[0]}"}, axis=1)
         )
 
+
         # Aggregate metrics
         evidence_datasets = [
             old_evidence_count, new_evidence_count,
