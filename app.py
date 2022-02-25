@@ -30,7 +30,7 @@ page = st.sidebar.radio(
 # Load data
 files = glob.glob("data/*.csv")
 dfs = [pd.read_csv(f, dtype={'runId':'string'}) for f in files]
-data = pd.concat(dfs, ignore_index=True)#.fillna({'value': 0}).astype({'value': int})
+data = pd.concat(dfs, ignore_index=True).fillna({'value': 0})
 
 if page == "Explore metrics":
     # Select a dataset to explore
@@ -49,11 +49,11 @@ if page == "Explore metrics":
 
         st.markdown("## Key metrics")
         col1, col2, col3, col4, col5 = st.columns(5)
-        col1.metric(label='Evidence', value=data.query('variable == "evidenceTotalCount"')['value'].values[0])
-        col2.metric(label='Associations', value=data.query('variable == "associationsIndirectTotalCount"')['value'].values[0])
-        col3.metric(label='Targets', value=data.query('variable == "targetsTotalCount"')['value'].values[0])
-        col4.metric(label='Diseases', value=data.query('variable == "diseasesTotalCount"')['value'].values[0])
-        col5.metric(label='Drugs', value=data.query('variable == "drugsTotalCount"')['value'].values[0])
+        col1.metric(label='Evidence', value=int(data.query('variable == "evidenceTotalCount"')['value'].values[0]))
+        col2.metric(label='Associations', value=int(data.query('variable == "associationsIndirectTotalCount"')['value'].values[0]))
+        col3.metric(label='Targets', value=int(data.query('variable == "targetsTotalCount"')['value'].values[0]))
+        col4.metric(label='Diseases', value=int(data.query('variable == "diseasesTotalCount"')['value'].values[0]))
+        col5.metric(label='Drugs', value=int(data.query('variable == "drugsTotalCount"')['value'].values[0]))
 
         # Refine the query
         st.markdown("## Filter the data")
@@ -92,7 +92,7 @@ if page == "Explore metrics":
             output = data.copy()
 
         # Display table
-        st.dataframe(output)
+        st.dataframe(output.style.set_precision(2))
         st.markdown(get_table_download_link_csv(output), unsafe_allow_html=True)
 
 if page == "Compare metrics":
