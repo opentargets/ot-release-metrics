@@ -248,9 +248,9 @@ if page == "Compare metrics":
 
         # Display tables
         st.header("Evidence related metrics:")
-        st.table(evidence_comparison)
+        st.table(evidence_comparison.astype(int))
         st.header("Associations related metrics:")
-        st.table(association_comparison)
+        st.table(association_comparison.astype(int))
         st.header("Disease related metrics:")
         st.table(disease_comparison)
         st.header("Target related metrics:")
