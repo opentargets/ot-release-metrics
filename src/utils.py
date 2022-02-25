@@ -46,12 +46,6 @@ def read_path_if_provided(spark, path):
     if parquet_files:
         return spark.read.parquet(path)
 
-def get_table_download_link_csv(df):
-    csv = df.to_csv().encode()
-    b64 = base64.b64encode(csv).decode()
-    href = f'<a href="data:file/csv;base64,{b64}" download="ot_metrics_data.csv" target="_blank">Download data</a>'
-    return href
-
 def add_delta(
     df: pd.DataFrame,
     metric: str,

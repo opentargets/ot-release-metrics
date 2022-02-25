@@ -93,7 +93,12 @@ if page == "Explore metrics":
 
         # Display table
         st.dataframe(output.style.set_precision(2))
-        st.markdown(get_table_download_link_csv(output), unsafe_allow_html=True)
+        st.download_button(
+            label="Download data as CSV",
+            data=output.to_csv().encode('utf-8'),
+            file_name=f'metrics-{select_run}.csv',
+            mime='text/csv',
+        )
 
 if page == "Compare metrics":
     # Select two datasets to compare
