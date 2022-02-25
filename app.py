@@ -30,7 +30,7 @@ page = st.sidebar.radio(
 # Load data
 files = glob.glob("data/*.csv")
 dfs = [pd.read_csv(f, dtype={'runId':'string'}) for f in files]
-data = pd.concat(dfs, ignore_index=True).fillna({'value': 0}).astype({'value': int})
+data = pd.concat(dfs, ignore_index=True)#.fillna({'value': 0}).astype({'value': int})
 
 if page == "Explore metrics":
     # Select a dataset to explore
