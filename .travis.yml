@@ -16,5 +16,5 @@ script:
       cat nohup.out; 
       exit 1; 
     else 
-      echo "Streamlit server running"
+      echo "Streamlit server running";
     fi
