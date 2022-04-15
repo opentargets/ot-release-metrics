@@ -1,6 +1,6 @@
 language: python
 python:
-  - '3.6'
+  - '3.9'
 sudo: required
 install:
   - python3 -m venv env
