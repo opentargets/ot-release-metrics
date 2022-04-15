@@ -9,6 +9,7 @@ install:
 script:
   # Staring streamlit in the background:
   - nohup streamlit run app.py &
+  - sleep 10 
 
   # Checking if streamlit is running:
   - if [[ ! $(ps aux | grep streamlit | grep -v grep) ]]; then 
