@@ -13,7 +13,7 @@ script:
 
   # Checking if streamlit is running:
   - if [[ ! $(ps aux | grep streamlit | grep -v grep) ]]; then 
-      echo "Launcing streamlit server failed."; 
+      echo "Streamlit server launch failed."; 
       cat nohup.out; 
       exit 1; 
     else 
