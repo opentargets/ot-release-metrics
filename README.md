@@ -77,7 +77,7 @@ conda activate pis-py3.8
 python platform-input-support/platform-input-support.py \
   -gkey ${CREDENTIALS_PATH}
   -steps evidence
-  -output platform-input-support/output
+  -o platform-input-support/output
 conda deactivate
 ```
 
