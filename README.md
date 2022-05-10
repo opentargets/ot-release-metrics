@@ -1,8 +1,7 @@
 # Open Targets release metrics calculation
 
 Contains modules to calculate and visualise Open Targets release metrics.
-Check it out here:
-<p class="callout info">Check it out here: `https://share.streamlit.io/opentargets/ot-release-metrics/app.py`</p>
+Check it out here: `https://share.streamlit.io/opentargets/ot-release-metrics/app.py`
 
 ## Set up
 This will create a Google Cloud instance, SSH into it and install the necessary dependencies. Tweak the commands as necessary.
