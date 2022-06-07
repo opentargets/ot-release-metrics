@@ -3,7 +3,7 @@ import logging
 import os
 import pandas as pd
 import plotly.express as px
-
+import streamlit as st
 
 def read_path_if_provided(spark, path):
     """Automatically detect the format of the input data and read it into the Spark dataframe. The supported formats
@@ -132,7 +132,7 @@ def plot_enrichment(data: pd.DataFrame):
 
     return enrichment_plot
 
-
+@st.cache
 def load_data(data_folder: str) -> pd.DataFrame:
     """This function reads all csv files from a provided location and returns as a concatenated pandas dataframe"""
 
