@@ -1,5 +1,4 @@
 from functools import reduce
-import glob
 
 import streamlit as st
 import pandas as pd
@@ -31,9 +30,8 @@ page = st.sidebar.radio(
 )
 
 # Load data
-files = glob.glob("data/*.csv")
-dfs = [pd.read_csv(f, dtype={'runId': 'string'}) for f in files]
-data = pd.concat(dfs, ignore_index=True).fillna({'value': 0})
+dataFolder = 'gs://otar000-evidence_input/release-metrics'  # This location should be read from a config file
+data = load_data(dataFolder)
 
 if page == "Explore metrics":
     # Select a dataset to explore
