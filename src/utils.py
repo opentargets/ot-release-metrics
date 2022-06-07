@@ -136,18 +136,19 @@ def plot_enrichment(data: pd.DataFrame):
 def load_data(data_folder: str) -> pd.DataFrame:
     """This function reads all csv files from a provided location and returns as a concatenated pandas dataframe"""
 
-    # Read all csv files from Google bucket:
+    # Get list of csv files in a Google bucket:
     if data_folder.startswith('gs://'):
         csv_files = ['gs://' + x for x in gcsfs.GCSFileSystem().ls(data_folder) if x.endswith('csv')]
 
-    # Reading files from local folder:
+    # Get list of csv files in a local folder:
     else:
         csv_files = [os.path.join(data_folder, x) for x in os.listdir(data_folder) if x.endswith('csv')]
 
     logging.info(f'Number of csv files found in the data folder: {len(csv_files)}')
 
-    # reading csv files from local directory:
+    # Reading csv files as pandas dataframes:
     data = pd.concat([pd.read_csv(x, sep=',', dtype={'runId': 'string'}) for x in csv_files], ignore_index=True).fillna({'value': 0})
     logging.info(f'Number of rows in the dataframe: {len(data)}')
+    logging.info(f'Number of datasets: {len(data.runId.unique())}')
 
     return data
