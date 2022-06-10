@@ -1,6 +1,9 @@
+import gcsfs
+import logging
 import os
 import pandas as pd
 import plotly.express as px
+import streamlit as st
 
 def read_path_if_provided(spark, path):
     """Automatically detect the format of the input data and read it into the Spark dataframe. The supported formats
@@ -45,10 +48,12 @@ def read_path_if_provided(spark, path):
         return spark.read.parquet(path)
 
 def add_delta(
-    df: pd.DataFrame,
-    metric: str,
-    previous_run: str,
-    latest_run: str):
+        df: pd.DataFrame,
+        metric: str,
+        previous_run: str,
+        latest_run: str
+    ):
+
     df[f"Δ in number of {metric}"] = (
         df[f"Nr of {metric} in {latest_run.split('-')[0]}"]
         .sub(
@@ -95,10 +100,10 @@ def compare_entity(
                 'Δ in number of direct associations'
             ]
         )
-    
+
     return df
 
-def plot_enrichment(data:pd.DataFrame):
+def plot_enrichment(data: pd.DataFrame):
     """Creates scatter plot that displays the different OR/AUC values per runId across data sources."""
 
     # Filter data per variables of interest
@@ -114,7 +119,7 @@ def plot_enrichment(data:pd.DataFrame):
     # Design plot
     enrichment_plot = px.scatter(
         data_unstacked,
-        x='associationsIndirectByDatasourceOR', 
+        x='associationsIndirectByDatasourceOR',
         y='associationsIndirectByDatasourceAUC',
         log_x=True, log_y=False,
         color='runId', hover_data=['datasourceId'], template='plotly_white',
@@ -126,3 +131,24 @@ def plot_enrichment(data:pd.DataFrame):
     enrichment_plot.update_yaxes(range=(0.35, 1), constrain='domain')
 
     return enrichment_plot
+
+@st.cache
+def load_data(data_folder: str) -> pd.DataFrame:
+    """This function reads all csv files from a provided location and returns as a concatenated pandas dataframe"""
+
+    # Get list of csv files in a Google bucket:
+    if data_folder.startswith('gs://'):
+        csv_files = ['gs://' + x for x in gcsfs.GCSFileSystem().ls(data_folder) if x.endswith('csv')]
+
+    # Get list of csv files in a local folder:
+    else:
+        csv_files = [os.path.join(data_folder, x) for x in os.listdir(data_folder) if x.endswith('csv')]
+
+    logging.info(f'Number of csv files found in the data folder: {len(csv_files)}')
+
+    # Reading csv files as pandas dataframes:
+    data = pd.concat([pd.read_csv(x, sep=',', dtype={'runId': 'string'}) for x in csv_files], ignore_index=True).fillna({'value': 0})
+    logging.info(f'Number of rows in the dataframe: {len(data)}')
+    logging.info(f'Number of datasets: {len(data.runId.unique())}')
+
+    return data
