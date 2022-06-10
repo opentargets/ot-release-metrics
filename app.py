@@ -30,7 +30,7 @@ page = st.sidebar.radio(
 )
 
 # Load data
-dataFolder = 'gs://otar000-evidence_input/release-metrics'  # This location should be read from a config file
+data_folder = 'gs://otar000-evidence_input/release-metrics'  # This location should be read from a config file
 data = load_data(dataFolder)
 
 if page == "Explore metrics":
