@@ -144,11 +144,20 @@ def load_data(data_folder: str) -> pd.DataFrame:
     else:
         csv_files = [os.path.join(data_folder, x) for x in os.listdir(data_folder) if x.endswith('csv')]
 
-    logging.info(f'Number of csv files found in the data folder: {len(csv_files)}')
+    dataset_count = len(csv_files)
+    logging.info(f'Number of csv files found in the data folder: {dataset_count}')
 
     # Reading csv files as pandas dataframes:
-    data = pd.concat([pd.read_csv(x, sep=',', dtype={'runId': 'string'}) for x in csv_files], ignore_index=True).fillna({'value': 0})
-    logging.info(f'Number of rows in the dataframe: {len(data)}')
-    logging.info(f'Number of datasets: {len(data.runId.unique())}')
+    while True:
+        data = (
+            pd.concat([pd.read_csv(x, sep=',', dtype={'runId': 'string'}) for x in csv_files], ignore_index=True)
+            .fillna({'value': 0})
+        )
+        logging.info(f'Number of rows in the dataframe: {len(data)}')
+        logging.info(f'Number of datasets: {len(data.runId.unique())}')
+
+        if len(data.runId.unique()) == dataset_count:
+            logging.info('All datasets loaded successfully.')
+            break
 
     return data
