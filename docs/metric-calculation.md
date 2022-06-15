@@ -79,8 +79,6 @@ conda deactivate
 
 The process will fail when attempting to upload the files to the Google Cloud bucket, **which is expected** (we do not want to do that upload). A pull request to platform-input-support to make the upload step optional is pending.
 
-
-
 The evidence strings will be collected in `platform-input-support/output/evidence-files/` relative to the current working directory. Now the script is ready to be run:
 
 ```bash

@@ -11,7 +11,7 @@ assert sys.version_info >= (3, 7), ('The script requires Python 3.7+ to work, be
 def recursively_normalise(list_dict_or_other):
     """Normalise the contents of list and dictionaries by recursively sorting them."""
     if type(list_dict_or_other) is list:
-        return sorted(recursively_normalise(x) for x in list_dict_or_other)
+        return sorted([recursively_normalise(x) for x in list_dict_or_other], key=str)
     if type(list_dict_or_other) is dict:
         return {k: recursively_normalise(list_dict_or_other[k]) for k in sorted(list_dict_or_other.keys())}
     else:
@@ -35,7 +35,7 @@ for infile, outfile in ((args.in_new, args.out_new), (args.in_old, args.out_old)
     # Ingest the JSON dataset.
     df = pd.read_json(infile, lines=True)
 
-    # Sort all lists and convert to tuples (recursively, if necessary).
+    # Sort and serialise all lists and dictionaries
     df = df.applymap(normalise_and_serialise)
 
     if not column_order:
