@@ -105,13 +105,13 @@ if page == "Compare metrics":
     select_runs = st.sidebar.multiselect(
         "Select two datasets:",
         sorted(data.runId.unique(), reverse=True),
-        help="First indicate the run with which you wish to make the comparison.",
+        help="First indicate the latest run and secondly the run with which you wish to make the comparison.",
     )
 
     # Apply masks
     if len(select_runs) == 2:
-        previous_run = select_runs[0]
-        latest_run = select_runs[1]
+        latest_run = select_runs[0]
+        previous_run = select_runs[1]
         masks_run = (data["runId"] == previous_run) | (data["runId"] == latest_run)
         data = data[masks_run]
 

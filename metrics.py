@@ -373,6 +373,9 @@ def main(args):
             # Evidence count (duplicates).
             document_total_count(evidence_failed.filter(f.col('markedDuplicate')),
                                  'evidenceDuplicateTotalCount'),
+            # Evidence count (nullified score).
+            document_total_count(evidence_failed.filter(f.col('nullifiedScore')),
+                                 'evidenceNullifiedScoreTotalCount'),
             # Evidence count (targets not resolved).
             document_total_count(evidence_failed.filter(~f.col('resolvedTarget')),
                                  'evidenceUnresolvedTargetTotalCount'),
@@ -380,7 +383,7 @@ def main(args):
             document_total_count(evidence_failed.filter(~f.col('resolvedDisease')),
                                  'evidenceUnresolvedDiseaseTotalCount'),
 
-            # Evidence count by datasource (invalids).
+            # Total invalids by datasource.
             document_count_by(evidence_failed,
                               'datasourceId',
                               'evidenceInvalidCountByDatasource'),
@@ -388,6 +391,10 @@ def main(args):
             document_count_by(evidence_failed.filter(f.col('markedDuplicate')),
                               'datasourceId',
                               'evidenceDuplicateCountByDatasource'),
+            # Evidence count by datasource (nullified score).
+            document_count_by(evidence_failed.filter(f.col('nullifiedScore')),
+                                'datasourceId',
+                                'evidenceNullifiedScoreCountByDatasource'),
             # Evidence count by datasource (targets not resolved).
             document_count_by(evidence_failed.filter(~f.col('resolvedTarget')),
                               'datasourceId',
@@ -397,12 +404,15 @@ def main(args):
                               'datasourceId',
                               'evidenceUnresolvedDiseaseCountByDatasource'),
 
-            # Distinct values in selected fields (invalid evidence).
+            # Distinct values in selected fields (total invalid evidence).
             evidence_distinct_fields_count(evidence_failed.select(columns_to_report),
                                            'evidenceInvalidDistinctFieldsCountByDatasource'),
             # Evidence count by datasource (duplicates).
             evidence_distinct_fields_count(evidence_failed.filter(f.col('markedDuplicate')).select(columns_to_report),
                                            'evidenceDuplicateDistinctFieldsCountByDatasource'),
+            # Evidence count by datasource (nullified score).
+            evidence_distinct_fields_count(evidence_failed.filter(f.col('nullifiedScore')).select(columns_to_report),
+                                             'evidenceNullifiedScoreDistinctFieldsCountByDatasource'),
             # Evidence count by datasource (targets not resolved).
             evidence_distinct_fields_count(evidence_failed.filter(~f.col('resolvedTarget')).select(columns_to_report),
                                            'evidenceUnresolvedTargetDistinctFieldsCountByDatasource'),
