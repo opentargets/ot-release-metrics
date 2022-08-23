@@ -10,25 +10,30 @@ from collections import namedtuple
 from functools import reduce
 import logging
 import logging.config
-import os
-import os.path
 from typing import Iterable
 
-from psutil import virtual_memory
-from pyspark.conf import SparkConf
 from pyspark.mllib.evaluation import BinaryClassificationMetrics
 from pyspark.sql import SparkSession, DataFrame
 import pyspark.sql.functions as f
 import pyspark.sql.types as t
 
-from src.utils import read_path_if_provided
+from src.utils import initialize_spark_session, read_path_if_provided
 
 
 def flatten(schema, prefix=None):
-    """Required to flatten the schema."""
+    """
+    It takes a Spark schema and returns a list of all fields in the schema once flattened.
+    
+    Args:
+      schema: The schema of the dataframe
+      prefix: The prefix to prepend to the field names.
+    
+    Returns:
+      A list of all the columns in the dataframe.
+    """
     fields = []
     for field in schema.fields:
-        name = prefix + '.' + field.name if prefix else field.name
+        name = f'{prefix}.{field.name}' if prefix else field.name
         dtype = field.dataType
         if isinstance(dtype, t.ArrayType):
             dtype = dtype.elementType
@@ -46,8 +51,20 @@ def melt(
         var_name: str = 'variable',
         value_name: str = 'value'
 ) -> DataFrame:
-    """Convert :class:`DataFrame` from wide to long format."""
-
+    """
+    It takes a DataFrame, and a list of columns to melt, and returns a DataFrame with the columns melted
+    into rows
+    
+    Args:
+      df (DataFrame): DataFrame
+      id_vars (Iterable[str]): The columns that will be kept as-is.
+      value_vars (Iterable[str]): The columns that you want to melt.
+      var_name (str): The name of the column that will contain the variable names. Defaults to variable
+      value_name (str): The name of the column that will contain the values. Defaults to value
+    
+    Returns:
+      A dataframe with the columns id_vars, var_name, and value_name.
+    """
     # Create array<struct<variable: str, value: ...>>
     _vars_and_vals = f.array(*(
         f.struct(f.lit(c).alias(var_name), f.col(c).alias(value_name))
@@ -154,12 +171,32 @@ def evidence_distinct_fields_count(
 
 
 def auc(associations, score_column_name):
+    """
+    It calculates the area under the curve for a given set of associations and a score column.
+    
+    Args:
+      associations: the DataFrame of associations
+      score_column_name: The name of the column in the associations DataFrame that contains the score.
+    
+    Returns:
+      The area under the ROC curve.
+    """
     return BinaryClassificationMetrics(
         associations.select(score_column_name, 'gold_standard').rdd.map(list)
     ).areaUnderROC
 
 
 def odds_ratio(associations, datasource):
+    """
+    It calculates the odds ratio of the associations in the given datasource
+    
+    Args:
+      associations: the dataframe of associations
+      datasource: the datasource we're interested in
+    
+    Returns:
+      The odds ratio of the gold standard associations to the non-gold standard associations.
+    """
     a = associations.filter((f.col('gold_standard') == 1.0) & (f.col('datasourceId') == datasource)).count()
     b = associations.filter((f.col('gold_standard') == 0.0) & (f.col('datasourceId') == datasource)).count()
     c = associations.filter((f.col('gold_standard') == 1.0) & (f.col('datasourceId') != datasource)).count()
@@ -282,6 +319,15 @@ def parse_args():
 
 
 def get_columns_to_report(dataset_columns):
+    """
+    It returns a list of columns that we want to report in the final output
+    
+    Args:
+      dataset_columns: the columns in the dataset
+    
+    Returns:
+      A list of columns to report.
+    """
     return [
         'datasourceId',
         'targetFromSourceId',
@@ -291,23 +337,10 @@ def get_columns_to_report(dataset_columns):
         'literature'
     ]
 
-def detect_spark_memory_limit():
-    """Spark does not automatically use all available memory on a machine. When working on large datasets, this may
-    cause Java heap space errors, even though there is plenty of RAM available. To fix this, we detect the total amount
-    of physical memory and allow Spark to use (almost) all of it."""
-    mem_gib = virtual_memory().total >> 30
-    return int(mem_gib * 0.9)
-
 def main(args):
     # Initialise a Spark session.
-    spark_mem_limit = detect_spark_memory_limit()
-    spark = (
-        SparkSession
-        .builder
-        .config("spark.driver.memory", f'{spark_mem_limit}G')
-        .config("spark.executor.memory", f'{spark_mem_limit}G')
-        .getOrCreate()
-    )
+    global spark
+    spark = initialize_spark_session()
 
     # Initialise logging.
     logging_config = {
