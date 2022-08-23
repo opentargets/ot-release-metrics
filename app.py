@@ -4,12 +4,12 @@ import streamlit as st
 import pandas as pd
 from PIL import Image
 
-from src.utils import *
+from src.metric_calculation.utils import *
 
 # App UI
 st.set_page_config(
     page_title="Open Targets Data Metrics",
-    page_icon=Image.open("img/favicon.png"),
+    page_icon=Image.open("src/assets/img/favicon.png"),
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -298,4 +298,4 @@ if page == "Visualise metrics":
         st.plotly_chart(plot_enrichment(data), use_container_width=True)
 
 st.markdown('###')
-st.image(Image.open("img/OT logo.png"), width=150)
+st.image(Image.open("src/assets/img/logo.png"), width=150)

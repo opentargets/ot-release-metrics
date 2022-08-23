@@ -5,7 +5,7 @@ import gcsfs
 import pandas as pd
 import plotly.express as px
 from psutil import virtual_memory
-from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql import SparkSession
 import streamlit as st
 
 

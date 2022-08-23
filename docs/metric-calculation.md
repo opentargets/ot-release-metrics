@@ -83,7 +83,7 @@ The evidence strings will be collected in `platform-input-support/output/evidenc
 
 ```bash
 export RUN_ID=21.11.1
-time python3 metrics.py \
+time python3 src/metric_calculation/metrics.py \
   --run-id ${RUN_ID}-pre \
   --out data/${RUN_ID}-pre.csv \
   --evidence platform-input-support/output/prod/evidence-files/
@@ -100,7 +100,7 @@ export ETL_PARQUET_OUTPUT_ROOT=gs://open-targets-data-releases/21.09/output/etl/
 
 # For snapshots.
 export ETL_RUN=21.09.2
-export ETL_PARQUET_OUTPUT_ROOT=gs://open-targets-pre-data-releases/21.09.2/output/etl/parquet
+export ETL_PARQUET_OUTPUT_ROOT=gs://open-targets-pre-data-releases/development/output/etl/parquet
 ```
 
 Now download the files:
@@ -124,7 +124,7 @@ gsutil -m cp -r \
 
 Next run the script to generate the metrics:
 ```bash
-python3 metrics.py \
+python3 src/metric_calculation/metrics.py \
   --run-id ${ETL_RUN} \
   --out data/${ETL_RUN}.csv \
   --evidence post-pipeline/evidence \
