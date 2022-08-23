@@ -12,6 +12,7 @@ from typing import Iterable, TYPE_CHECKING
 
 import hydra
 from pyspark.mllib.evaluation import BinaryClassificationMetrics
+from pyspark.sql import DataFrame
 import pyspark.sql.functions as f
 import pyspark.sql.types as t
 
@@ -19,7 +20,6 @@ from src.metric_calculation.utils import get_cwd, initialize_spark_session, read
 
 if TYPE_CHECKING:
     from omegaconf import DictConfig
-    from pyspark.sql import DataFrame
 
 
 def flatten(schema, prefix=None):
