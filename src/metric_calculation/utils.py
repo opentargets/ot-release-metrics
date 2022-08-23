@@ -33,7 +33,7 @@ def detect_spark_memory_limit():
     return int(mem_gib * 0.9)
 
 
-def read_path_if_provided(spark, path: str):
+def read_path_if_provided(path: str):
     """
     Automatically detect the format of the input data and read it into the Spark dataframe. The supported formats
     are: a single TSV file; a single JSON file; a directory with JSON files; a directory with Parquet files.
@@ -43,20 +43,19 @@ def read_path_if_provided(spark, path: str):
         return None
 
     # The provided path must exist and must be either a file or a directory.
-    assert os.path.exists(path), f'The provided path {path} does not exist.'
-    assert os.path.isdir(path) or os.path.isfile(path), f'The provided path {path} is neither a file or a directory.'
+    assert gcsfs.GCSFileSystem().exists(path), f'The provided path {path} does not exist.'
 
     # Case 1: We are provided with a single file.
-    if os.path.isfile(path):
+    if gcsfs.GCSFileSystem().isfile(path):
         if path.endswith('.tsv'):
-            return spark.getOrCreate.read.csv(path, sep='\t', header=True)
+            return SparkSession.getActiveSession().read.csv(path, sep='\t', header=True)
         elif path.endswith(('.json', '.json.gz', '.jsonl', '.jsonl.gz')):
-            return spark.read.json(path)
+            return SparkSession.getActiveSession().read.json(path)
         else:
             raise AssertionError(f'The format of the provided file {path} is not supported.')
 
     # Case 2: We are provided with a directory. Let's peek inside to see what it contains.
-    all_files = [os.path.join(dp, filename) for dp, dn, filenames in os.walk(path) for filename in filenames]
+    all_files = [f'gs://{file}' for file in gcsfs.GCSFileSystem().ls()]
 
     # It must be either exclusively JSON, or exclusively Parquet.
     json_files = [fn for fn in all_files if fn.endswith(('.json', '.json.gz', '.jsonl', '.jsonl.gz'))]
@@ -66,11 +65,11 @@ def read_path_if_provided(spark, path: str):
 
     # A directory with JSON files.
     if json_files:
-        return spark.read.option('recursiveFileLookup', 'true').json(path)
+        return SparkSession.getActiveSession().read.option('recursiveFileLookup', 'true').json(path)
 
     # A directory with Parquet files.
     if parquet_files:
-        return spark.read.parquet(path)
+        return SparkSession.getActiveSession().read.parquet(path)
 
 
 def add_delta(df: pd.DataFrame, metric: str, previous_run: str, latest_run: str):
