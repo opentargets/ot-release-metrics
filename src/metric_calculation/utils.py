@@ -53,22 +53,8 @@ def read_path_if_provided(path: str):
         else:
             raise AssertionError(f'The format of the provided file {path} is not supported.')
 
-    # Case 2: We are provided with a directory. Let's peek inside to see what it contains.
-    all_files = [f'gs://{file}' for file in gcsfs.GCSFileSystem().ls()]
-
-    # It must be either exclusively JSON, or exclusively Parquet.
-    json_files = [fn for fn in all_files if fn.endswith(('.json', '.json.gz', '.jsonl', '.jsonl.gz'))]
-    parquet_files = [fn for fn in all_files if fn.endswith('.parquet')]
-    assert not (json_files and parquet_files), f'The provided directory {path} contains a mix of JSON and Parquet.'
-    assert json_files or parquet_files, f'The provided directory {path} contains neither JSON nor Parquet.'
-
-    # A directory with JSON files.
-    if json_files:
-        return SparkSession.getActiveSession().read.option('recursiveFileLookup', 'true').json(path)
-
-    # A directory with Parquet files.
-    if parquet_files:
-        return SparkSession.getActiveSession().read.parquet(path)
+    # Case 2: We are provided with a directory. We assume it contains parquet files.
+    return SparkSession.getActiveSession().read.parquet(path)
 
 
 def add_delta(df: pd.DataFrame, metric: str, previous_run: str, latest_run: str):
