@@ -6,38 +6,31 @@ from typing import TYPE_CHECKING
 
 import gcsfs
 import pandas as pd
+from pathlib import Path
 import plotly.express as px
-from psutil import virtual_memory
 from pyspark.sql import SparkSession
 import streamlit as st
 
 if TYPE_CHECKING:
     from pyspark.sql import DataFrame
 
+def get_cwd() -> str:
+    """
+    `get_cwd()` returns the current working directory as a string
+    
+    Returns:
+      The current working directory.
+    """
+    return Path.cwd()
 
 def initialize_spark_session():
     """
-    It creates a SparkSession object with the driver and executor memory set to the value of the
-    spark_mem_limit variable
-
+    It creates a SparkSession object, sets the master to YARN, and returns the SparkSession object
+    
     Returns:
       A SparkSession object
     """
-    spark_mem_limit = detect_spark_memory_limit()
-    return (
-        SparkSession.builder.config("spark.driver.memory", f'{spark_mem_limit}G')
-        .config("spark.executor.memory", f'{spark_mem_limit}G')
-        .getOrCreate()
-    )
-
-
-def detect_spark_memory_limit():
-    """Spark does not automatically use all available memory on a machine. When working on large datasets, this may
-    cause Java heap space errors, even though there is plenty of RAM available. To fix this, we detect the total amount
-    of physical memory and allow Spark to use (almost) all of it."""
-    mem_gib = virtual_memory().total >> 30
-    return int(mem_gib * 0.9)
-
+    return SparkSession.master("yarn").getOrCreate()
 
 def read_path_if_provided(path: str):
     """
