@@ -15,7 +15,7 @@ from pyspark.mllib.evaluation import BinaryClassificationMetrics
 import pyspark.sql.functions as f
 import pyspark.sql.types as t
 
-from utils import initialize_spark_session, read_path_if_provided, write_metrics_to_csv
+from src.metric_calculation.utils import get_cwd, initialize_spark_session, read_path_if_provided, write_metrics_to_csv
 
 if TYPE_CHECKING:
     from omegaconf import DictConfig
@@ -253,7 +253,7 @@ def get_columns_to_report(dataset_columns):
     ]
 
 
-@hydra.main(config_name="config")
+@hydra.main(config_path=get_cwd(), config_name="config")
 def main(cfg: DictConfig) -> None:
     global spark
     spark = initialize_spark_session()

@@ -30,7 +30,7 @@ def initialize_spark_session():
     Returns:
       A SparkSession object
     """
-    return SparkSession.master("yarn").getOrCreate()
+    return SparkSession.builder.master("yarn").getOrCreate()
 
 def read_path_if_provided(path: str):
     """
