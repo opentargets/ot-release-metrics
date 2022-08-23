@@ -137,6 +137,7 @@ def compare_entity(df: pd.DataFrame, entity_name: str, latest_run: str, previous
                 'Δ in number of evidence strings',
                 'Δ in number of invalid evidence strings',
                 'Δ in number of evidence strings dropped due to duplication',
+                'Δ in number of evidence strings dropped due to null score',
                 'Δ in number of evidence strings dropped due to unresolved target',
                 'Δ in number of evidence strings dropped due to unresolved disease',
             ]

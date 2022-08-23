@@ -140,11 +140,13 @@ if page == "Compare metrics":
         old_evidence_null_score = data.query(
             'runId == @previous_run & variable == "evidenceNullifiedScoreCountByDatasource"'
         )[["value", "datasourceId"]].rename(
-            {"value": f"Nr of evidence strings dropped due to a null score in {previous_run.split('-')[0]}"}, axis=1
+            {"value": f"Nr of evidence strings dropped due to null score in {previous_run.split('-')[0]}"}, axis=1
         )
-        new_evidence_null_score = data.query('runId == @latest_run & variable == "evidenceNullifiedScoreCountByDatasource"')[
-            ["value", "datasourceId"]
-        ].rename({"value": f"Nr of evidence strings dropped due to a null score in {latest_run.split('-')[0]}"}, axis=1)
+        new_evidence_null_score = data.query(
+            'runId == @latest_run & variable == "evidenceNullifiedScoreCountByDatasource"'
+        )[["value", "datasourceId"]].rename(
+            {"value": f"Nr of evidence strings dropped due to null score in {latest_run.split('-')[0]}"}, axis=1
+        )
         old_evidence_unresolved_target = data.query(
             'runId == @previous_run & variable == "evidenceUnresolvedTargetCountByDatasource"'
         )[["value", "datasourceId"]].rename(
