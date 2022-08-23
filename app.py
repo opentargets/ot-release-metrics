@@ -91,7 +91,7 @@ if page == "Explore metrics":
             output = data.copy()
 
         # Display table
-        st.dataframe(output.style.set_precision(2))
+        st.dataframe(output.style.format(precision=2))
         st.download_button(
             label="Download data as CSV",
             data=output.to_csv().encode('utf-8'),
