@@ -1,5 +1,8 @@
+from __future__ import annotations
+
 import logging
 import os
+from typing import TYPE_CHECKING
 
 import gcsfs
 import pandas as pd
@@ -8,12 +11,15 @@ from psutil import virtual_memory
 from pyspark.sql import SparkSession
 import streamlit as st
 
+if TYPE_CHECKING:
+    from pyspark.sql import DataFrame
+
 
 def initialize_spark_session():
     """
     It creates a SparkSession object with the driver and executor memory set to the value of the
     spark_mem_limit variable
-    
+
     Returns:
       A SparkSession object
     """
@@ -205,3 +211,12 @@ def load_data(data_folder: str) -> pd.DataFrame:
             break
 
     return data
+
+
+def write_metrics_to_csv(metrics: DataFrame, output_path: str):
+    """This function writes the dataframe to a csv file in the provided output folder."""
+
+    # Write dataframe to csv file:
+    metrics.toPandas().to_csv(output_path, index=False, header=True)
+
+    logging.info(f'Metrics written to {output_path}.')
