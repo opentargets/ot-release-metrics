@@ -8,7 +8,7 @@ metric_calculation:
   datasets:
     # Post ETL data
     evidence: ${metric_calculation.data_repositories.release_output_root}/evidence
-    evidence_failed: ${metric_calculation.data_repositories.release_output_root}/evidenceFailed
+    evidence_failed: ${metric_calculation.data_repositories.release_output_root}/errors/evidence
     associations_overall_indirect: ${metric_calculation.data_repositories.release_output_root}/associationByOverallIndirect
     associations_overall_direct: ${metric_calculation.data_repositories.release_output_root}/associationByOverallDirect
     associations_source_indirect: ${metric_calculation.data_repositories.release_output_root}/associationByDatasourceIndirect
