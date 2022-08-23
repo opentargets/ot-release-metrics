@@ -137,6 +137,14 @@ if page == "Compare metrics":
         new_evidence_duplicates = data.query('runId == @latest_run & variable == "evidenceDuplicateCountByDatasource"')[
             ["value", "datasourceId"]
         ].rename({"value": f"Nr of evidence strings dropped due to duplication in {latest_run.split('-')[0]}"}, axis=1)
+        old_evidence_null_score = data.query(
+            'runId == @previous_run & variable == "evidenceNullifiedScoreCountByDatasource"'
+        )[["value", "datasourceId"]].rename(
+            {"value": f"Nr of evidence strings dropped due to a null score in {previous_run.split('-')[0]}"}, axis=1
+        )
+        new_evidence_null_score = data.query('runId == @latest_run & variable == "evidenceNullifiedScoreCountByDatasource"')[
+            ["value", "datasourceId"]
+        ].rename({"value": f"Nr of evidence strings dropped due to a null score in {latest_run.split('-')[0]}"}, axis=1)
         old_evidence_unresolved_target = data.query(
             'runId == @previous_run & variable == "evidenceUnresolvedTargetCountByDatasource"'
         )[["value", "datasourceId"]].rename(
@@ -208,6 +216,8 @@ if page == "Compare metrics":
             new_evidence_invalid,
             old_evidence_duplicates,
             new_evidence_duplicates,
+            old_evidence_null_score,
+            new_evidence_null_score,
             old_evidence_unresolved_target,
             new_evidence_unresolved_target,
             old_evidence_unresolved_disease,

@@ -60,46 +60,28 @@ def add_delta(
             df[f"Nr of {metric} in {previous_run.split('-')[0]}"],
             axis=0, fill_value=0))
 
-def compare_entity(
-    df: pd.DataFrame,
-    entity_name: str,
-    latest_run: str,
-    previous_run: str
-) -> pd.DataFrame:
-
-    if entity_name in ['diseases', 'drugs', 'targets']:
+def compare_entity(df: pd.DataFrame, entity_name: str, latest_run: str, previous_run: str) -> pd.DataFrame:
+    if entity_name in {'diseases', 'drugs', 'targets'}:
         add_delta(df, entity_name, previous_run, latest_run)
-
-    if entity_name == 'evidence':
-        add_delta(df, "evidence strings", previous_run, latest_run)
-        add_delta(df, "invalid evidence strings", previous_run, latest_run)
-        add_delta(df, "evidence strings dropped due to duplication", previous_run, latest_run)
-        add_delta(df, "evidence strings dropped due to unresolved target", previous_run, latest_run)
-        add_delta(df, "evidence strings dropped due to unresolved disease", previous_run, latest_run)
-        df.loc['Total'] = df.sum()
-        df = df.filter(
-            items=[
-                f'Nr of evidence strings in {latest_run}',
-                'Δ in number of evidence strings',
-                'Δ in number of invalid evidence strings',
-                'Δ in number of evidence strings dropped due to duplication',
-                'Δ in number of evidence strings dropped due to unresolved target',
-                'Δ in number of evidence strings dropped due to unresolved disease'
-            ]
-        )
-
     if entity_name == 'associations':
         add_delta(df, "direct associations", previous_run, latest_run)
         add_delta(df, "indirect associations", previous_run, latest_run)
         df.loc['Total'] = df.sum()
-        df = df.filter(
-            items=[
-                f'Nr of indirect associations in {latest_run}',
-                'Δ in number of indirect associations',
-                f'Nr of direct associations in {latest_run}',
-                'Δ in number of direct associations'
-            ]
-        )
+        df = df.filter(items=[f'Nr of indirect associations in {latest_run}', 'Δ in number of indirect associations', f'Nr of direct associations in {latest_run}', 'Δ in number of direct associations'])
+
+    elif entity_name == 'evidence':
+        add_delta(df, "evidence strings", previous_run, latest_run)
+        add_delta(df, "invalid evidence strings", previous_run, latest_run)
+        add_delta(df, "evidence strings dropped due to duplication", previous_run, latest_run)
+
+        add_delta(df, "evidence strings dropped due to null score", previous_run, latest_run)
+
+        add_delta(df, "evidence strings dropped due to unresolved target", previous_run, latest_run)
+
+        add_delta(df, "evidence strings dropped due to unresolved disease", previous_run, latest_run)
+
+        df.loc['Total'] = df.sum()
+        df = df.filter(items=[f'Nr of evidence strings in {latest_run}', 'Δ in number of evidence strings', 'Δ in number of invalid evidence strings', 'Δ in number of evidence strings dropped due to duplication', 'Δ in number of evidence strings dropped due to unresolved target', 'Δ in number of evidence strings dropped due to unresolved disease'])
 
     return df
 
