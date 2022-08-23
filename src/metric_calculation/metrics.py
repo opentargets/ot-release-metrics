@@ -13,11 +13,11 @@ import logging.config
 from typing import Iterable
 
 from pyspark.mllib.evaluation import BinaryClassificationMetrics
-from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql import DataFrame
 import pyspark.sql.functions as f
 import pyspark.sql.types as t
 
-from src.utils import initialize_spark_session, read_path_if_provided
+from utils import initialize_spark_session, read_path_if_provided
 
 
 def flatten(schema, prefix=None):
