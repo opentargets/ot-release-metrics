@@ -466,7 +466,7 @@ def main(cfg: DictConfig) -> None:
 
     # Write output and clean up.
     metrics = reduce(DataFrame.unionByName, datasets)
-    metrics = metrics.withColumn('runId', f.lit(metrics_cfg.run_id))
+    metrics = metrics.withColumn('runId', f.lit(metrics_cfg.run_id)).cache()
 
     for output_path in cfg.metric_calculation.outputs.values():
         write_metrics_to_csv(metrics, output_path)

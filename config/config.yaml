@@ -1,5 +1,5 @@
 metric_calculation:
-  run_id: 22.06.3
+  run_id: 22.08.1
 
   data_repositories:
     release_output_root: gs://open-targets-pre-data-releases/development/output/etl/parquet
