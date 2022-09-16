@@ -1,39 +1,38 @@
+from __future__ import annotations
+
 import logging
 import os
+from typing import TYPE_CHECKING
 
 import gcsfs
 import pandas as pd
+from pathlib import Path
 import plotly.express as px
-from psutil import virtual_memory
-from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql import SparkSession
 import streamlit as st
 
+if TYPE_CHECKING:
+    from pyspark.sql import DataFrame
+
+def get_cwd() -> str:
+    """
+    `get_cwd()` returns the current working directory as a string
+    
+    Returns:
+      The current working directory.
+    """
+    return Path.cwd()
 
 def initialize_spark_session():
     """
-    It creates a SparkSession object with the driver and executor memory set to the value of the
-    spark_mem_limit variable
+    It creates a SparkSession object, sets the master to YARN, and returns the SparkSession object
     
     Returns:
       A SparkSession object
     """
-    spark_mem_limit = detect_spark_memory_limit()
-    return (
-        SparkSession.builder.config("spark.driver.memory", f'{spark_mem_limit}G')
-        .config("spark.executor.memory", f'{spark_mem_limit}G')
-        .getOrCreate()
-    )
+    return SparkSession.builder.master("yarn").getOrCreate()
 
-
-def detect_spark_memory_limit():
-    """Spark does not automatically use all available memory on a machine. When working on large datasets, this may
-    cause Java heap space errors, even though there is plenty of RAM available. To fix this, we detect the total amount
-    of physical memory and allow Spark to use (almost) all of it."""
-    mem_gib = virtual_memory().total >> 30
-    return int(mem_gib * 0.9)
-
-
-def read_path_if_provided(spark, path: str):
+def read_path_if_provided(path: str):
     """
     Automatically detect the format of the input data and read it into the Spark dataframe. The supported formats
     are: a single TSV file; a single JSON file; a directory with JSON files; a directory with Parquet files.
@@ -43,34 +42,19 @@ def read_path_if_provided(spark, path: str):
         return None
 
     # The provided path must exist and must be either a file or a directory.
-    assert os.path.exists(path), f'The provided path {path} does not exist.'
-    assert os.path.isdir(path) or os.path.isfile(path), f'The provided path {path} is neither a file or a directory.'
+    assert gcsfs.GCSFileSystem().exists(path), f'The provided path {path} does not exist.'
 
     # Case 1: We are provided with a single file.
-    if os.path.isfile(path):
+    if gcsfs.GCSFileSystem().isfile(path):
         if path.endswith('.tsv'):
-            return spark.getOrCreate.read.csv(path, sep='\t', header=True)
+            return SparkSession.getActiveSession().read.csv(path, sep='\t', header=True)
         elif path.endswith(('.json', '.json.gz', '.jsonl', '.jsonl.gz')):
-            return spark.read.json(path)
+            return SparkSession.getActiveSession().read.json(path)
         else:
             raise AssertionError(f'The format of the provided file {path} is not supported.')
 
-    # Case 2: We are provided with a directory. Let's peek inside to see what it contains.
-    all_files = [os.path.join(dp, filename) for dp, dn, filenames in os.walk(path) for filename in filenames]
-
-    # It must be either exclusively JSON, or exclusively Parquet.
-    json_files = [fn for fn in all_files if fn.endswith(('.json', '.json.gz', '.jsonl', '.jsonl.gz'))]
-    parquet_files = [fn for fn in all_files if fn.endswith('.parquet')]
-    assert not (json_files and parquet_files), f'The provided directory {path} contains a mix of JSON and Parquet.'
-    assert json_files or parquet_files, f'The provided directory {path} contains neither JSON nor Parquet.'
-
-    # A directory with JSON files.
-    if json_files:
-        return spark.read.option('recursiveFileLookup', 'true').json(path)
-
-    # A directory with Parquet files.
-    if parquet_files:
-        return spark.read.parquet(path)
+    # Case 2: We are provided with a directory. We assume it contains parquet files.
+    return SparkSession.getActiveSession().read.parquet(path)
 
 
 def add_delta(df: pd.DataFrame, metric: str, previous_run: str, latest_run: str):
@@ -206,3 +190,12 @@ def load_data(data_folder: str) -> pd.DataFrame:
             break
 
     return data
+
+
+def write_metrics_to_csv(metrics: DataFrame, output_path: str):
+    """This function writes the dataframe to a csv file in the provided output folder."""
+
+    # Write dataframe to csv file:
+    metrics.toPandas().to_csv(output_path, index=False, header=True)
+
+    logging.info(f'Metrics written to {output_path}.')

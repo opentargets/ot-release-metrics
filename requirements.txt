@@ -6,3 +6,5 @@ streamlit==1.5.1
 click==8
 gcsfs==2022.7.1
 protobuf==3.20.0
+hydra-core==1.2.0
+pathlib==1.0.1
