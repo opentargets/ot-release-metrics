@@ -2,7 +2,7 @@ metric_calculation:
   run_id: 22.09.1
 
   data_repositories:
-    release_output_root: gs://open-targets-pre-data-releases/development/output/etl/parquet
+    release_output_root: gs://open-targets-pre-data-releases/22.09/output/etl/parquet
     metrics_root: gs://otar000-evidence_input/release-metrics
 
   datasets:
