@@ -1,0 +1,27 @@
+metric_calculation:
+  run_id: 22.09.3
+
+  data_repositories:
+    release_output_root: gs://open-targets-pre-data-releases/22.09/output/etl/parquet
+    metrics_root: gs://otar000-evidence_input/release-metrics
+
+  datasets:
+    # Post ETL data
+    evidence: ${metric_calculation.data_repositories.release_output_root}/evidence
+    evidence_failed: ${metric_calculation.data_repositories.release_output_root}/errors/evidence
+    associations_overall_indirect: ${metric_calculation.data_repositories.release_output_root}/associationByOverallIndirect
+    associations_overall_direct: ${metric_calculation.data_repositories.release_output_root}/associationByOverallDirect
+    associations_source_indirect: ${metric_calculation.data_repositories.release_output_root}/associationByDatasourceIndirect
+    associations_source_direct: ${metric_calculation.data_repositories.release_output_root}/associationByDatasourceDirect
+    diseases: ${metric_calculation.data_repositories.release_output_root}/diseases
+    targets: ${metric_calculation.data_repositories.release_output_root}/targets
+    drugs: ${metric_calculation.data_repositories.release_output_root}/molecule
+
+  gold_standard:
+    associations: ${metric_calculation.data_repositories.metrics_root}/gold-standard/informa_abbvie.tsv
+    efo_mappings: ${metric_calculation.data_repositories.metrics_root}/gold-standard/mesh_mappings.tsv
+
+  outputs:
+    # Metrics are written to the directory that contains them all
+    all_metrics_path: ${metric_calculation.data_repositories.metrics_root}/${metric_calculation.run_id}.csv
+    release_output_path: ${metric_calculation.data_repositories.release_output_root}/metadata/metrics/${metric_calculation.run_id}.csv

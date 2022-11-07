@@ -4,12 +4,12 @@ import streamlit as st
 import pandas as pd
 from PIL import Image
 
-from src.utils import *
+from src.metric_calculation.utils import *
 
 # App UI
 st.set_page_config(
     page_title="Open Targets Data Metrics",
-    page_icon=Image.open("img/favicon.png"),
+    page_icon=Image.open("src/assets/img/favicon.png"),
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -91,7 +91,7 @@ if page == "Explore metrics":
             output = data.copy()
 
         # Display table
-        st.dataframe(output.style.set_precision(2))
+        st.dataframe(output.style.format(precision=2))
         st.download_button(
             label="Download data as CSV",
             data=output.to_csv().encode('utf-8'),
@@ -137,6 +137,16 @@ if page == "Compare metrics":
         new_evidence_duplicates = data.query('runId == @latest_run & variable == "evidenceDuplicateCountByDatasource"')[
             ["value", "datasourceId"]
         ].rename({"value": f"Nr of evidence strings dropped due to duplication in {latest_run.split('-')[0]}"}, axis=1)
+        old_evidence_null_score = data.query(
+            'runId == @previous_run & variable == "evidenceNullifiedScoreCountByDatasource"'
+        )[["value", "datasourceId"]].rename(
+            {"value": f"Nr of evidence strings dropped due to null score in {previous_run.split('-')[0]}"}, axis=1
+        )
+        new_evidence_null_score = data.query(
+            'runId == @latest_run & variable == "evidenceNullifiedScoreCountByDatasource"'
+        )[["value", "datasourceId"]].rename(
+            {"value": f"Nr of evidence strings dropped due to null score in {latest_run.split('-')[0]}"}, axis=1
+        )
         old_evidence_unresolved_target = data.query(
             'runId == @previous_run & variable == "evidenceUnresolvedTargetCountByDatasource"'
         )[["value", "datasourceId"]].rename(
@@ -208,6 +218,8 @@ if page == "Compare metrics":
             new_evidence_invalid,
             old_evidence_duplicates,
             new_evidence_duplicates,
+            old_evidence_null_score,
+            new_evidence_null_score,
             old_evidence_unresolved_target,
             new_evidence_unresolved_target,
             old_evidence_unresolved_disease,
@@ -286,4 +298,4 @@ if page == "Visualise metrics":
         st.plotly_chart(plot_enrichment(data), use_container_width=True)
 
 st.markdown('###')
-st.image(Image.open("img/OT logo.png"), width=150)
+st.image(Image.open("src/assets/img/logo.png"), width=150)
