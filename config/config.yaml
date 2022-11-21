@@ -1,11 +1,13 @@
 metric_calculation:
-  run_id: 22.09.3
+  run_id: 22.11.1
 
   data_repositories:
-    release_output_root: gs://open-targets-pre-data-releases/22.09/output/etl/parquet
+    release_output_root: gs://open-targets-pre-data-releases/22.11/output/etl/parquet
     metrics_root: gs://otar000-evidence_input/release-metrics
 
   datasets:
+    # Pre ETL data
+    raw_evidence: gs://open-targets-pre-data-releases/22.11/input/evidence-files
     # Post ETL data
     evidence: ${metric_calculation.data_repositories.release_output_root}/evidence
     evidence_failed: ${metric_calculation.data_repositories.release_output_root}/errors/evidence

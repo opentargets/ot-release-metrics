@@ -24,9 +24,10 @@ gcloud dataproc clusters create ${CLUSTER_NAME} \
     --region=${CLUSTER_REGION} \
     --metadata 'PIP_PACKAGES=pandas==1.3.4 plotly-express==0.4.1 psutil==5.8.0 pyspark==3.2.0 streamlit==1.5.1 click==8 gcsfs==2022.7.1 protobuf==3.20.0 hydra-core==1.2.0' \
     --initialization-actions gs://goog-dataproc-initialization-actions-europe-west1/python/pip-install.sh                                                  \
-    --master-machine-type=n1-standard-32 \
+    --master-machine-type=n1-standard-64 \
     --master-boot-disk-size=100 \
-    --max-idle=1h
+    --max-idle=10m \
+    --project open-targets-eu-dev
 ```
 
 ### Job submission
@@ -39,5 +40,6 @@ gcloud dataproc jobs submit pyspark \
   --cluster=${CLUSTER_NAME} \
   --region=${CLUSTER_REGION} \
   --py-files code_bundle.zip \
-  --files='config/config.yaml'
+  --files='config/config.yaml' \
+  --project open-targets-eu-dev
 ```

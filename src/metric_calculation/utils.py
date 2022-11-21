@@ -48,7 +48,7 @@ def read_path_if_provided(path: str):
     if gcsfs.GCSFileSystem().isfile(path):
         if path.endswith('.tsv'):
             return SparkSession.getActiveSession().read.csv(path, sep='\t', header=True)
-        elif path.endswith(('.json', '.json.gz', '.jsonl', '.jsonl.gz')):
+        elif path.endswith(('.json', '.json.gz', '.jsonl', '.jsonl.gz', 'json.bz2')):
             return SparkSession.getActiveSession().read.json(path)
         else:
             raise AssertionError(f'The format of the provided file {path} is not supported.')
