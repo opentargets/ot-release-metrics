@@ -104,26 +104,26 @@ def compare_entity(df: pd.DataFrame, entity_name: str, latest_run: str, previous
         )
 
     elif entity_name == 'evidence':
-        add_delta(df, "evidence strings", previous_run, latest_run)
-        add_delta(df, "invalid evidence strings", previous_run, latest_run)
-        add_delta(df, "evidence strings dropped due to duplication", previous_run, latest_run)
+        add_delta(df, "evidence", previous_run, latest_run)
+        add_delta(df, "invalid evidence", previous_run, latest_run)
+        add_delta(df, "evidence dropped due to duplication", previous_run, latest_run)
 
-        add_delta(df, "evidence strings dropped due to null score", previous_run, latest_run)
+        add_delta(df, "evidence dropped due to null score", previous_run, latest_run)
 
-        add_delta(df, "evidence strings dropped due to unresolved target", previous_run, latest_run)
+        add_delta(df, "evidence dropped due to unresolved target", previous_run, latest_run)
 
-        add_delta(df, "evidence strings dropped due to unresolved disease", previous_run, latest_run)
+        add_delta(df, "evidence dropped due to unresolved disease", previous_run, latest_run)
 
         df.loc['Total'] = df.sum()
         df = df.filter(
             items=[
-                f'Nr of evidence strings in {latest_run}',
-                'Δ in number of evidence strings',
-                'Δ in number of invalid evidence strings',
-                'Δ in number of evidence strings dropped due to duplication',
-                'Δ in number of evidence strings dropped due to null score',
-                'Δ in number of evidence strings dropped due to unresolved target',
-                'Δ in number of evidence strings dropped due to unresolved disease',
+                f'Nr of evidence in {latest_run}',
+                'Δ in number of evidence',
+                'Δ in number of invalid evidence',
+                'Δ in number of evidence dropped due to duplication',
+                'Δ in number of evidence dropped due to null score',
+                'Δ in number of evidence dropped due to unresolved target',
+                'Δ in number of evidence dropped due to unresolved disease',
             ]
         )
 
@@ -199,3 +199,39 @@ def write_metrics_to_csv(metrics: DataFrame, output_path: str):
     metrics.toPandas().to_csv(output_path, index=False, header=True)
 
     logging.info(f'Metrics written to {output_path}.')
+
+def highlight_cell(row, entity, latest_run):
+    """Highlights the cell in red if the count relative to the total number of evidence is higher than a set threshold.
+    
+    Args:
+        row: row of the dataframe
+        entity: name of the entity the metrics refer to
+        latest_run: latest runId to indicate which column is useful to extract the total number
+    
+    Returns:
+        An array of strings with the css property to pass the Pandas Styler and set the background color.
+    """
+    background = []
+    total_count_name = f'Nr of indirect {entity} in {latest_run}' if entity == 'associations' else f'Nr of {entity} in {latest_run}'
+    total_count = row[total_count_name]
+    for cell in row:
+        ratio = abs(cell / total_count)
+        color = 'background-color: blank'
+        if ratio > 0.5 and ratio != 1:
+            color = 'background-color: red'
+        elif ratio > 0.2 and ratio != 1:
+            color = 'background-color: yellow'
+        background.append(color)
+    return background
+
+def show_table(name:str, latest_run: str, df: pd.DataFrame):
+    """Displays the dataframe as a table in the Streamlit app."""
+    st.header(f'{name.capitalize()} related metrics')
+    try:
+        st.table(
+            df.fillna(0).astype(int)
+            .style.apply(highlight_cell, entity=name, latest_run=latest_run, axis=1)
+        )
+    except Exception:
+        # TODO: since the disease/target/drug tables have diff col names due to a bug, the styling is not applied
+        st.table(df)

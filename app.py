@@ -119,55 +119,55 @@ if page == "Compare metrics":
         # EVIDENCE
         old_evidence_count = data.query('runId == @previous_run & variable == "evidenceCountByDatasource"')[
             ["value", "datasourceId"]
-        ].rename({"value": f"Nr of evidence strings in {previous_run.split('-')[0]}"}, axis=1)
+        ].rename({"value": f"Nr of evidence in {previous_run.split('-')[0]}"}, axis=1)
         new_evidence_count = data.query('runId == @latest_run & variable == "evidenceCountByDatasource"')[
             ["value", "datasourceId"]
-        ].rename({"value": f"Nr of evidence strings in {latest_run.split('-')[0]}"}, axis=1)
+        ].rename({"value": f"Nr of evidence in {latest_run.split('-')[0]}"}, axis=1)
         old_evidence_invalid = data.query('runId == @previous_run & variable == "evidenceInvalidCountByDatasource"')[
             ["value", "datasourceId"]
-        ].rename({"value": f"Nr of invalid evidence strings in {previous_run.split('-')[0]}"}, axis=1)
+        ].rename({"value": f"Nr of invalid evidence in {previous_run.split('-')[0]}"}, axis=1)
         new_evidence_invalid = data.query('runId == @latest_run & variable == "evidenceInvalidCountByDatasource"')[
             ["value", "datasourceId"]
-        ].rename({"value": f"Nr of invalid evidence strings in {latest_run.split('-')[0]}"}, axis=1)
+        ].rename({"value": f"Nr of invalid evidence in {latest_run.split('-')[0]}"}, axis=1)
         old_evidence_duplicates = data.query(
             'runId == @previous_run & variable == "evidenceDuplicateCountByDatasource"'
         )[["value", "datasourceId"]].rename(
-            {"value": f"Nr of evidence strings dropped due to duplication in {previous_run.split('-')[0]}"}, axis=1
+            {"value": f"Nr of evidence dropped due to duplication in {previous_run.split('-')[0]}"}, axis=1
         )
         new_evidence_duplicates = data.query('runId == @latest_run & variable == "evidenceDuplicateCountByDatasource"')[
             ["value", "datasourceId"]
-        ].rename({"value": f"Nr of evidence strings dropped due to duplication in {latest_run.split('-')[0]}"}, axis=1)
+        ].rename({"value": f"Nr of evidence dropped due to duplication in {latest_run.split('-')[0]}"}, axis=1)
         old_evidence_null_score = data.query(
             'runId == @previous_run & variable == "evidenceNullifiedScoreCountByDatasource"'
         )[["value", "datasourceId"]].rename(
-            {"value": f"Nr of evidence strings dropped due to null score in {previous_run.split('-')[0]}"}, axis=1
+            {"value": f"Nr of evidence dropped due to null score in {previous_run.split('-')[0]}"}, axis=1
         )
         new_evidence_null_score = data.query(
             'runId == @latest_run & variable == "evidenceNullifiedScoreCountByDatasource"'
         )[["value", "datasourceId"]].rename(
-            {"value": f"Nr of evidence strings dropped due to null score in {latest_run.split('-')[0]}"}, axis=1
+            {"value": f"Nr of evidence dropped due to null score in {latest_run.split('-')[0]}"}, axis=1
         )
         old_evidence_unresolved_target = data.query(
             'runId == @previous_run & variable == "evidenceUnresolvedTargetCountByDatasource"'
         )[["value", "datasourceId"]].rename(
-            {"value": f"Nr of evidence strings dropped due to unresolved target in {previous_run.split('-')[0]}"},
+            {"value": f"Nr of evidence dropped due to unresolved target in {previous_run.split('-')[0]}"},
             axis=1,
         )
         new_evidence_unresolved_target = data.query(
             'runId == @latest_run & variable == "evidenceUnresolvedTargetCountByDatasource"'
         )[["value", "datasourceId"]].rename(
-            {"value": f"Nr of evidence strings dropped due to unresolved target in {latest_run.split('-')[0]}"}, axis=1
+            {"value": f"Nr of evidence dropped due to unresolved target in {latest_run.split('-')[0]}"}, axis=1
         )
         old_evidence_unresolved_disease = data.query(
             'runId == @previous_run & variable == "evidenceUnresolvedDiseaseCountByDatasource"'
         )[["value", "datasourceId"]].rename(
-            {"value": f"Nr of evidence strings dropped due to unresolved disease in {previous_run.split('-')[0]}"},
+            {"value": f"Nr of evidence dropped due to unresolved disease in {previous_run.split('-')[0]}"},
             axis=1,
         )
         new_evidence_unresolved_disease = data.query(
             'runId == @latest_run & variable == "evidenceUnresolvedDiseaseCountByDatasource"'
         )[["value", "datasourceId"]].rename(
-            {"value": f"Nr of evidence strings dropped due to unresolved disease in {latest_run.split('-')[0]}"}, axis=1
+            {"value": f"Nr of evidence dropped due to unresolved disease in {latest_run.split('-')[0]}"}, axis=1
         )
 
         # ASSOCIATION
@@ -267,16 +267,15 @@ if page == "Compare metrics":
             drug_comparison = drug.copy().reindex([f"Nr of drugs in {previous_run}", f"Nr of drugs in {latest_run}"])
 
         # Display tables
-        st.header("Evidence related metrics:")
-        st.table(evidence_comparison.astype(int))
-        st.header("Associations related metrics:")
-        st.table(association_comparison.astype(int))
-        st.header("Disease related metrics:")
-        st.table(disease_comparison)
-        st.header("Target related metrics:")
-        st.table(target_comparison)
-        st.header("Drug related metrics:")
-        st.table(drug_comparison)
+        dfs = [
+            ('evidence', evidence_comparison),
+            ('associations', association_comparison),
+            ('diseases', disease_comparison),
+            ('targets', target_comparison),
+            ('drugs', drug_comparison)
+        ]
+        for name, df in dfs:
+            show_table(name, latest_run, df)
 
 if page == "Visualise metrics":
     # Select two datasets to compare
