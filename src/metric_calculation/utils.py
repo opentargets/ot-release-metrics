@@ -200,7 +200,10 @@ def write_metrics_to_csv(metrics: DataFrame, output_path: str):
 
     logging.info(f'Metrics written to {output_path}.')
 
-def highlight_cell(row, entity, latest_run):
+def highlight_cell(
+    row: pd.Series, 
+    entity: str, latest_run: str, 
+    yellow_bound: float, red_bound: float) -> list[str]:
     """Highlights the cell in red if the count relative to the total number of evidence is higher than a set threshold.
     
     Args:
@@ -217,20 +220,27 @@ def highlight_cell(row, entity, latest_run):
     for cell in row:
         ratio = abs(cell / total_count)
         color = 'background-color: blank'
-        if ratio > 0.5 and ratio != 1:
+        if ratio >= red_bound and ratio != 1:
             color = 'background-color: red'
-        elif ratio > 0.2 and ratio != 1:
+        elif ratio >= yellow_bound and ratio != 1:
             color = 'background-color: yellow'
         background.append(color)
     return background
 
-def show_table(name:str, latest_run: str, df: pd.DataFrame):
+def show_table(
+    name:str, latest_run: str,
+    df: pd.DataFrame,
+    yellow_bound: float, red_bound: float) -> None:
     """Displays the dataframe as a table in the Streamlit app."""
     st.header(f'{name.capitalize()} related metrics')
     try:
         st.table(
             df.fillna(0).astype(int)
-            .style.apply(highlight_cell, entity=name, latest_run=latest_run, axis=1)
+            .style.apply(
+                highlight_cell,
+                entity=name, latest_run=latest_run,
+                yellow_bound=yellow_bound, red_bound=red_bound,
+                axis=1)
         )
     except Exception:
         # TODO: since the disease/target/drug tables have diff col names due to a bug, the styling is not applied
