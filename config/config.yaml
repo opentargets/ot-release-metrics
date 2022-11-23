@@ -27,3 +27,8 @@ metric_calculation:
     # Metrics are written to the directory that contains them all
     all_metrics_path: ${metric_calculation.data_repositories.metrics_root}/${metric_calculation.run_id}.csv
     release_output_path: ${metric_calculation.data_repositories.release_output_root}/metadata/metrics/${metric_calculation.run_id}.csv
+
+metric_visualization:
+  parameters:
+    yellow_highlight_bound: 0.2
+    red_highlight_bound: 0.5
