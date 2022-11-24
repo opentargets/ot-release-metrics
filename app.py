@@ -32,7 +32,7 @@ def main(cfg: DictConfig):
             "allows you to compare the main metrics between two releases."
         ),
     )
-    data = load_data(cfg.data_repositories.metrics_root)
+    data = load_data(cfg.metric_calculation.data_repositories.metrics_root)
 
     if page == "Explore metrics":
         # Select a dataset to explore
