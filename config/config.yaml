@@ -7,7 +7,7 @@ metric_calculation:
 
   datasets:
     # Pre ETL data
-    raw_evidence: gs://open-targets-pre-data-releases/22.11.2/input/evidence-files
+    raw_evidence: gs://open-targets-pre-data-releases/${metric_calculation.run_id}/input/evidence-files
     # Post ETL data
     evidence: ${metric_calculation.data_repositories.release_output_root}/evidence
     evidence_failed: ${metric_calculation.data_repositories.release_output_root}/errors/evidence
