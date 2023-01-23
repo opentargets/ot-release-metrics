@@ -1,13 +1,13 @@
 metric_calculation:
-  run_id: 22.11.1
+  run_id: 22.11.2
 
   data_repositories:
-    release_output_root: gs://open-targets-pre-data-releases/22.11/output/etl/parquet
+    release_output_root: gs://open-targets-pre-data-releases/${metric_calculation.run_id}/output/etl/parquet
     metrics_root: gs://otar000-evidence_input/release-metrics
 
   datasets:
     # Pre ETL data
-    raw_evidence: gs://open-targets-pre-data-releases/22.11/input/evidence-files
+    raw_evidence: gs://open-targets-pre-data-releases/${metric_calculation.run_id}/input/evidence-files
     # Post ETL data
     evidence: ${metric_calculation.data_repositories.release_output_root}/evidence
     evidence_failed: ${metric_calculation.data_repositories.release_output_root}/errors/evidence
@@ -27,3 +27,8 @@ metric_calculation:
     # Metrics are written to the directory that contains them all
     all_metrics_path: ${metric_calculation.data_repositories.metrics_root}/${metric_calculation.run_id}.csv
     release_output_path: ${metric_calculation.data_repositories.release_output_root}/metadata/metrics/${metric_calculation.run_id}.csv
+
+metric_visualization:
+  parameters:
+    yellow_highlight_bound: 0.2
+    red_highlight_bound: 0.5
