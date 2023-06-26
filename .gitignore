@@ -1,5 +1,5 @@
 .vscode/settings.json
 .DS_Store
 env/**
-
 outputs/**/*
+code_bundle.zip

@@ -1,6 +1,6 @@
 metric_calculation:
-  run_id: 23.06.1
-  etl_run_id: 23.06.littest
+  run_id: 23.06
+  etl_run_id: 23.06
 
   data_repositories:
     release_output_root: gs://open-targets-pre-data-releases/${metric_calculation.etl_run_id}/output/etl/parquet
