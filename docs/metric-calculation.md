@@ -19,10 +19,10 @@ export CLUSTER_NAME=ot-release-metrics
 export CLUSTER_REGION=europe-west1
 
 gcloud dataproc clusters create ${CLUSTER_NAME} \
-    --image-version=2.0 \
+    --image-version=2.1 \
     --single-node \
     --region=${CLUSTER_REGION} \
-    --metadata 'PIP_PACKAGES=pandas==1.3.4 plotly-express==0.4.1 psutil==5.8.0 pyspark==3.2.0 streamlit==1.5.1 click==8 gcsfs==2022.7.1 protobuf==3.20.0 hydra-core==1.2.0 altair==4.2.2' \
+    --metadata 'PIP_PACKAGES=hydra-core==1.2.0 gcsfs==2022.7.1' \
     --initialization-actions gs://goog-dataproc-initialization-actions-europe-west1/python/pip-install.sh                                                  \
     --master-machine-type=n1-standard-64 \
     --master-boot-disk-size=100 \
@@ -33,7 +33,7 @@ gcloud dataproc clusters create ${CLUSTER_NAME} \
 ### Job submission
 ```bash
 # Package the repo structure to provision the cluster with it
-zip -r code_bundle.zip . -x "src/metric_calculation/metrics.py" "env/*" "src/metric_calculation/metrics.py"
+zip -r code_bundle.zip . -x "src/metric_calculation/metrics.py" "env/*" "src/assets/*" ".git/*" "outputs/*" "docs/*"
 
 gcloud dataproc jobs submit pyspark \
   src/metric_calculation/metrics.py \
