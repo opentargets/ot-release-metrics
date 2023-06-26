@@ -6,7 +6,7 @@ import pandas as pd
 from PIL import Image
 import streamlit as st
 
-from src.metric_visualisation.utils import highlight_cell, show_table, load_data, plot_enrichment, add_delta, compare_entity
+from src.metric_visualisation.utils import highlight_cell, show_table, load_data, plot_enrichment, compare_entity
 
 @hydra.main(version_base=None, config_path="config", config_name="config")
 def main(cfg: DictConfig):
@@ -187,30 +187,6 @@ def main(cfg: DictConfig):
                 ["value", "datasourceId"]
             ].rename({"value": f"Nr of direct associations in {latest_run.split('-')[0]}"}, axis=1)
 
-            # DISEASES
-            old_diseases_count = data.query('runId == @previous_run & variable == "diseasesTotalCount"')[["value"]].rename(
-                {"value": f"Nr of diseases in {previous_run.split('-')[0]}"}, axis=1
-            )
-            new_diseases_count = data.query('runId == @latest_run & variable == "diseasesTotalCount"')[["value"]].rename(
-                {"value": f"Nr of diseases in {latest_run.split('-')[0]}"}, axis=1
-            )
-
-            # DRUGS
-            old_drugs_count = data.query('runId == @previous_run & variable == "drugsTotalCount"')["value"].rename(
-                {"value": f"Nr of drugs in {previous_run.split('-')[0]}"}, axis=1
-            )
-            new_drugs_count = data.query('runId == @latest_run & variable == "drugsTotalCount"')["value"].rename(
-                {"value": f"Nr of drugs in {latest_run.split('-')[0]}"}, axis=1
-            )
-
-            # TARGETS
-            old_targets_count = data.query('runId == @previous_run & variable == "targetsTotalCount"')[["value"]].rename(
-                {"value": f"Nr of targets in {previous_run.split('-')[0]}"}, axis=1
-            )
-            new_targets_count = data.query('runId == @latest_run & variable == "targetsTotalCount"')[["value"]].rename(
-                {"value": f"Nr of targets in {latest_run.split('-')[0]}"}, axis=1
-            )
-
             # Aggregate metrics
             evidence_datasets = [
                 old_evidence_count,
@@ -241,31 +217,12 @@ def main(cfg: DictConfig):
                 "datasourceId"
             )
 
-            disease_datasets = [old_diseases_count, new_diseases_count]
-            disease = pd.concat(disease_datasets, axis=0, ignore_index=True).T.rename(columns={0: "value"})
-
-            target_datasets = [old_targets_count, new_targets_count]
-            target = pd.concat(target_datasets, axis=0, ignore_index=True).T.rename(columns={0: "value"})
-
-            drug_datasets = [old_drugs_count, new_drugs_count]
-            drug = pd.concat(drug_datasets, axis=0, ignore_index=True).T
-
             # Compare datasets
             evidence_comparison = compare_entity(evidence, 'evidence', latest_run, previous_run)
             association_comparison = compare_entity(association, 'associations', latest_run, previous_run)
-            # TODO: All comparisons are failing, executing the except block. compare_entity must be fixed
-            try:
-                disease_comparison = compare_entity(disease, 'diseases', latest_run, previous_run)
-            except KeyError:
-                disease_comparison = disease.copy()
-            try:
-                target_comparison = compare_entity(target, 'targets', latest_run, previous_run)
-            except KeyError:
-                target_comparison = target.copy()
-            try:
-                drug_comparison = compare_entity(drug, 'drugs', latest_run, previous_run)
-            except KeyError:
-                drug_comparison = drug.copy().reindex([f"Nr of drugs in {previous_run}", f"Nr of drugs in {latest_run}"])
+            disease_comparison = compare_entity(data, 'diseases', latest_run, previous_run)
+            target_comparison = compare_entity(data, 'targets', latest_run, previous_run)
+            drug_comparison = compare_entity(data, 'drugs', latest_run, previous_run)
 
             # Display tables
             dfs = [

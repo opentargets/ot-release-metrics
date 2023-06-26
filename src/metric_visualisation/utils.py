@@ -132,13 +132,39 @@ def add_delta(df: pd.DataFrame, metric: str, previous_run: str, latest_run: str)
         df[f"Nr of {metric} in {previous_run.split('-')[0]}"], axis=0, fill_value=0
     )
 
+def show_total_between_runs_for_entity(df: pd.DataFrame, entity_name: str, latest_run: str, previous_run: str) -> pd.DataFrame:
+    """It takes a dataframe with metrics and returns a dataframe showing the total count between releasesfor a given entity.
+
+    Args:
+        df (pd.DataFrame): the dataframe with all metrics
+        entity_name (str): the name of the entity you want to compare.
+        latest_run (str): the name of the latest run
+        previous_run (str): the name of the previous run
+
+    Returns:
+        pd.DataFrame: A dataframe with two columns (one per run) and one row with the total number of entities in each run.
+    """
+    total_count_col = f'{entity_name}TotalCount'
+    return (
+        df.query(
+            'runId == @previous_run & variable == @total_count_col or runId == @latest_run & variable == @total_count_col'
+        )
+        [['runId', 'value']]
+        # Prettify column names
+        .assign(runId=lambda df: f"Nr of {entity_name} in " + df['runId'])
+        # Transpose dataframe to have the runIds as columns
+        .set_index('runId')
+        .T
+    )
+
+
 
 def compare_entity(df: pd.DataFrame, entity_name: str, latest_run: str, previous_run: str) -> pd.DataFrame:
     """
     It takes a dataframe with metrics and returns a dataframe with the difference between the latest and previous run.
 
     Args:
-      df (pd.DataFrame): the dataframe to be modified
+      df (pd.DataFrame): the dataframe with all metrics
       entity_name (str): the name of the entity you want to compare.
       latest_run (str): the name of the latest run
       previous_run (str): the name of the previous run
@@ -147,9 +173,13 @@ def compare_entity(df: pd.DataFrame, entity_name: str, latest_run: str, previous
       A dataframe with the number of entities in the latest run and the difference between the latest
     and previous run.
     """
-    if entity_name in {'diseases', 'drugs', 'targets'}:
-        add_delta(df, entity_name, previous_run, latest_run)
-    if entity_name == 'associations':
+    if entity_name in {'diseases', 'targets', 'drugs'}:
+        print(df.columns)
+        return show_total_between_runs_for_entity(
+            df, entity_name, latest_run, previous_run
+        )
+
+    elif entity_name == 'associations':
         add_delta(df, "direct associations", previous_run, latest_run)
         add_delta(df, "indirect associations", previous_run, latest_run)
         df.loc['Total'] = df.sum()
