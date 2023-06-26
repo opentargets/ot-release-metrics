@@ -7,28 +7,28 @@ import plotly.express as px
 import streamlit as st
 
 def show_table(
-    name:str, latest_run: str,
+    name: str,
+    latest_run: str,
     df: pd.DataFrame,
     yellow_bound: float, red_bound: float) -> None:
     """Displays the dataframe as a table in the Streamlit app."""
     st.header(f'{name.capitalize()} related metrics')
-    try:
-        st.table(
-            df.fillna(0).astype(int)
-            .style.apply(
-                highlight_cell,
-                entity=name, latest_run=latest_run,
-                yellow_bound=yellow_bound, red_bound=red_bound,
-                axis=1)
-        )
-    except Exception:
-        # TODO: since the disease/target/drug tables have diff col names due to a bug, the styling is not applied
-        st.table(df)
+    st.table(
+        df.fillna(0).astype(int)
+        .style.apply(
+            highlight_cell,
+            entity=name, latest_run=latest_run,
+            yellow_bound=yellow_bound, red_bound=red_bound,
+            axis=1)
+    )
 
 def highlight_cell(
     row: pd.Series, 
-    entity: str, latest_run: str, 
-    yellow_bound: float, red_bound: float) -> list[str]:
+    entity: str,
+    latest_run: str, 
+    yellow_bound: float,
+    red_bound: float
+) -> list[str]:
     """Highlights the cell in red if the count relative to the total number of evidence is higher than a set threshold.
     
     Args:
@@ -39,17 +39,26 @@ def highlight_cell(
     Returns:
         An array of strings with the css property to pass the Pandas Styler and set the background color.
     """
+
     background = []
+
     total_count_name = f'Nr of indirect {entity} in {latest_run}' if entity == 'associations' else f'Nr of {entity} in {latest_run}'
     total_count = row[total_count_name]
+  
     for cell in row:
+        # For associations and evidence, we compare the delta between releases and the total count
         ratio = abs(cell / total_count)
         color = 'background-color: blank'
+        if entity in {'diseases', 'targets', 'drugs'}:
+            # For diseases, targets and drugs, we have to calculate the delta between releases first
+            total_count_diff = row[f'Nr of {entity} in {latest_run}'] - row[f'Nr of {entity} in {latest_run}']
+            ratio = abs(total_count_diff / total_count)
         if ratio >= red_bound and ratio != 1:
             color = 'background-color: red'
         elif ratio >= yellow_bound and ratio != 1:
             color = 'background-color: yellow'
         background.append(color)
+        
     return background
 
 @st.cache
@@ -174,7 +183,6 @@ def compare_entity(df: pd.DataFrame, entity_name: str, latest_run: str, previous
     and previous run.
     """
     if entity_name in {'diseases', 'targets', 'drugs'}:
-        print(df.columns)
         return show_total_between_runs_for_entity(
             df, entity_name, latest_run, previous_run
         )
