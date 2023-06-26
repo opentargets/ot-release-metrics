@@ -471,6 +471,7 @@ def main(cfg: DictConfig) -> None:
     for output_path in cfg.metric_calculation.outputs.values():
         write_metrics_to_csv(metrics, output_path)
 
+    logging.info(f'Metrics written to {output_path}.')
     spark.stop()
 
 

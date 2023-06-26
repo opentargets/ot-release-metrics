@@ -6,7 +6,7 @@ import pandas as pd
 from PIL import Image
 import streamlit as st
 
-from src.metric_calculation.utils import *
+from src.metric_visualisation.utils import highlight_cell, show_table, load_data, plot_enrichment, add_delta, compare_entity
 
 @hydra.main(version_base=None, config_path="config", config_name="config")
 def main(cfg: DictConfig):
