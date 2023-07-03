@@ -43,3 +43,12 @@ gcloud dataproc jobs submit pyspark \
   --files='config/config.yaml' \
   --project open-targets-eu-dev
 ```
+
+### Updating the Streamlit app
+If the Streamlit app was already deployed at the time when the above code was run, it will not automatically pick up the new data and will need to be rebooted. In order to do that:
+1. Log in to https://share.streamlit.io/ with your work GitHub account.
+2. In the upper right corner, click on your username and switch to the _opentargets_ workspace.
+3. Next to the _ot-release-metrics_ app, click on a three dot icon and then choose “Reboot”.
+
+> **Note**
+> A “Rerun” option, available inside the app itself from a sandwich dropdown menu in the upper right corner, is _different_ to the “Reboot” option described above, and will not work to make the app ingest the new data.
