@@ -13,7 +13,6 @@ def show_table(
     yellow_bound: float, red_bound: float) -> None:
     """Displays the dataframe as a table in the Streamlit app."""
     st.header(f'{name.capitalize()} related metrics')
-    print("LAS COLUMNAS", df.columns)
     st.table(
         df.fillna(0).astype(int)
         .style.apply(
@@ -40,10 +39,9 @@ def highlight_cell(
     Returns:
         An array of strings with the css property to pass the Pandas Styler and set the background color.
     """
-    latest_run_nice_name = latest_run.split('-')[0]
     background = []
 
-    total_count_name = f'Nr of indirect {entity} in {latest_run_nice_name}' if entity == 'associations' else f'Nr of {entity} in {latest_run_nice_name}'
+    total_count_name = f'Nr of indirect {entity} in {latest_run}' if entity == 'associations' else f'Nr of {entity} in {latest_run}'
     total_count = row[total_count_name]
   
     for cell in row:
@@ -52,7 +50,7 @@ def highlight_cell(
         color = 'background-color: blank'
         if entity in {'diseases', 'targets', 'drugs'}:
             # For diseases, targets and drugs, we have to calculate the delta between releases first
-            total_count_diff = row[f'Nr of {entity} in {latest_run_nice_name}'] - row[f'Nr of {entity} in {latest_run_nice_name}']
+            total_count_diff = row[f'Nr of {entity} in {latest_run}'] - row[f'Nr of {entity} in {latest_run}']
             ratio = abs(total_count_diff / total_count)
         if ratio >= red_bound and ratio != 1:
             color = 'background-color: red'
@@ -138,8 +136,8 @@ def add_delta(df: pd.DataFrame, metric: str, previous_run: str, latest_run: str)
       latest_run (str): the latest run of the pipeline
     """
 
-    df[f"Δ in number of {metric}"] = df[f"Nr of {metric} in {latest_run.split('-')[0]}"].sub(
-        df[f"Nr of {metric} in {previous_run.split('-')[0]}"], axis=0, fill_value=0
+    df[f"Δ in number of {metric}"] = df[f"Nr of {metric} in {latest_run}"].sub(
+        df[f"Nr of {metric} in {previous_run}"], axis=0, fill_value=0
     )
 
 def show_total_between_runs_for_entity(df: pd.DataFrame, entity_name: str, latest_run: str, previous_run: str) -> pd.DataFrame:

@@ -121,72 +121,72 @@ def main(cfg: DictConfig):
             # EVIDENCE
             old_evidence_count = data.query('runId == @previous_run & variable == "evidenceCountByDatasource"')[
                 ["value", "datasourceId"]
-            ].rename({"value": f"Nr of evidence in {previous_run.split('-')[0]}"}, axis=1)
+            ].rename({"value": f"Nr of evidence in {previous_run}"}, axis=1)
             new_evidence_count = data.query('runId == @latest_run & variable == "evidenceCountByDatasource"')[
                 ["value", "datasourceId"]
-            ].rename({"value": f"Nr of evidence in {latest_run.split('-')[0]}"}, axis=1)
+            ].rename({"value": f"Nr of evidence in {latest_run}"}, axis=1)
             old_evidence_invalid = data.query('runId == @previous_run & variable == "evidenceInvalidCountByDatasource"')[
                 ["value", "datasourceId"]
-            ].rename({"value": f"Nr of invalid evidence in {previous_run.split('-')[0]}"}, axis=1)
+            ].rename({"value": f"Nr of invalid evidence in {previous_run}"}, axis=1)
             new_evidence_invalid = data.query('runId == @latest_run & variable == "evidenceInvalidCountByDatasource"')[
                 ["value", "datasourceId"]
-            ].rename({"value": f"Nr of invalid evidence in {latest_run.split('-')[0]}"}, axis=1)
+            ].rename({"value": f"Nr of invalid evidence in {latest_run}"}, axis=1)
             old_evidence_duplicates = data.query(
                 'runId == @previous_run & variable == "evidenceDuplicateCountByDatasource"'
             )[["value", "datasourceId"]].rename(
-                {"value": f"Nr of evidence dropped due to duplication in {previous_run.split('-')[0]}"}, axis=1
+                {"value": f"Nr of evidence dropped due to duplication in {previous_run}"}, axis=1
             )
             new_evidence_duplicates = data.query('runId == @latest_run & variable == "evidenceDuplicateCountByDatasource"')[
                 ["value", "datasourceId"]
-            ].rename({"value": f"Nr of evidence dropped due to duplication in {latest_run.split('-')[0]}"}, axis=1)
+            ].rename({"value": f"Nr of evidence dropped due to duplication in {latest_run}"}, axis=1)
             old_evidence_null_score = data.query(
                 'runId == @previous_run & variable == "evidenceNullifiedScoreCountByDatasource"'
             )[["value", "datasourceId"]].rename(
-                {"value": f"Nr of evidence dropped due to null score in {previous_run.split('-')[0]}"}, axis=1
+                {"value": f"Nr of evidence dropped due to null score in {previous_run}"}, axis=1
             )
             new_evidence_null_score = data.query(
                 'runId == @latest_run & variable == "evidenceNullifiedScoreCountByDatasource"'
             )[["value", "datasourceId"]].rename(
-                {"value": f"Nr of evidence dropped due to null score in {latest_run.split('-')[0]}"}, axis=1
+                {"value": f"Nr of evidence dropped due to null score in {latest_run}"}, axis=1
             )
             old_evidence_unresolved_target = data.query(
                 'runId == @previous_run & variable == "evidenceUnresolvedTargetCountByDatasource"'
             )[["value", "datasourceId"]].rename(
-                {"value": f"Nr of evidence dropped due to unresolved target in {previous_run.split('-')[0]}"},
+                {"value": f"Nr of evidence dropped due to unresolved target in {previous_run}"},
                 axis=1,
             )
             new_evidence_unresolved_target = data.query(
                 'runId == @latest_run & variable == "evidenceUnresolvedTargetCountByDatasource"'
             )[["value", "datasourceId"]].rename(
-                {"value": f"Nr of evidence dropped due to unresolved target in {latest_run.split('-')[0]}"}, axis=1
+                {"value": f"Nr of evidence dropped due to unresolved target in {latest_run}"}, axis=1
             )
             old_evidence_unresolved_disease = data.query(
                 'runId == @previous_run & variable == "evidenceUnresolvedDiseaseCountByDatasource"'
             )[["value", "datasourceId"]].rename(
-                {"value": f"Nr of evidence dropped due to unresolved disease in {previous_run.split('-')[0]}"},
+                {"value": f"Nr of evidence dropped due to unresolved disease in {previous_run}"},
                 axis=1,
             )
             new_evidence_unresolved_disease = data.query(
                 'runId == @latest_run & variable == "evidenceUnresolvedDiseaseCountByDatasource"'
             )[["value", "datasourceId"]].rename(
-                {"value": f"Nr of evidence dropped due to unresolved disease in {latest_run.split('-')[0]}"}, axis=1
+                {"value": f"Nr of evidence dropped due to unresolved disease in {latest_run}"}, axis=1
             )
 
             # ASSOCIATION
             old_indirect_association = data.query(
                 'runId == @previous_run & variable == "associationsIndirectByDatasource"'
             )[["value", "datasourceId"]].rename(
-                {"value": f"Nr of indirect associations in {previous_run.split('-')[0]}"}, axis=1
+                {"value": f"Nr of indirect associations in {previous_run}"}, axis=1
             )
             new_indirect_association = data.query('runId == @latest_run & variable == "associationsIndirectByDatasource"')[
                 ["value", "datasourceId"]
-            ].rename({"value": f"Nr of indirect associations in {latest_run.split('-')[0]}"}, axis=1)
+            ].rename({"value": f"Nr of indirect associations in {latest_run}"}, axis=1)
             old_direct_association = data.query('runId == @previous_run & variable == "associationsDirectByDatasource"')[
                 ["value", "datasourceId"]
-            ].rename({"value": f"Nr of direct associations in {previous_run.split('-')[0]}"}, axis=1)
+            ].rename({"value": f"Nr of direct associations in {previous_run}"}, axis=1)
             new_direct_association = data.query('runId == @latest_run & variable == "associationsDirectByDatasource"')[
                 ["value", "datasourceId"]
-            ].rename({"value": f"Nr of direct associations in {latest_run.split('-')[0]}"}, axis=1)
+            ].rename({"value": f"Nr of direct associations in {latest_run}"}, axis=1)
 
             # Aggregate metrics
             evidence_datasets = [
