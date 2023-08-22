@@ -86,7 +86,8 @@ def main(cfg: DictConfig):
                         .dropna(axis='columns', how='any')
                     )
                     output.columns = output.columns.get_level_values(1)
-                except ValueError:
+                except ValueError as e:
+                    print(e)
                     st.write("Please, indicate a specific pipeline run to group and explore the data.")
             else:
                 output = data.copy()

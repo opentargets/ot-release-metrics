@@ -82,7 +82,7 @@ def load_data(data_folder: str) -> pd.DataFrame:
     # Reading csv files as pandas dataframes:
     while True:
         data = pd.concat(
-            [pd.read_csv(x, sep=',', dtype={'runId': 'string'}) for x in csv_files], ignore_index=True
+            [pd.read_csv(x, sep=',', dtype={'runId': 'str'}) for x in csv_files], ignore_index=True
         ).fillna({'value': 0})
         logging.info(f'Number of rows in the dataframe: {len(data)}')
         logging.info(f'Number of datasets: {len(data.runId.unique())}')
