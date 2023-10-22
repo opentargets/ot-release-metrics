@@ -8,7 +8,7 @@ metric_calculation:
     metrics_root: gs://otar000-evidence_input/release-metrics
 
   datasets:
-    # Post ETL data.
+    # Post ETL data
     evidence: ${metric_calculation.data_repositories.release_output_root}/evidence
     evidence_failed: ${metric_calculation.data_repositories.release_output_root}/errors/evidence
     associations_overall_indirect: ${metric_calculation.data_repositories.release_output_root}/associationByOverallIndirect
@@ -24,7 +24,7 @@ metric_calculation:
     efo_mappings: ${metric_calculation.data_repositories.metrics_root}/gold-standard/mesh_mappings.tsv
 
   outputs:
-    # Metrics are written to the directory that contains them all.
+    # Metrics are written to the directory that contains them all
     all_metrics_path: ${metric_calculation.data_repositories.metrics_root}/${metric_calculation.run_id}.csv
     release_output_path: ${metric_calculation.data_repositories.release_output_root}/metadata/metrics/${metric_calculation.run_id}.csv
 
