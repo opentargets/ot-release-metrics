@@ -1,21 +1,14 @@
 metric_calculation:
+  is_pre_etl_run: false
   run_id: 23.06
   etl_run_id: 23.06
-
-  pre_etl:
-    # Whether to treat this as a pre-ETL run. In this mode, only the raw evidence is processed.
-    is_pre_etl_run: false
-    # Which platform-input-support branch to use to fetch the configs.
-    pis_github_branch: master
 
   data_repositories:
     release_output_root: gs://open-targets-pre-data-releases/${metric_calculation.etl_run_id}/output/etl/parquet
     metrics_root: gs://otar000-evidence_input/release-metrics
 
   datasets:
-    # Pre ETL data
-    raw_evidence: gs://open-targets-pre-data-releases/${metric_calculation.etl_run_id}/input/evidence-files
-    # Post ETL data
+    # Post ETL data.
     evidence: ${metric_calculation.data_repositories.release_output_root}/evidence
     evidence_failed: ${metric_calculation.data_repositories.release_output_root}/errors/evidence
     associations_overall_indirect: ${metric_calculation.data_repositories.release_output_root}/associationByOverallIndirect
@@ -31,7 +24,7 @@ metric_calculation:
     efo_mappings: ${metric_calculation.data_repositories.metrics_root}/gold-standard/mesh_mappings.tsv
 
   outputs:
-    # Metrics are written to the directory that contains them all
+    # Metrics are written to the directory that contains them all.
     all_metrics_path: ${metric_calculation.data_repositories.metrics_root}/${metric_calculation.run_id}.csv
     release_output_path: ${metric_calculation.data_repositories.release_output_root}/metadata/metrics/${metric_calculation.run_id}.csv
 

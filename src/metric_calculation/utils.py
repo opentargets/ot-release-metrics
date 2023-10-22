@@ -9,6 +9,7 @@ from pyspark.sql import SparkSession
 if TYPE_CHECKING:
     from pyspark.sql import DataFrame
 
+
 def get_cwd() -> str:
     """
     `get_cwd()` returns the current working directory as a string
@@ -18,6 +19,7 @@ def get_cwd() -> str:
     """
     return Path.cwd()
 
+
 def initialize_spark_session():
     """
     It creates a SparkSession object, sets the master to YARN, and returns the SparkSession object
@@ -26,6 +28,7 @@ def initialize_spark_session():
       A SparkSession object
     """
     return SparkSession.builder.master("yarn").getOrCreate()
+
 
 def read_path_if_provided(path: str):
     """
@@ -48,12 +51,12 @@ def read_path_if_provided(path: str):
         else:
             raise AssertionError(f'The format of the provided file {path} is not supported.')
 
-    # Case 2: We are provided with a directory. We assume it contains parquet files.
+    # Case 2: Otherwise, we assume that the directory contains Parquet files.
     return SparkSession.getActiveSession().read.parquet(path)
+
 
 def write_metrics_to_csv(metrics: DataFrame, output_path: str):
     """This function writes the dataframe to a csv file in the provided output folder."""
 
     # Write dataframe to csv file:
     metrics.toPandas().to_csv(output_path, index=False, header=True)
-
