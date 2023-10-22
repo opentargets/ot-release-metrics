@@ -449,7 +449,7 @@ def main(cfg: DictConfig) -> None:
     datasets = []
 
     # Load evidence dataset.
-    if metrics_cfg.pre_etl.is_pre_etl_run:
+    if metrics_cfg.is_pre_etl_run:
         # Pre-ETL mode. The latest evidence is collected using platform-input-support.
         # See src/initialise_cluster.sh for details.
         evidence = spark.read.json("output/prod/evidence-files")
@@ -477,7 +477,7 @@ def main(cfg: DictConfig) -> None:
         )
 
     # For the post-ETL mode, calculate lots of additional metrics from the output.
-    if not metrics_cfg.pre_etl.is_pre_etl_run:
+    if not metrics_cfg.is_pre_etl_run:
         datasets.extend(calculate_additional_post_etl_metrics(metrics_cfg))
 
     # Write metric calculation results and clean up.
