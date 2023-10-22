@@ -2,6 +2,12 @@ metric_calculation:
   run_id: 23.06
   etl_run_id: 23.06
 
+  pre_etl:
+    # Whether to treat this as a pre-ETL run. In this mode, only the raw evidence is processed.
+    is_pre_etl_run: false
+    # Which platform-input-support branch to use to fetch the configs.
+    pis_github_branch: master
+
   data_repositories:
     release_output_root: gs://open-targets-pre-data-releases/${metric_calculation.etl_run_id}/output/etl/parquet
     metrics_root: gs://otar000-evidence_input/release-metrics
