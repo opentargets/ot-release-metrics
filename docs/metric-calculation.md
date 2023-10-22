@@ -25,11 +25,8 @@ export CLUSTER_NAME=ot-release-metrics
 export CLUSTER_REGION=europe-west1
 export CLUSTER_INIT_ACTIONS=gs://otar000-evidence_input/release-metrics/initialise_cluster.sh
 
-# Package the repo structure to provision the cluster with it.
-zip -r code_bundle.zip . -x "src/metric_calculation/metrics.py" "env/*" "src/assets/*" ".git/*" "outputs/*" "docs/*" "code_bundle.zip"
-gsutil cp src/initialise_cluster.sh ${CLUSTER_INIT_ACTIONS}
-
 # Create Dataproc cluster.
+gsutil cp src/initialise_cluster.sh ${CLUSTER_INIT_ACTIONS}
 gcloud dataproc clusters create ${CLUSTER_NAME} \
     --image-version=2.1 \
     --single-node \
@@ -41,7 +38,8 @@ gcloud dataproc clusters create ${CLUSTER_NAME} \
     --max-idle=10m \
     --project open-targets-eu-dev
 
-# Submit PySpark job to the Dataproc cluster.
+# Package code and submit a PySpark job to the Dataproc cluster.
+zip -r code_bundle.zip . -x "src/metric_calculation/metrics.py" "env/*" "src/assets/*" ".git/*" "outputs/*" "docs/*" "code_bundle.zip"
 gcloud dataproc jobs submit pyspark \
   src/metric_calculation/metrics.py \
   --cluster=${CLUSTER_NAME} \

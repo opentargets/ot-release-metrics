@@ -452,7 +452,7 @@ def main(cfg: DictConfig) -> None:
     if metrics_cfg.is_pre_etl_run:
         # Pre-ETL mode. The latest evidence is collected using platform-input-support.
         # See src/initialise_cluster.sh for details.
-        evidence = spark.read.json("output/prod/evidence-files")
+        evidence = spark.read.json("evidence-files")
     else:
         # Post-ETL mode. The processed evidence is collected from ETL output.
         evidence = read_path_if_provided(metrics_cfg.datasets.evidence)
