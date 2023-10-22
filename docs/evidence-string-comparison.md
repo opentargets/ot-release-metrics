@@ -9,6 +9,7 @@ The scripts for running this comparison are located in the [`compare-evidence-st
 * Separate and count the evidence strings which are exactly the same and appear in both sets.
 * Compute the diff for the evidence strings which do not fall into the previous category.
 
+
 ## Running the comparison
 ```bash
 export INSTANCE_NAME=evidence-comparison
