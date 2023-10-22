@@ -16,7 +16,12 @@ from pyspark.sql import DataFrame
 import pyspark.sql.functions as f
 import pyspark.sql.types as t
 
-from src.metric_calculation.utils import get_cwd, initialize_spark_session, read_path_if_provided, write_metrics_to_csv
+from src.metric_calculation.utils import (
+    get_cwd,
+    initialize_spark_session,
+    read_path_if_provided,
+    write_metrics_to_csv,
+)
 
 if TYPE_CHECKING:
     from omegaconf import DictConfig
@@ -35,7 +40,7 @@ def flatten(schema, prefix=None):
     """
     fields = []
     for field in schema.fields:
-        name = f'{prefix}.{field.name}' if prefix else field.name
+        name = f"{prefix}.{field.name}" if prefix else field.name
         dtype = field.dataType
         if isinstance(dtype, t.ArrayType):
             dtype = dtype.elementType
@@ -50,8 +55,8 @@ def melt(
     df: DataFrame,
     id_vars: Iterable[str],
     value_vars: Iterable[str],
-    var_name: str = 'variable',
-    value_name: str = 'value',
+    var_name: str = "variable",
+    value_name: str = "value",
 ) -> DataFrame:
     """
     It takes a DataFrame, and a list of columns to melt, and returns a DataFrame with the columns melted
@@ -68,63 +73,83 @@ def melt(
       A dataframe with the columns id_vars, var_name, and value_name.
     """
     # Create array<struct<variable: str, value: ...>>
-    _vars_and_vals = f.array(*(f.struct(f.lit(c).alias(var_name), f.col(c).alias(value_name)) for c in value_vars))
+    _vars_and_vals = f.array(
+        *(
+            f.struct(f.lit(c).alias(var_name), f.col(c).alias(value_name))
+            for c in value_vars
+        )
+    )
 
     # Add to the DataFrame and explode
-    _tmp = df.withColumn('_vars_and_vals', f.explode(_vars_and_vals))
+    _tmp = df.withColumn("_vars_and_vals", f.explode(_vars_and_vals))
 
-    cols = list(id_vars) + [f.col('_vars_and_vals')[x].alias(x) for x in [var_name, value_name]]
+    cols = list(id_vars) + [
+        f.col("_vars_and_vals")[x].alias(x) for x in [var_name, value_name]
+    ]
     return _tmp.select(*cols)
 
 
 def document_total_count(df: DataFrame, var_name: str) -> DataFrame:
     """Count total documents."""
-    out = df.groupBy().count().withColumnRenamed('count', 'value')
-    out = out.withColumn('datasourceId', f.lit('all'))
-    out = out.withColumn('variable', f.lit(var_name))
-    out = out.withColumn('field', f.lit(None).cast(t.StringType()))
+    out = df.groupBy().count().withColumnRenamed("count", "value")
+    out = out.withColumn("datasourceId", f.lit("all"))
+    out = out.withColumn("variable", f.lit(var_name))
+    out = out.withColumn("field", f.lit(None).cast(t.StringType()))
     return out
 
 
 def document_count_by(df: DataFrame, column: str, var_name: str) -> DataFrame:
     """Count documents by grouping column."""
-    out = df.groupBy(column).count().withColumnRenamed('count', 'value')
-    out = out.withColumn('variable', f.lit(var_name))
-    out = out.withColumn('field', f.lit(None).cast(t.StringType()))
+    out = df.groupBy(column).count().withColumnRenamed("count", "value")
+    out = out.withColumn("variable", f.lit(var_name))
+    out = out.withColumn("field", f.lit(None).cast(t.StringType()))
     return out
 
 
-def not_null_fields_count(df: DataFrame, var_name: str, group_by_datasource: bool) -> DataFrame:
+def not_null_fields_count(
+    df: DataFrame, var_name: str, group_by_datasource: bool
+) -> DataFrame:
     """Count number of not null values for each field in the dataframe. If `group_by_datasource` is enabled, the
-    calculation is performed separately for every datasource in the `datasourceId` column."""
+    calculation is performed separately for every datasource in the `datasourceId` column.
+    """
     # Flatten the dataframe schema.
     flat_df = df.select([f.col(c).alias(c) for c in flatten(df.schema)])
     # Get the list of fields to count.
     field_list = flat_df.schema
     if group_by_datasource:
-        field_list = [field for field in field_list if field.name != 'datasourceId']
+        field_list = [field for field in field_list if field.name != "datasourceId"]
     # Count not-null values per field.
     exprs = [
-        f.sum(f.when(f.col(field.name).getItem(0).isNotNull(), f.lit(1)).otherwise(f.lit(0))).alias(field.name)
+        f.sum(
+            f.when(f.col(field.name).getItem(0).isNotNull(), f.lit(1)).otherwise(
+                f.lit(0)
+            )
+        ).alias(field.name)
         if isinstance(field.dataType, t.ArrayType)
-        else f.sum(f.when(f.col(field.name).isNotNull(), f.lit(1)).otherwise(f.lit(0))).alias(field.name)
+        else f.sum(
+            f.when(f.col(field.name).isNotNull(), f.lit(1)).otherwise(f.lit(0))
+        ).alias(field.name)
         for field in field_list
     ]
     # Group (if necessary) and aggregate.
-    df_grouped = df.groupBy(f.col('datasourceId')) if group_by_datasource else df
+    df_grouped = df.groupBy(f.col("datasourceId")) if group_by_datasource else df
     df_aggregated = df_grouped.agg(*exprs)
     # Clean column names.
-    df_cleaned = df_aggregated.toDF(*(c.replace('.', '_') for c in df_aggregated.columns))
+    df_cleaned = df_aggregated.toDF(
+        *(c.replace(".", "_") for c in df_aggregated.columns)
+    )
     # Wide to long format.
     melted = melt(
         df=df_cleaned,
-        id_vars=['datasourceId'] if group_by_datasource else [],
-        var_name='field',
-        value_vars=df_cleaned.drop('datasourceId').columns if group_by_datasource else df_cleaned.columns,
-        value_name='value',
-    ).withColumn('variable', f.lit(var_name))
+        id_vars=["datasourceId"] if group_by_datasource else [],
+        var_name="field",
+        value_vars=df_cleaned.drop("datasourceId").columns
+        if group_by_datasource
+        else df_cleaned.columns,
+        value_name="value",
+    ).withColumn("variable", f.lit(var_name))
     if not group_by_datasource:
-        melted = melted.withColumn('datasourceId', f.lit('all'))
+        melted = melted.withColumn("datasourceId", f.lit("all"))
     return melted
 
 
@@ -136,15 +161,24 @@ def evidence_distinct_fields_count(df: DataFrame, var_name: str) -> DataFrame:
     # Unique counts per column field
     exprs = [
         f.countDistinct(f.col(field.name)).alias(field.name)
-        for field in list(filter(lambda x: x.name != 'datasourceId', flat_df.schema))
+        for field in list(filter(lambda x: x.name != "datasourceId", flat_df.schema))
     ]
-    out = df.groupBy(f.col('datasourceId')).agg(*exprs)
+    out = df.groupBy(f.col("datasourceId")).agg(*exprs)
     # Clean column names
-    out_cleaned = out.toDF(*(c.replace('.', '_') for c in out.columns))
+    out_cleaned = out.toDF(*(c.replace(".", "_") for c in out.columns))
     # Clean  column names
-    cols = [c.name for c in filter(lambda x: x.name != 'datasourceId', out_cleaned.schema.fields)]
-    melted = melt(out_cleaned, id_vars=['datasourceId'], var_name='field', value_vars=cols, value_name='value')
-    melted = melted.withColumn('variable', f.lit(var_name))
+    cols = [
+        c.name
+        for c in filter(lambda x: x.name != "datasourceId", out_cleaned.schema.fields)
+    ]
+    melted = melt(
+        out_cleaned,
+        id_vars=["datasourceId"],
+        var_name="field",
+        value_vars=cols,
+        value_name="value",
+    )
+    melted = melted.withColumn("variable", f.lit(var_name))
     return melted
 
 
@@ -160,7 +194,7 @@ def auc(associations, score_column_name):
       The area under the ROC curve.
     """
     return BinaryClassificationMetrics(
-        associations.select(score_column_name, 'gold_standard').rdd.map(list)
+        associations.select(score_column_name, "gold_standard").rdd.map(list)
     ).areaUnderROC
 
 
@@ -175,10 +209,18 @@ def odds_ratio(associations, datasource):
     Returns:
       The odds ratio of the gold standard associations to the non-gold standard associations.
     """
-    a = associations.filter((f.col('gold_standard') == 1.0) & (f.col('datasourceId') == datasource)).count()
-    b = associations.filter((f.col('gold_standard') == 0.0) & (f.col('datasourceId') == datasource)).count()
-    c = associations.filter((f.col('gold_standard') == 1.0) & (f.col('datasourceId') != datasource)).count()
-    d = associations.filter((f.col('gold_standard') == 0.0) & (f.col('datasourceId') != datasource)).count()
+    a = associations.filter(
+        (f.col("gold_standard") == 1.0) & (f.col("datasourceId") == datasource)
+    ).count()
+    b = associations.filter(
+        (f.col("gold_standard") == 0.0) & (f.col("datasourceId") == datasource)
+    ).count()
+    c = associations.filter(
+        (f.col("gold_standard") == 1.0) & (f.col("datasourceId") != datasource)
+    ).count()
+    d = associations.filter(
+        (f.col("gold_standard") == 0.0) & (f.col("datasourceId") != datasource)
+    ).count()
     return a * d / (b * c)
 
 
@@ -190,42 +232,50 @@ def gold_standard_benchmark(associations: DataFrame, associations_type: str) -> 
         associations_type: Can be either "Direct" or "Indirect", used to compute the names of metrics.
 
     Returns:
-        A list containing two sets of metrics, AUC and OR, both for each dataframe and overall."""
+        A list containing two sets of metrics, AUC and OR, both for each dataframe and overall.
+    """
 
-    if 'Overall' in associations_type:
+    if "Overall" in associations_type:
         auc_metrics = [
             {
-                'value': auc(associations, 'score'),
-                'datasourceId': 'all',
-                'variable': f'associations{associations_type}AUC',
-                'field': '',
+                "value": auc(associations, "score"),
+                "datasourceId": "all",
+                "variable": f"associations{associations_type}AUC",
+                "field": "",
             }
         ]
         or_metrics = [
             {
-                'value': 1.0,
-                'datasourceId': 'all',
-                'variable': f'associations{associations_type}OR',
-                'field': '',
+                "value": 1.0,
+                "datasourceId": "all",
+                "variable": f"associations{associations_type}OR",
+                "field": "",
             }
         ]
     else:
-        datasource_names = associations.select('datasourceId').distinct().toPandas()['datasourceId'].unique()
+        datasource_names = (
+            associations.select("datasourceId")
+            .distinct()
+            .toPandas()["datasourceId"]
+            .unique()
+        )
         auc_metrics = [
             {
-                'value': auc(associations.filter(f.col('datasourceId') == datasource), 'score'),
-                'datasourceId': datasource,
-                'variable': f'associations{associations_type}AUC',
-                'field': '',
+                "value": auc(
+                    associations.filter(f.col("datasourceId") == datasource), "score"
+                ),
+                "datasourceId": datasource,
+                "variable": f"associations{associations_type}AUC",
+                "field": "",
             }
             for datasource in datasource_names
         ]
         or_metrics = [
             {
-                'value': odds_ratio(associations, datasource),
-                'datasourceId': datasource,
-                'variable': f'associations{associations_type}OR',
-                'field': '',
+                "value": odds_ratio(associations, datasource),
+                "datasourceId": datasource,
+                "variable": f"associations{associations_type}OR",
+                "field": "",
             }
             for datasource in datasource_names
         ]
@@ -244,152 +294,199 @@ def get_columns_to_report(dataset_columns):
       A list of columns to report.
     """
     return [
-        'datasourceId',
-        'targetFromSourceId',
-        'diseaseFromSourceMappedId' if 'diseaseFromSourceMappedId' in dataset_columns else 'diseaseFromSourceId',
-        'drugId',
-        'variantId',
-        'literature',
+        "datasourceId",
+        "targetFromSourceId",
+        "diseaseFromSourceMappedId"
+        if "diseaseFromSourceMappedId" in dataset_columns
+        else "diseaseFromSourceId",
+        "drugId",
+        "variantId",
+        "literature",
     ]
 
 
 def calculate_additional_post_etl_metrics(metrics_cfg):
     evidence_failed = read_path_if_provided(metrics_cfg.datasets.evidence_failed)
-    associations_direct = read_path_if_provided(metrics_cfg.datasets.associations_source_direct)
-    associations_indirect = read_path_if_provided(metrics_cfg.datasets.associations_source_indirect)
-    associations_overall_direct = read_path_if_provided(metrics_cfg.datasets.associations_overall_direct)
-    associations_overall_indirect = read_path_if_provided(metrics_cfg.datasets.associations_overall_indirect)
+    associations_direct = read_path_if_provided(
+        metrics_cfg.datasets.associations_source_direct
+    )
+    associations_indirect = read_path_if_provided(
+        metrics_cfg.datasets.associations_source_indirect
+    )
+    associations_overall_direct = read_path_if_provided(
+        metrics_cfg.datasets.associations_overall_direct
+    )
+    associations_overall_indirect = read_path_if_provided(
+        metrics_cfg.datasets.associations_overall_indirect
+    )
     diseases = read_path_if_provided(metrics_cfg.datasets.diseases)
     targets = read_path_if_provided(metrics_cfg.datasets.targets)
     drugs = read_path_if_provided(metrics_cfg.datasets.drugs)
-    gold_standard_associations = read_path_if_provided(metrics_cfg.gold_standard.associations)
-    gold_standard_mappings = read_path_if_provided(metrics_cfg.gold_standard.efo_mappings)
+    gold_standard_associations = read_path_if_provided(
+        metrics_cfg.gold_standard.associations
+    )
+    gold_standard_mappings = read_path_if_provided(
+        metrics_cfg.gold_standard.efo_mappings
+    )
 
     gold_standard = None
     if gold_standard_associations and gold_standard_mappings:
         gold_standard = (
             gold_standard_associations.join(
-                gold_standard_mappings, on=gold_standard_associations.MSH == gold_standard_mappings.mesh_label
+                gold_standard_mappings,
+                on=gold_standard_associations.MSH == gold_standard_mappings.mesh_label,
             )
-            .filter(f.col('`Phase.Latest`') == 'Approved')
-            .select(f.col('ensembl_id').alias('targetId'), f.col('efo_id').alias('diseaseId'))
-            .withColumn('diseaseId', f.regexp_replace('diseaseId', ':', '_'))
-            .withColumn('gold_standard', f.lit(1.0))
+            .filter(f.col("`Phase.Latest`") == "Approved")
+            .select(
+                f.col("ensembl_id").alias("targetId"),
+                f.col("efo_id").alias("diseaseId"),
+            )
+            .withColumn("diseaseId", f.regexp_replace("diseaseId", ":", "_"))
+            .withColumn("gold_standard", f.lit(1.0))
         )
 
     datasets = []
 
     if evidence_failed:
-        logging.info(f'Running metrics from {metrics_cfg.datasets.evidence_failed}.')
+        logging.info(f"Running metrics from {metrics_cfg.datasets.evidence_failed}.")
         columns_to_report = get_columns_to_report(evidence_failed.columns)
         datasets.extend(
             [
                 # Total invalids.
-                document_total_count(evidence_failed, 'evidenceInvalidTotalCount'),
+                document_total_count(evidence_failed, "evidenceInvalidTotalCount"),
                 # Evidence count (duplicates).
-                document_total_count(evidence_failed.filter(f.col('markedDuplicate')), 'evidenceDuplicateTotalCount'),
+                document_total_count(
+                    evidence_failed.filter(f.col("markedDuplicate")),
+                    "evidenceDuplicateTotalCount",
+                ),
                 # Evidence count (nullified score).
                 document_total_count(
-                    evidence_failed.filter(f.col('nullifiedScore')), 'evidenceNullifiedScoreTotalCount'
+                    evidence_failed.filter(f.col("nullifiedScore")),
+                    "evidenceNullifiedScoreTotalCount",
                 ),
                 # Evidence count (targets not resolved).
                 document_total_count(
-                    evidence_failed.filter(~f.col('resolvedTarget')), 'evidenceUnresolvedTargetTotalCount'
+                    evidence_failed.filter(~f.col("resolvedTarget")),
+                    "evidenceUnresolvedTargetTotalCount",
                 ),
                 # Evidence count (diseases not resolved).
                 document_total_count(
-                    evidence_failed.filter(~f.col('resolvedDisease')), 'evidenceUnresolvedDiseaseTotalCount'
+                    evidence_failed.filter(~f.col("resolvedDisease")),
+                    "evidenceUnresolvedDiseaseTotalCount",
                 ),
                 # Total invalids by datasource.
-                document_count_by(evidence_failed, 'datasourceId', 'evidenceInvalidCountByDatasource'),
+                document_count_by(
+                    evidence_failed, "datasourceId", "evidenceInvalidCountByDatasource"
+                ),
                 # Evidence count by datasource (duplicates).
                 document_count_by(
-                    evidence_failed.filter(f.col('markedDuplicate')),
-                    'datasourceId',
-                    'evidenceDuplicateCountByDatasource',
+                    evidence_failed.filter(f.col("markedDuplicate")),
+                    "datasourceId",
+                    "evidenceDuplicateCountByDatasource",
                 ),
                 # Evidence count by datasource (nullified score).
                 document_count_by(
-                    evidence_failed.filter(f.col('nullifiedScore')),
-                    'datasourceId',
-                    'evidenceNullifiedScoreCountByDatasource',
+                    evidence_failed.filter(f.col("nullifiedScore")),
+                    "datasourceId",
+                    "evidenceNullifiedScoreCountByDatasource",
                 ),
                 # Evidence count by datasource (targets not resolved).
                 document_count_by(
-                    evidence_failed.filter(~f.col('resolvedTarget')),
-                    'datasourceId',
-                    'evidenceUnresolvedTargetCountByDatasource',
+                    evidence_failed.filter(~f.col("resolvedTarget")),
+                    "datasourceId",
+                    "evidenceUnresolvedTargetCountByDatasource",
                 ),
                 # Evidence count by datasource (diseases not resolved).
                 document_count_by(
-                    evidence_failed.filter(~f.col('resolvedDisease')),
-                    'datasourceId',
-                    'evidenceUnresolvedDiseaseCountByDatasource',
+                    evidence_failed.filter(~f.col("resolvedDisease")),
+                    "datasourceId",
+                    "evidenceUnresolvedDiseaseCountByDatasource",
                 ),
                 # Distinct values in selected fields (total invalid evidence).
                 evidence_distinct_fields_count(
-                    evidence_failed.select(columns_to_report), 'evidenceInvalidDistinctFieldsCountByDatasource'
+                    evidence_failed.select(columns_to_report),
+                    "evidenceInvalidDistinctFieldsCountByDatasource",
                 ),
                 # Evidence count by datasource (duplicates).
                 evidence_distinct_fields_count(
-                    evidence_failed.filter(f.col('markedDuplicate')).select(columns_to_report),
-                    'evidenceDuplicateDistinctFieldsCountByDatasource',
+                    evidence_failed.filter(f.col("markedDuplicate")).select(
+                        columns_to_report
+                    ),
+                    "evidenceDuplicateDistinctFieldsCountByDatasource",
                 ),
                 # Evidence count by datasource (nullified score).
                 evidence_distinct_fields_count(
-                    evidence_failed.filter(f.col('nullifiedScore')).select(columns_to_report),
-                    'evidenceNullifiedScoreDistinctFieldsCountByDatasource',
+                    evidence_failed.filter(f.col("nullifiedScore")).select(
+                        columns_to_report
+                    ),
+                    "evidenceNullifiedScoreDistinctFieldsCountByDatasource",
                 ),
                 # Evidence count by datasource (targets not resolved).
                 evidence_distinct_fields_count(
-                    evidence_failed.filter(~f.col('resolvedTarget')).select(columns_to_report),
-                    'evidenceUnresolvedTargetDistinctFieldsCountByDatasource',
+                    evidence_failed.filter(~f.col("resolvedTarget")).select(
+                        columns_to_report
+                    ),
+                    "evidenceUnresolvedTargetDistinctFieldsCountByDatasource",
                 ),
                 # Evidence count by datasource (diseases not resolved).
                 evidence_distinct_fields_count(
-                    evidence_failed.filter(~f.col('resolvedDisease')).select(columns_to_report),
-                    'evidenceUnresolvedDiseaseDistinctFieldsCountByDatasource',
+                    evidence_failed.filter(~f.col("resolvedDisease")).select(
+                        columns_to_report
+                    ),
+                    "evidenceUnresolvedDiseaseDistinctFieldsCountByDatasource",
                 ),
             ]
         )
 
-    AssociationsDataset = namedtuple('AssociationsDataset', 'kind df filename')
+    AssociationsDataset = namedtuple("AssociationsDataset", "kind df filename")
     for associations in (
         AssociationsDataset(
-            kind='Direct', df=associations_direct, filename=metrics_cfg.datasets.associations_source_direct
+            kind="Direct",
+            df=associations_direct,
+            filename=metrics_cfg.datasets.associations_source_direct,
         ),
         AssociationsDataset(
-            kind='Indirect', df=associations_indirect, filename=metrics_cfg.datasets.associations_source_indirect
+            kind="Indirect",
+            df=associations_indirect,
+            filename=metrics_cfg.datasets.associations_source_indirect,
         ),
         AssociationsDataset(
-            kind='Direct', df=associations_overall_direct, filename=metrics_cfg.datasets.associations_overall_direct
+            kind="Direct",
+            df=associations_overall_direct,
+            filename=metrics_cfg.datasets.associations_overall_direct,
         ),
         AssociationsDataset(
-            kind='Indirect',
+            kind="Indirect",
             df=associations_overall_indirect,
             filename=metrics_cfg.datasets.associations_overall_indirect,
         ),
     ):
         if not associations.df:
             continue
-        logging.info(f'Running metrics from {associations.filename}.')
+        logging.info(f"Running metrics from {associations.filename}.")
         associations_df = associations.df
         if gold_standard:
-            associations_df = associations_df.join(gold_standard, on=['targetId', 'diseaseId'], how='left').fillna(
-                {'gold_standard': 0.0}
-            )
+            associations_df = associations_df.join(
+                gold_standard, on=["targetId", "diseaseId"], how="left"
+            ).fillna({"gold_standard": 0.0})
         if "Overall" not in associations.filename:
             datasets.extend(
                 [
                     # Total association count.
                     document_total_count(
                         associations_df.select("diseaseId", "targetId").distinct(),
-                        f'associations{associations.kind}TotalCount',
+                        f"associations{associations.kind}TotalCount",
                     ),
                     # Associations by datasource.
-                    document_count_by(associations_df, 'datasourceId', f'associations{associations.kind}ByDatasource'),
+                    document_count_by(
+                        associations_df,
+                        "datasourceId",
+                        f"associations{associations.kind}ByDatasource",
+                    ),
                     # Associations by datasource benchmark.
-                    gold_standard_benchmark(associations_df, f'{associations.kind}ByDatasource')
+                    gold_standard_benchmark(
+                        associations_df, f"{associations.kind}ByDatasource"
+                    )
                     if gold_standard
                     else None,
                 ]
@@ -398,38 +495,44 @@ def calculate_additional_post_etl_metrics(metrics_cfg):
             datasets.extend(
                 [
                     # Total association benchmark.
-                    gold_standard_benchmark(associations_df, f'{associations.kind}Overall')
+                    gold_standard_benchmark(
+                        associations_df, f"{associations.kind}Overall"
+                    )
                     if gold_standard
                     else None,
                 ]
             )
 
     if diseases:
-        logging.info(f'Running metrics from {metrics_cfg.datasets.diseases}.')
+        logging.info(f"Running metrics from {metrics_cfg.datasets.diseases}.")
         datasets.extend(
             [
-                document_total_count(diseases, 'diseasesTotalCount'),
-                not_null_fields_count(diseases, 'diseasesNotNullCount', group_by_datasource=False),
+                document_total_count(diseases, "diseasesTotalCount"),
+                not_null_fields_count(
+                    diseases, "diseasesNotNullCount", group_by_datasource=False
+                ),
             ]
         )
 
     if targets:
-        logging.info(f'Running metrics from {metrics_cfg.datasets.targets}.')
+        logging.info(f"Running metrics from {metrics_cfg.datasets.targets}.")
         datasets.extend(
             [
-                document_total_count(targets, 'targetsTotalCount'),
+                document_total_count(targets, "targetsTotalCount"),
             ]
         )
 
     if drugs:
-        logging.info(f'Running metrics from {metrics_cfg.datasets.drugs}.')
+        logging.info(f"Running metrics from {metrics_cfg.datasets.drugs}.")
         datasets.extend(
             [
-                document_total_count(drugs, 'drugsTotalCount'),
-                not_null_fields_count(drugs, 'drugsNotNullCount', group_by_datasource=False),
+                document_total_count(drugs, "drugsTotalCount"),
+                not_null_fields_count(
+                    drugs, "drugsNotNullCount", group_by_datasource=False
+                ),
             ]
         )
-    
+
     return datasets
 
 
@@ -439,9 +542,9 @@ def main(cfg: DictConfig) -> None:
     spark = initialize_spark_session()
 
     logging_config = {
-        'level': logging.INFO,
-        'format': '%(name)s - %(levelname)s - %(message)s',
-        'datefmt': '%Y-%m-%d %H:%M:%S',
+        "level": logging.INFO,
+        "format": "%(name)s - %(levelname)s - %(message)s",
+        "datefmt": "%Y-%m-%d %H:%M:%S",
     }
     logging.basicConfig(**logging_config)
 
@@ -451,10 +554,14 @@ def main(cfg: DictConfig) -> None:
     # Load evidence dataset.
     if metrics_cfg.is_pre_etl_run:
         # See src/initialise_cluster.sh for details on how the metrics are collected by platform-input-support.
-        logging.info(f'Collecting pre-ETL evidence metrics collected by platform-input-support.')
+        logging.info(
+            f"Collecting pre-ETL evidence metrics collected by platform-input-support."
+        )
         evidence = spark.read.json("/evidence-files")
     else:
-        logging.info(f'Collecting post-ETL evidence metrics from {metrics_cfg.datasets.evidence}.')
+        logging.info(
+            f"Collecting post-ETL evidence metrics from {metrics_cfg.datasets.evidence}."
+        )
         evidence = read_path_if_provided(metrics_cfg.datasets.evidence)
 
     # Process evidence metrics.
@@ -464,14 +571,21 @@ def main(cfg: DictConfig) -> None:
         datasets.extend(
             [
                 # Total evidence count.
-                document_total_count(evidence, 'evidenceTotalCount'),
+                document_total_count(evidence, "evidenceTotalCount"),
                 # Evidence count by datasource.
-                document_count_by(evidence, 'datasourceId', 'evidenceCountByDatasource'),
+                document_count_by(
+                    evidence, "datasourceId", "evidenceCountByDatasource"
+                ),
                 # Number of evidences that have a not null value in the given field.
-                not_null_fields_count(evidence, 'evidenceFieldNotNullCountByDatasource', group_by_datasource=True),
+                not_null_fields_count(
+                    evidence,
+                    "evidenceFieldNotNullCountByDatasource",
+                    group_by_datasource=True,
+                ),
                 # distinctCount takes some time on all columns: subsetting them.
                 evidence_distinct_fields_count(
-                    evidence.select(columns_to_report), 'evidenceDistinctFieldsCountByDatasource'
+                    evidence.select(columns_to_report),
+                    "evidenceDistinctFieldsCountByDatasource",
                 ),
             ]
         )
@@ -482,14 +596,14 @@ def main(cfg: DictConfig) -> None:
 
     # Write metric calculation results and clean up.
     metrics = reduce(DataFrame.unionByName, datasets)
-    metrics = metrics.withColumn('runId', f.lit(metrics_cfg.run_id)).cache()
+    metrics = metrics.withColumn("runId", f.lit(metrics_cfg.run_id)).cache()
 
     for output_path in cfg.metric_calculation.outputs.values():
         write_metrics_to_csv(metrics, output_path)
 
-    logging.info(f'Metrics written to {output_path}.')
+    logging.info(f"Metrics written to {output_path}.")
     spark.stop()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
