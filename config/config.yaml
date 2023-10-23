@@ -1,4 +1,5 @@
 metric_calculation:
+  is_pre_etl_run: false
   run_id: 23.06
   etl_run_id: 23.06
 
@@ -7,8 +8,6 @@ metric_calculation:
     metrics_root: gs://otar000-evidence_input/release-metrics
 
   datasets:
-    # Pre ETL data
-    raw_evidence: gs://open-targets-pre-data-releases/${metric_calculation.etl_run_id}/input/evidence-files
     # Post ETL data
     evidence: ${metric_calculation.data_repositories.release_output_root}/evidence
     evidence_failed: ${metric_calculation.data_repositories.release_output_root}/errors/evidence

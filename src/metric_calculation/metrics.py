@@ -253,22 +253,7 @@ def get_columns_to_report(dataset_columns):
     ]
 
 
-@hydra.main(config_path=get_cwd(), config_name="config")
-def main(cfg: DictConfig) -> None:
-    global spark
-    spark = initialize_spark_session()
-
-    logging_config = {
-        'level': logging.INFO,
-        'format': '%(name)s - %(levelname)s - %(message)s',
-        'datefmt': '%Y-%m-%d %H:%M:%S',
-    }
-    logging.basicConfig(**logging_config)
-
-    metrics_cfg = cfg.metric_calculation
-
-    # Load data. All datasets are optional.
-    evidence = read_path_if_provided(metrics_cfg.datasets.evidence)
+def calculate_additional_post_etl_metrics(metrics_cfg):
     evidence_failed = read_path_if_provided(metrics_cfg.datasets.evidence_failed)
     associations_direct = read_path_if_provided(metrics_cfg.datasets.associations_source_direct)
     associations_indirect = read_path_if_provided(metrics_cfg.datasets.associations_source_indirect)
@@ -293,25 +278,6 @@ def main(cfg: DictConfig) -> None:
         )
 
     datasets = []
-
-    if evidence:
-        logging.info(f'Running metrics from {metrics_cfg.datasets.evidence}.')
-        columns_to_report = get_columns_to_report(evidence.columns)
-
-        datasets.extend(
-            [
-                # Total evidence count.
-                document_total_count(evidence, 'evidenceTotalCount'),
-                # Evidence count by datasource.
-                document_count_by(evidence, 'datasourceId', 'evidenceCountByDatasource'),
-                # Number of evidences that have a not null value in the given field.
-                not_null_fields_count(evidence, 'evidenceFieldNotNullCountByDatasource', group_by_datasource=True),
-                # distinctCount takes some time on all columns: subsetting them.
-                evidence_distinct_fields_count(
-                    evidence.select(columns_to_report), 'evidenceDistinctFieldsCountByDatasource'
-                ),
-            ]
-        )
 
     if evidence_failed:
         logging.info(f'Running metrics from {metrics_cfg.datasets.evidence_failed}.')
@@ -463,8 +429,58 @@ def main(cfg: DictConfig) -> None:
                 not_null_fields_count(drugs, 'drugsNotNullCount', group_by_datasource=False),
             ]
         )
+    
+    return datasets
 
-    # Write output and clean up.
+
+@hydra.main(config_path=get_cwd(), config_name="config")
+def main(cfg: DictConfig) -> None:
+    global spark
+    spark = initialize_spark_session()
+
+    logging_config = {
+        'level': logging.INFO,
+        'format': '%(name)s - %(levelname)s - %(message)s',
+        'datefmt': '%Y-%m-%d %H:%M:%S',
+    }
+    logging.basicConfig(**logging_config)
+
+    metrics_cfg = cfg.metric_calculation
+    datasets = []
+
+    # Load evidence dataset.
+    if metrics_cfg.is_pre_etl_run:
+        # See src/initialise_cluster.sh for details on how the metrics are collected by platform-input-support.
+        logging.info(f'Collecting pre-ETL evidence metrics collected by platform-input-support.')
+        evidence = spark.read.json("/evidence-files")
+    else:
+        logging.info(f'Collecting post-ETL evidence metrics from {metrics_cfg.datasets.evidence}.')
+        evidence = read_path_if_provided(metrics_cfg.datasets.evidence)
+
+    # Process evidence metrics.
+    if evidence:
+        logging.info("Running evidence metrics.")
+        columns_to_report = get_columns_to_report(evidence.columns)
+        datasets.extend(
+            [
+                # Total evidence count.
+                document_total_count(evidence, 'evidenceTotalCount'),
+                # Evidence count by datasource.
+                document_count_by(evidence, 'datasourceId', 'evidenceCountByDatasource'),
+                # Number of evidences that have a not null value in the given field.
+                not_null_fields_count(evidence, 'evidenceFieldNotNullCountByDatasource', group_by_datasource=True),
+                # distinctCount takes some time on all columns: subsetting them.
+                evidence_distinct_fields_count(
+                    evidence.select(columns_to_report), 'evidenceDistinctFieldsCountByDatasource'
+                ),
+            ]
+        )
+
+    # For the post-ETL mode, calculate lots of additional metrics from the output.
+    if not metrics_cfg.is_pre_etl_run:
+        datasets.extend(calculate_additional_post_etl_metrics(metrics_cfg))
+
+    # Write metric calculation results and clean up.
     metrics = reduce(DataFrame.unionByName, datasets)
     metrics = metrics.withColumn('runId', f.lit(metrics_cfg.run_id)).cache()
 
