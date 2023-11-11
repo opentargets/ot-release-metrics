@@ -1,10 +1,10 @@
 metric_calculation:
-  is_pre_etl_run: false
-  run_id: 23.06
-  etl_run_id: 23.06
+  # Specifies the upcoming Open Targets release for which the metrics are being computed, for example "23.12".
+  # If computing metrics in pre-ETL mode, append "_pre", for example "23.12_pre".
+  ot_release: YY.MM
 
   data_repositories:
-    release_output_root: gs://open-targets-pre-data-releases/${metric_calculation.etl_run_id}/output/etl/parquet
+    release_output_root: gs://open-targets-pre-data-releases/${metric_calculation.ot_release}/output/etl/parquet
     metrics_root: gs://otar000-evidence_input/release-metrics
 
   datasets:
