@@ -21,6 +21,7 @@ from src.metric_calculation.utils import (
     read_path_if_provided,
     write_metrics_to_csv,
     fetch_pre_etl_evidence,
+    detect_release_timestamp
 )
 
 if TYPE_CHECKING:
@@ -548,24 +549,27 @@ def main(cfg: DictConfig) -> None:
     }
     logging.basicConfig(**logging_config)
 
+    # Check that the ot_release parameter is set.
     metrics_cfg = cfg.metric_calculation
-    datasets = []
+    ot_release = metrics_cfg.ot_release
+    assert(ot_release != "YY.MM", "Mandatory parameter metric_calculation.ot_release is not set")
 
-    # Load evidence dataset.
-    if metrics_cfg.is_pre_etl_run:
-        # See src/initialise_cluster.sh for details on how the metrics are collected by platform-input-support.
-        logging.info(
-            f"Collecting pre-ETL evidence metrics collected by platform-input-support."
-        )
+    # Determine type of run and load evidence accordingly.
+    if ot_release.endswith("_pre"):
+        is_pre_etl_run = True
+        run_id = ot_release  # Example: 23.12_pre
+        logging.info(f"Fetching evidence for pre-ETL run {run_id}")
         fetch_pre_etl_evidence()
         evidence = spark.read.json("/evidence-files")
     else:
-        logging.info(
-            f"Collecting post-ETL evidence metrics from {metrics_cfg.datasets.evidence}."
-        )
+        is_pre_etl_run = False
+        release_timestamp = detect_release_timestamp(metrics_cfg.datasets.evidence)
+        run_id = f"{ot_release}_{release_timestamp}"  # Example: 23.12_2023-10-26
+        logging.info(f"Reading evidence for post-ETL run {run_id}")
         evidence = read_path_if_provided(metrics_cfg.datasets.evidence)
 
     # Process evidence metrics.
+    datasets = []
     if evidence:
         logging.info("Running evidence metrics.")
         columns_to_report = get_columns_to_report(evidence.columns)
@@ -592,12 +596,12 @@ def main(cfg: DictConfig) -> None:
         )
 
     # For the post-ETL mode, calculate lots of additional metrics from the output.
-    if not metrics_cfg.is_pre_etl_run:
+    if not is_pre_etl_run:
         datasets.extend(calculate_additional_post_etl_metrics(metrics_cfg))
 
     # Write metric calculation results and clean up.
     metrics = reduce(DataFrame.unionByName, datasets)
-    metrics = metrics.withColumn("runId", f.lit(metrics_cfg.run_id)).cache()
+    metrics = metrics.withColumn("runId", f.lit(run_id)).cache()
 
     for output_path in cfg.metric_calculation.outputs.values():
         write_metrics_to_csv(metrics, output_path)
