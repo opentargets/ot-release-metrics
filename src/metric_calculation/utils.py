@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import subprocess
 from typing import TYPE_CHECKING
 import yaml
 
@@ -56,26 +55,12 @@ def write_metrics_to_csv(metrics: DataFrame, output_path: str):
     metrics.toPandas().to_csv(output_path, index=False, header=True)
 
 
-def fetch_pre_etl_evidence():
-    """Fetch pre-ETL evidence using platform-input-support bundled inside the Docker container.
-
-    First, the evidence is fetched locally, and then it is ingested into the Hadoop HDFS, where it can be picked up by Spark.
-    """
-    cmd = (
-        "python3 $HOME/platform-input-support/platform-input-support.py -steps Evidence -o $HOME/output &> $HOME/pis.log && "
-        "hadoop fs -copyFromLocal $HOME/output/prod/evidence-files /"
-    )
-    process = subprocess.Popen(cmd, shell=True)
-    process.wait()
-    assert process.returncode == 0, "Fetching pre-ETL evidence using PIS failed"
-
-
 def detect_release_timestamp(evidence_path):
     """Automatically detects ETL run timestamp based on the latest update time."""
     evidence_success_marker = f"{evidence_path}/_SUCCESS"
     evidence_metadata = gcsfs.GCSFileSystem().info(evidence_success_marker)
     update_timestamp = evidence_metadata["updated"]
-    update_date = update_timestamp[:10]  # Keeping only the YYYY-MM-DD date part
+    update_date = update_timestamp[:10]
     return update_date
 
 
@@ -96,10 +81,9 @@ def fetch_pre_etl_evidence():
     for resource in pis_config.evidence.gs_downloads_latest:
         bucket_name, path = GoogleBucketResource.get_bucket_and_path(resource.bucket)
         google_resource = GoogleBucketResource(bucket_name, path)
-        latest_resource_filename = pis_downloads.get_latest(google_resource, resource)[
-            "latest_filename"
-        ]
-        all_files.append(f"gs://{bucket_name}/{latest_resource_filename}")
+        latest_resource = pis_downloads.get_latest(google_resource, resource)
+        latest_filename = latest_resource["latest_filename"]
+        all_files.append(f"gs://{bucket_name}/{latest_filename}")
 
     # Read all files into Spark.
     return SparkSession.getActiveSession().read.json(all_files)

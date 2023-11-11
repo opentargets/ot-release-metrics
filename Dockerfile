@@ -21,7 +21,6 @@ RUN mkdir -p "${PIP_PACKAGES}"
 
 
 
-
 # Part 2: ot-release-metrics specific setup.
 
 # Install main requirements.
