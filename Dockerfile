@@ -24,6 +24,10 @@ RUN mkdir -p "${PYTHONPATH}"
 
 # Part 2: ot-release-metrics specific setup.
 
+# Install PIS and its requirements.
+RUN python3 -m pip install -q --target "${PYTHONPATH}" configargparse strenum jsonpickle google-cloud-storage addict yapsy
+RUN git clone -b master https://github.com/opentargets/platform-input-support /home/spark/platform-input-support
+
 # Install main requirements.
 COPY requirements.txt /home/spark/requirements.txt
 RUN python3 -m pip install -q --target "${PYTHONPATH}" -r /home/spark/requirements.txt
@@ -32,12 +36,7 @@ RUN python3 -m pip install -q --target "${PYTHONPATH}" -r /home/spark/requiremen
 COPY src $PYTHONPATH/src
 COPY config/config.yaml $PYTHONPATH/src/metric_calculation/config.yaml
 
-# Install PIS and its requirements.
-RUN python3 -m pip install -q --target "${PYTHONPATH}" configargparse strenum jsonpickle google-cloud-storage addict yapsy
-RUN git clone -b master https://github.com/opentargets/platform-input-support
-
 # Define the entry point.
 RUN chmod -R 777 /home/spark
-WORKDIR /home/spark/packages/src/metric_calculation
 ENTRYPOINT ["python3", "/home/spark/packages/src/metric_calculation/metrics.py"]
 USER spark

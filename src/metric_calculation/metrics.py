@@ -21,7 +21,7 @@ from src.metric_calculation.utils import (
     read_path_if_provided,
     write_metrics_to_csv,
     fetch_pre_etl_evidence,
-    detect_release_timestamp
+    detect_release_timestamp,
 )
 
 if TYPE_CHECKING:
@@ -549,22 +549,19 @@ def main(cfg: DictConfig) -> None:
     }
     logging.basicConfig(**logging_config)
 
-    # Check that the ot_release parameter is set.
-    metrics_cfg = cfg.metric_calculation
-    ot_release = metrics_cfg.ot_release
-    assert(ot_release != "YY.MM", "Mandatory parameter metric_calculation.ot_release is not set")
-
     # Determine type of run and load evidence accordingly.
+    metrics_cfg = cfg.metric_calculation
+    ot_release = str(metrics_cfg.ot_release)
     if ot_release.endswith("_pre"):
         is_pre_etl_run = True
-        run_id = ot_release  # Example: 23.12_pre
+        run_id = ot_release  # Example: "23.12_pre".
         logging.info(f"Fetching evidence for pre-ETL run {run_id}")
         fetch_pre_etl_evidence()
         evidence = spark.read.json("/evidence-files")
     else:
         is_pre_etl_run = False
         release_timestamp = detect_release_timestamp(metrics_cfg.datasets.evidence)
-        run_id = f"{ot_release}_{release_timestamp}"  # Example: 23.12_2023-10-26
+        run_id = f"{ot_release}_{release_timestamp}"  # Example: "23.12_2023-10-26".
         logging.info(f"Reading evidence for post-ETL run {run_id}")
         evidence = read_path_if_provided(metrics_cfg.datasets.evidence)
 

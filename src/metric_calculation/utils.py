@@ -57,18 +57,18 @@ def fetch_pre_etl_evidence():
     First, the evidence is fetched locally, and then it is ingested into the Hadoop HDFS, where it can be picked up by Spark.
     """
     cmd = (
-        "python3 /platform-input-support/platform-input-support.py -steps Evidence -o $HOME/output &> $HOME/pis.log && "
+        "python3 $HOME/platform-input-support/platform-input-support.py -steps Evidence -o $HOME/output &> $HOME/pis.log && "
         "hadoop fs -copyFromLocal $HOME/output/prod/evidence-files /"
     )
     process = subprocess.Popen(cmd, shell=True)
     process.wait()
-    assert (process.returncode == 0, "Fetching pre-ETL evidence using PIS failed")
+    assert process.returncode == 0, "Fetching pre-ETL evidence using PIS failed"
 
 
 def detect_release_timestamp(evidence_path):
     """Automatically detects ETL run timestamp based on the latest update time."""
     evidence_success_marker = f"{evidence_path}/_SUCCESS"
     evidence_metadata = gcsfs.GCSFileSystem().info(evidence_success_marker)
-    update_time = evidence_metadata['updated']
-    iso_timestamp = update_time.strftime('%Y-%m-%d')
-    return iso_timestamp
+    update_timestamp = evidence_metadata["updated"]
+    update_date = update_timestamp[:10]  # Keeping only the YYYY-MM-DD date part
+    return update_date
