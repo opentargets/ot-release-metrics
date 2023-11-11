@@ -25,8 +25,8 @@ metric_calculation:
 
   outputs:
     # Metrics are written to the directory that contains them all.
-    all_metrics_path: ${metric_calculation.data_repositories.metrics_root}/${metric_calculation.run_id}.csv
-    release_output_path: ${metric_calculation.data_repositories.release_output_root}/metadata/metrics/${metric_calculation.run_id}.csv
+    all_metrics_path_base: ${metric_calculation.data_repositories.metrics_root}
+    release_output_path: ${metric_calculation.data_repositories.release_output_root}/metadata/metrics/${metric_calculation.ot_release}.csv
 
 metric_visualization:
   parameters:

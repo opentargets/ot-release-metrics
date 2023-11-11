@@ -550,20 +550,19 @@ def main(cfg: DictConfig) -> None:
     logging.basicConfig(**logging_config)
 
     # Determine type of run and load evidence accordingly.
-    metrics_cfg = cfg.metric_calculation
-    ot_release = str(metrics_cfg.ot_release)
+    cfg = cfg.metric_calculation
+    ot_release = str(cfg.ot_release)
     if ot_release.endswith("_pre"):
         is_pre_etl_run = True
         run_id = ot_release  # Example: "23.12_pre".
         logging.info(f"Fetching evidence for pre-ETL run {run_id}")
-        fetch_pre_etl_evidence()
-        evidence = spark.read.json("/evidence-files")
+        evidence = fetch_pre_etl_evidence()
     else:
         is_pre_etl_run = False
-        release_timestamp = detect_release_timestamp(metrics_cfg.datasets.evidence)
+        release_timestamp = detect_release_timestamp(cfg.datasets.evidence)
         run_id = f"{ot_release}_{release_timestamp}"  # Example: "23.12_2023-10-26".
         logging.info(f"Reading evidence for post-ETL run {run_id}")
-        evidence = read_path_if_provided(metrics_cfg.datasets.evidence)
+        evidence = read_path_if_provided(cfg.datasets.evidence)
 
     # Process evidence metrics.
     datasets = []
@@ -594,15 +593,20 @@ def main(cfg: DictConfig) -> None:
 
     # For the post-ETL mode, calculate lots of additional metrics from the output.
     if not is_pre_etl_run:
-        datasets.extend(calculate_additional_post_etl_metrics(metrics_cfg))
+        datasets.extend(calculate_additional_post_etl_metrics(cfg))
 
-    # Write metric calculation results and clean up.
+    # Finalise the metrics dataframe.
     metrics = reduce(DataFrame.unionByName, datasets)
     metrics = metrics.withColumn("runId", f.lit(run_id)).cache()
 
-    for output_path in cfg.metric_calculation.outputs.values():
-        write_metrics_to_csv(metrics, output_path)
-        logging.info(f"Metrics written to {output_path}.")
+    app_metrics_path = f"{cfg.outputs.all_metrics_path_base}/{run_id}.csv"
+    write_metrics_to_csv(metrics, app_metrics_path)
+    logging.info(f"Wrote metrics to the visualisation app path: {app_metrics_path}")
+
+    write_metrics_to_csv(metrics, cfg.outputs.release_output_path)
+    logging.info(
+        f"Wrote metrics to the release folder: {cfg.outputs.release_output_path}"
+    )
 
     spark.stop()
 

@@ -2,9 +2,14 @@ from __future__ import annotations
 
 import subprocess
 from typing import TYPE_CHECKING
+import yaml
 
+from addict import Dict
 import gcsfs
 from pyspark.sql import SparkSession
+
+from modules.common.Downloads import Downloads
+from modules.common.GoogleBucketResource import GoogleBucketResource
 
 if TYPE_CHECKING:
     from pyspark.sql import DataFrame
@@ -72,3 +77,29 @@ def detect_release_timestamp(evidence_path):
     update_timestamp = evidence_metadata["updated"]
     update_date = update_timestamp[:10]  # Keeping only the YYYY-MM-DD date part
     return update_date
+
+
+def fetch_pre_etl_evidence():
+    """Returns latest evidence for each input source, fetched using PIS code."""
+    pis_config = Dict(
+        yaml.load(
+            open("/home/spark/platform-input-support/config.yaml").read(),
+            yaml.SafeLoader,
+        )
+    )
+
+    # Instantiate a helper class to identify the latest file in each bucket.
+    pis_downloads = Downloads(None)
+
+    # Identify latest files for each evidence source.
+    all_files = []
+    for resource in pis_config.evidence.gs_downloads_latest:
+        bucket_name, path = GoogleBucketResource.get_bucket_and_path(resource.bucket)
+        google_resource = GoogleBucketResource(bucket_name, path)
+        latest_resource_filename = pis_downloads.get_latest(google_resource, resource)[
+            "latest_filename"
+        ]
+        all_files.append(f"gs://{bucket_name}/{latest_resource_filename}")
+
+    # Read all files into Spark.
+    return SparkSession.getActiveSession().read.json(all_files)
