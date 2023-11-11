@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import subprocess
 from typing import TYPE_CHECKING
 
 import gcsfs
@@ -48,3 +49,17 @@ def write_metrics_to_csv(metrics: DataFrame, output_path: str):
 
     # Write dataframe to csv file:
     metrics.toPandas().to_csv(output_path, index=False, header=True)
+
+
+def fetch_pre_etl_evidence():
+    """Fetch pre-ETL evidence using platform-input-support bundled inside the Docker container.
+
+    First, the evidence is fetched locally, and then it is ingested into the Hadoop HDFS, where it can be picked up by Spark.
+    """
+    cmd = (
+        "python3 /platform-input-support/platform-input-support.py -steps Evidence -o $HOME/output &> $HOME/pis.log && "
+        "hadoop fs -copyFromLocal $HOME/output/prod/evidence-files /"
+    )
+    process = subprocess.Popen(cmd, shell=True)
+    process.wait()
+    assert (process.returncode == 0, "Fetching pre-ETL evidence using PIS failed")

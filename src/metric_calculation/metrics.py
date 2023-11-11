@@ -20,6 +20,7 @@ from src.metric_calculation.utils import (
     initialize_spark_session,
     read_path_if_provided,
     write_metrics_to_csv,
+    fetch_pre_etl_evidence,
 )
 
 if TYPE_CHECKING:
@@ -556,6 +557,7 @@ def main(cfg: DictConfig) -> None:
         logging.info(
             f"Collecting pre-ETL evidence metrics collected by platform-input-support."
         )
+        fetch_pre_etl_evidence()
         evidence = spark.read.json("/evidence-files")
     else:
         logging.info(
