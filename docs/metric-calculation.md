@@ -13,44 +13,28 @@ IS_PRE_ETL_RUN="true"
 If you are running in post-ETL mode, set:
 ```bash
 # Substitute XX.YY with the upcoming release, and YYYYMMDD with the timestamp for the date on which the ETL was run. This is essential to be able to compare multiple ETL runs throughout the release preparation process.
-RUN_ID=XX.YY.YYYYMMDD
+RUN_ID="XX.YY.YYYYMMDD"
 # Substite XX.YY with the upcoming release. Consequent ETL runs are stored in the same bucket, overwriting its contents, so this path is the same for all ETL runs for the release.
-ETL_RUN_ID=XX.YY
+ETL_RUN_ID="XX.YY"
 IS_PRE_ETL_RUN="false"
 ```
 
-## Submit job do Dataproc
-The below commands should not need to be modified. They will create a Google Dataproc cluster and submit the job which will calculate the metrics and upload them to the output bucket in Google Storage.
-
+## Submit job to Dataproc
 ```bash
-# Cluster parameters.
-export PROJECT_ID=open-targets-eu-dev
-export IMAGE_NAME=ot-release-metrics
-export CLUSTER_NAME=ot-release-metrics
-export CLUSTER_REGION=europe-west1
-export CLUSTER_INIT_ACTIONS=gs://otar000-evidence_input/release-metrics/initialise_cluster.sh
-
-# Create Dataproc cluster.
-gsutil cp src/initialise_cluster.sh ${CLUSTER_INIT_ACTIONS}
-gcloud dataproc clusters create ${CLUSTER_NAME} \
-    --image-version=2.1 \
-    --single-node \
-    --region=${CLUSTER_REGION} \
-    --metadata 'PIP_PACKAGES=hydra-core==1.2.0 gcsfs==2022.7.1' \
-    --initialization-actions ${CLUSTER_INIT_ACTIONS} \
-    --master-machine-type=n1-standard-64 \
-    --master-boot-disk-size=100 \
-    --max-idle=10m \
-    --project open-targets-eu-dev
-
-# Submit a PySpark job to the Dataproc cluster.
-gcloud dataproc jobs submit pyspark \
-  --cluster=${CLUSTER_NAME} \
-  --region=${CLUSTER_REGION} \
-  --image-uri=gcr.io/${PROJECT_ID}/${IMAGEA_NAME}:latest \
-  -- \
-  main.py \
-  run_id=${RUN_ID} etl_run_id=${ETL_RUN_ID} is_pre_etl_run=${IS_PRE_ETL_RUN}
+export IMAGE=gcr.io/open-targets-eu-dev/ot-release-metrics:latest
+export REGION=europe-west1
+export BUCKET=gs://ot-release-metrics
+gcloud dataproc batches submit pyspark \
+    --container-image ${IMAGE} \
+    --region ${REGION} \
+    --deps-bucket ${BUCKET} \
+    --files config/config.yaml \
+    --properties "spark.executor.cores=16" \
+    src/metric_calculation/metrics.py \
+    -- \
+    metric_calculation.run_id=${RUN_ID} \
+    metric_calculation.etl_run_id=${ETL_RUN_ID} \
+    metric_calculation.is_pre_etl_run=${IS_PRE_ETL_RUN}
 ```
 
 ## Update the Streamlit app
