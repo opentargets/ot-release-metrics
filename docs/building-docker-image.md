@@ -10,7 +10,7 @@ This document contains commands which may need to be run in special cases.
 export TAG=latest
 export IMAGE_NAME=ot-release-metrics
 export PROJECT_NAME=open-targets-eu-dev
-docker build -t ${IMAGE_NAME}:${TAG}
+docker build -t ${IMAGE_NAME}:${TAG} .
 gcloud auth configure-docker
 docker tag ${IMAGE_NAME}:${TAG} gcr.io/${PROJECT_NAME}/${IMAGE_NAME}:${TAG}
 docker push gcr.io/${PROJECT_NAME}/${IMAGE_NAME}:${TAG}
@@ -41,3 +41,8 @@ gcloud iam service-accounts keys create /tmp/keyfile.json --iam-account=$SERVICE
 ```
 
 Next, copy the contents of the key from `/tmp/keyfile.json` and paste it as the `GCP_SA_KEY` secret variable in GitHub Actions.
+
+Finally, create a temporary Google bucket:
+```bash
+gcloud storage buckets create gs://${IMAGE_NAME}
+```
