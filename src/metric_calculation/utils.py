@@ -63,3 +63,12 @@ def fetch_pre_etl_evidence():
     process = subprocess.Popen(cmd, shell=True)
     process.wait()
     assert (process.returncode == 0, "Fetching pre-ETL evidence using PIS failed")
+
+
+def detect_release_timestamp(evidence_path):
+    """Automatically detects ETL run timestamp based on the latest update time."""
+    evidence_success_marker = f"{evidence_path}/_SUCCESS"
+    evidence_metadata = gcsfs.GCSFileSystem().info(evidence_success_marker)
+    update_time = evidence_metadata['updated']
+    iso_timestamp = update_time.strftime('%Y-%m-%d')
+    return iso_timestamp
