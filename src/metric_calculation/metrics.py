@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""Calculates the various quality metrics for evidence and the associated datasets.
-"""
+"""Calculates the various quality metrics for evidence and the associated datasets."""
 
 from __future__ import annotations
 
@@ -8,6 +7,7 @@ from collections import namedtuple
 from functools import reduce
 import logging
 import logging.config
+import os
 from typing import Iterable, TYPE_CHECKING
 
 import hydra
@@ -17,7 +17,6 @@ import pyspark.sql.functions as f
 import pyspark.sql.types as t
 
 from src.metric_calculation.utils import (
-    get_cwd,
     initialize_spark_session,
     read_path_if_provided,
     write_metrics_to_csv,
@@ -536,7 +535,7 @@ def calculate_additional_post_etl_metrics(metrics_cfg):
     return datasets
 
 
-@hydra.main(config_path=get_cwd(), config_name="config")
+@hydra.main(config_path=os.getcwd(), config_name="config")
 def main(cfg: DictConfig) -> None:
     global spark
     spark = initialize_spark_session()
@@ -600,8 +599,8 @@ def main(cfg: DictConfig) -> None:
 
     for output_path in cfg.metric_calculation.outputs.values():
         write_metrics_to_csv(metrics, output_path)
+        logging.info(f"Metrics written to {output_path}.")
 
-    logging.info(f"Metrics written to {output_path}.")
     spark.stop()
 
 

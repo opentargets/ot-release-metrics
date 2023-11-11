@@ -3,31 +3,15 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import gcsfs
-from pathlib import Path
 from pyspark.sql import SparkSession
 
 if TYPE_CHECKING:
     from pyspark.sql import DataFrame
 
 
-def get_cwd() -> str:
-    """
-    `get_cwd()` returns the current working directory as a string
-
-    Returns:
-      The current working directory.
-    """
-    return Path.cwd()
-
-
 def initialize_spark_session():
-    """
-    It creates a SparkSession object, sets the master to YARN, and returns the SparkSession object
-
-    Returns:
-      A SparkSession object
-    """
-    return SparkSession.builder.master("yarn").getOrCreate()
+    """Creates and returns a SparkSession object."""
+    return SparkSession.builder.getOrCreate()
 
 
 def read_path_if_provided(path: str):
