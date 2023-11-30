@@ -4,20 +4,25 @@ metric_calculation:
   ot_release: ???
 
   data_repositories:
-    release_output_root: gs://open-targets-pre-data-releases/${metric_calculation.ot_release}/output/etl/parquet
+    release_output_root: gs://open-targets-pre-data-releases/${metric_calculation.ot_release}/output
+    data_output_root: ${metric_calculation.data_repositories.release_output_root}/etl/parquet
+    metadata_output_root: ${metric_calculation.data_repositories.release_output_root}/metadata
     metrics_root: gs://otar000-evidence_input/release-metrics
 
   datasets:
     # Post ETL data.
-    evidence: ${metric_calculation.data_repositories.release_output_root}/evidence
-    evidence_failed: ${metric_calculation.data_repositories.release_output_root}/errors/evidence
-    associations_overall_indirect: ${metric_calculation.data_repositories.release_output_root}/associationByOverallIndirect
-    associations_overall_direct: ${metric_calculation.data_repositories.release_output_root}/associationByOverallDirect
-    associations_source_indirect: ${metric_calculation.data_repositories.release_output_root}/associationByDatasourceIndirect
-    associations_source_direct: ${metric_calculation.data_repositories.release_output_root}/associationByDatasourceDirect
-    diseases: ${metric_calculation.data_repositories.release_output_root}/diseases
-    targets: ${metric_calculation.data_repositories.release_output_root}/targets
-    drugs: ${metric_calculation.data_repositories.release_output_root}/molecule
+    evidence: ${metric_calculation.data_repositories.data_output_root}/evidence
+    evidence_failed: ${metric_calculation.data_repositories.data_output_root}/errors/evidence
+    associations_overall_indirect: ${metric_calculation.data_repositories.data_output_root}/associationByOverallIndirect
+    associations_overall_direct: ${metric_calculation.data_repositories.data_output_root}/associationByOverallDirect
+    associations_source_indirect: ${metric_calculation.data_repositories.data_output_root}/associationByDatasourceIndirect
+    associations_source_direct: ${metric_calculation.data_repositories.data_output_root}/associationByDatasourceDirect
+    diseases: ${metric_calculation.data_repositories.data_output_root}/diseases
+    targets: ${metric_calculation.data_repositories.data_output_root}/targets
+    drugs: ${metric_calculation.data_repositories.data_output_root}/molecule
+
+  metadata:
+    evidence: ${metric_calculation.data_repositories.metadata_output_root}/evidence
 
   gold_standard:
     associations: ${metric_calculation.data_repositories.metrics_root}/gold-standard/informa_abbvie.tsv
@@ -26,7 +31,7 @@ metric_calculation:
   outputs:
     # Metrics are written to the directory that contains them all.
     all_metrics_path_base: ${metric_calculation.data_repositories.metrics_root}
-    release_output_path: ${metric_calculation.data_repositories.release_output_root}/metadata/metrics/${metric_calculation.ot_release}.csv
+    release_output_path: ${metric_calculation.data_repositories.metadata_output_root}/metrics.csv
 
 metric_visualization:
   parameters:
