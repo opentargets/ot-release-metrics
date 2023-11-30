@@ -561,7 +561,7 @@ def main(cfg: DictConfig) -> None:
     else:
         # Post-ETL mode.
         is_pre_etl_run = False
-        release_timestamp = detect_release_timestamp(cfg.datasets.evidence)
+        release_timestamp = detect_release_timestamp(cfg.metadata.evidence)
         if ot_release.startswith("partners/"):
             # Remove the "partners" prefix which was important for locating the files.
             ot_release = ot_release.split('/')[1] + "_ppp"

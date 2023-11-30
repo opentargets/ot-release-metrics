@@ -6,6 +6,7 @@ import yaml
 from addict import Dict
 import gcsfs
 from pyspark.sql import SparkSession
+import pyspark.sql.functions as f
 
 from modules.common.Downloads import Downloads
 from modules.common.GoogleBucketResource import GoogleBucketResource
@@ -64,12 +65,19 @@ def write_metrics_to_csv(metrics: DataFrame, output_path: str):
     metrics.toPandas().to_csv(output_path, index=False, header=True)
 
 
-def detect_release_timestamp(evidence_path):
+def detect_release_timestamp(evidence_metadata_path):
     """Automatically detects ETL run timestamp based on the latest update time."""
-    evidence_success_marker = f"{evidence_path}/_SUCCESS"
-    evidence_metadata = gcsfs.GCSFileSystem().info(evidence_success_marker)
-    update_timestamp = evidence_metadata["updated"]
-    update_date = update_timestamp[:10]
+    evidence_metadata = read_path_if_provided(evidence_metadata_path, format="json")
+    parquet_rows = evidence_metadata.filter(
+        f.col("resource").getField("format") == "parquet"
+    ).collect()
+    assert (
+        len(parquet_rows) == 1
+    ), "There should be exactly one row with Parquet metadata"
+    update_timestamp = parquet_rows[
+        0
+    ].timeStamp  # Example format: "2023-10-31T18:11:57.508Z".
+    update_date = update_timestamp[:10]  # Example format: "2023-10-31".
     return update_date
 
 
