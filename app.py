@@ -30,6 +30,12 @@ def main(cfg: DictConfig):
         "This application is a dashboard to display the metrics of the different data releases in Open Targets."
     )
 
+    # Add a "Refresh" button.
+    refresh_btn = st.button("Refresh list of runs")
+    if refresh_btn:
+        st.cache_data.clear()
+        st.rerun()
+
     st.sidebar.header("What do you want to do?")
     page = st.sidebar.radio(
         "Choose an option",
