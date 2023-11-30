@@ -1,6 +1,6 @@
 metric_calculation:
-  # Specifies the upcoming Open Targets release for which the metrics are being computed, for example "23.12".
-  # If computing metrics in pre-ETL mode, append "_pre", for example "23.12_pre".
+  # Specifies the upcoming Open Targets release for which the metrics are being computed.
+  # See documentation (`metric-calculation.md`) about how to set it in various cases.
   ot_release: ???
 
   data_repositories:
