@@ -553,14 +553,22 @@ def main(cfg: DictConfig) -> None:
     cfg = cfg.metric_calculation
     ot_release = str(cfg.ot_release)
     if ot_release.endswith("_pre"):
+        # Pre-ETL mode.
         is_pre_etl_run = True
         run_id = ot_release  # Example: "23.12_pre".
         logging.info(f"Fetching evidence for pre-ETL run {run_id}")
         evidence = fetch_pre_etl_evidence()
     else:
+        # Post-ETL mode.
         is_pre_etl_run = False
         release_timestamp = detect_release_timestamp(cfg.datasets.evidence)
-        run_id = f"{ot_release}_{release_timestamp}"  # Example: "23.12_2023-10-26".
+        if ot_release.startswith("partners/"):
+            # Remove the "partners" prefix which was important for locating the files.
+            ot_release = ot_release.split('/')[1] + "_ppp"
+        # Calculate the final run ID:
+        # - Example for regular: "23.12_2023-10-26".
+        # - Example for PPP: "23.12_ppp_2023-11-27".
+        run_id = f"{ot_release}_{release_timestamp}"
         logging.info(f"Reading evidence for post-ETL run {run_id}")
         evidence = read_path_if_provided(cfg.datasets.evidence)
 
