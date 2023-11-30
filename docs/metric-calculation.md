@@ -8,12 +8,13 @@ The only parameter required for run configuration is the upcoming Open Targets r
 ## Submit job to Dataproc
 ```bash
 export IMAGE=gcr.io/open-targets-eu-dev/ot-release-metrics:latest
+export PROJECT=open-targets-eu-dev
 export REGION=europe-west1
 export BUCKET=gs://ot-release-metrics
 gcloud dataproc batches submit pyspark \
     --container-image ${IMAGE} \
     --region ${REGION} \
-    --project open-targets-eu-dev \
+    --project ${PROJECT} \
     --deps-bucket ${BUCKET} \
     --files config/config.yaml \
     --properties "spark.executor.cores=16" \
