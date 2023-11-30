@@ -13,6 +13,7 @@ export BUCKET=gs://ot-release-metrics
 gcloud dataproc batches submit pyspark \
     --container-image ${IMAGE} \
     --region ${REGION} \
+    --project open-targets-eu-dev \
     --deps-bucket ${BUCKET} \
     --files config/config.yaml \
     --properties "spark.executor.cores=16" \
