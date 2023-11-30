@@ -19,7 +19,7 @@ def initialize_spark_session():
     return SparkSession.builder.getOrCreate()
 
 
-def read_path_if_provided(path: str):
+def read_path_if_provided(path: str, dir_format="parquet"):
     """
     Automatically detect the format of the input data and read it into the Spark dataframe. The supported formats
     are: a single TSV file; a single JSON file; a directory with JSON files; a directory with Parquet files.
@@ -44,8 +44,17 @@ def read_path_if_provided(path: str):
                 f"The format of the provided file {path} is not supported."
             )
 
-    # Case 2: We are provided with a directory. We assume it contains parquet files.
-    return SparkSession.getActiveSession().read.parquet(path)
+    # Case 2: We are provided with a directory.
+    read_method = SparkSession.getActiveSession().read
+    if dir_format == "parquet":
+        read_method = read_method.parquet
+    elif dir_format == "json":
+        read_method = read_method.json
+    else:
+        raise NotImplementedError(
+            "Only Parquet or JSON are supported for partitioned files."
+        )
+    return read_method(path)
 
 
 def write_metrics_to_csv(metrics: DataFrame, output_path: str):
