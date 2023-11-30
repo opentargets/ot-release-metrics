@@ -8,4 +8,4 @@ protobuf>=3.20.0
 psutil>=5.8.0
 pyspark>=3.2.0
 streamlit>=1.28.1
-urllib3>=1.26.6
+urllib3==1.26.6
