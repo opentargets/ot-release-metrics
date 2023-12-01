@@ -7,7 +7,6 @@ from PIL import Image
 import streamlit as st
 
 from src.metric_visualisation.utils import (
-    highlight_cell,
     show_table,
     load_data,
     plot_enrichment,
