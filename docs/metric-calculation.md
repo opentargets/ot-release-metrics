@@ -30,5 +30,6 @@ gcloud dataproc batches submit pyspark \
     metric_calculation.ot_release=${OT_RELEASE}
 ```
 
-## Update the Streamlit app
-If the Streamlit app was already deployed at the time when the above code was run, it will not be able to automatically pick up the new metrics. Reboot it manually to reflect the new changes. See instructions in the [app documentation](metric-visualisation.md#rebooting-the-app).
+
+## Updating the Streamlit app
+If a recently completed run doesn't show up in the app, click on the “Refresh list of runs” button.

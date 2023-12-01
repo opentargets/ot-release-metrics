@@ -68,7 +68,7 @@ def highlight_cell(
     return background
 
 
-@st.cache
+@st.cache_data(ttl="1h")
 def load_data(data_folder: str) -> pd.DataFrame:
     """This function reads all csv files from a provided location and returns as a concatenated pandas dataframe"""
 
