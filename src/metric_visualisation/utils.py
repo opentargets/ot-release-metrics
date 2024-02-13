@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 
 import gcsfs
 import pandas as pd
@@ -251,3 +252,13 @@ def compare_entity(
         )
 
     return df
+
+def extract_primary_run_id_list(all_run_ids: list[str]) -> list[str]:
+    """Generates a runId selector based on the runIds. This is used to identify to which major runId the metrics belong to."""
+    primary_run_id_pattern = r"^\d+.\d+"
+    return ["All"] + sorted(list({re.match(primary_run_id_pattern, x).group() for x in all_run_ids}), reverse=True) # type: ignore
+
+def extract_secondary_run_id_list(all_run_ids: list[str], primary_run_id: str) -> list[str]:
+    """Generates a runId selector based on the runIds. This is used to identify to which major runId the metrics belong to."""
+    return sorted([x for x in all_run_ids if primary_run_id in x], reverse=True)
+
