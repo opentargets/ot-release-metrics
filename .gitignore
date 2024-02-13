@@ -2,3 +2,4 @@
 env/**
 outputs/**/*
 code_bundle.zip
+.streamlit/secrets.toml
