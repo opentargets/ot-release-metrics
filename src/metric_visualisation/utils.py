@@ -5,6 +5,7 @@ import gcsfs
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+from gcsfs import GCSFileSystem
 
 
 def show_table(
@@ -251,3 +252,20 @@ def compare_entity(
         )
 
     return df
+
+
+def _delete_release_metrics(file_path: str):
+    """Deletes the metrics of the release from GCS if the password matchs up."""
+    password_input = st.session_state.password_input
+    c = st.container(border=True)
+    c.write(f"You entered: {password_input}")
+    if password_input != st.secrets["MANAGER_PASSWORD"]:
+        c.error("Incorrect password")
+    else:
+        c.write("Correct password. Deleting...")
+        try:
+            gcs = GCSFileSystem()
+            gcs.rm(file_path)
+            c.write("Metrics deleted successfully")
+        except Exception as e:
+            c.error(f"Error deleting metrics: {e}")

@@ -7,6 +7,7 @@ from PIL import Image
 import streamlit as st
 
 from src.metric_visualisation.utils import (
+    _delete_release_metrics,
     show_table,
     load_data,
     plot_enrichment,
@@ -139,12 +140,27 @@ def main(cfg: DictConfig):
 
             # Display table
             st.dataframe(output.style.format(precision=2))
-            st.download_button(
-                label="Download data as CSV",
-                data=output.to_csv().encode("utf-8"),
-                file_name=f"metrics-{select_run}.csv",
-                mime="text/csv",
-            )
+            download_button, delete_button = st.columns(2)
+            with download_button:
+                st.download_button(
+                    label="Download data as CSV",
+                    data=output.to_csv().encode("utf-8"),
+                    file_name=f"metrics-{select_run}.csv",
+                    mime="text/csv",
+                )
+            with delete_button:
+                if st.button(
+                    "Delete release metrics",
+                    help="Delete release metrics from the GCS bucket. This action is irreversible.",
+                ):
+                    gcs_data_path = f"{cfg.metric_calculation.data_repositories.metrics_root}/{select_run}.csv"
+                    st.text_input(
+                        "Type password to confirm",
+                        placeholder="OT manager password",
+                        key="password_input",
+                        on_change=_delete_release_metrics,
+                        args=(gcs_data_path,),
+                    )
 
     if page == "Compare metrics":
         # Select two datasets to compare
