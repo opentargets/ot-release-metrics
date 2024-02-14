@@ -8,11 +8,12 @@ import streamlit as st
 
 from src.metric_visualisation.utils import (
     extract_primary_run_id_list,
-    extract_secondary_run_id_list,
     show_table,
     load_data,
     plot_enrichment,
     compare_entity,
+    select_and_mask_data_to_compare,
+    select_and_mask_data_to_explore,
 )
 
 
@@ -53,17 +54,8 @@ def main(cfg: DictConfig):
     all_releases = extract_primary_run_id_list(all_runs)
 
     if page == "Explore metrics":
-        # Select a dataset to explore
-        select_release = [st.sidebar.selectbox("Select a release:", all_releases)]
-
-        # Apply select_run mask
-        if select_release != "All":
-            select_run = st.sidebar.selectbox(
-                "Select a specific release run:", extract_secondary_run_id_list(all_runs, select_release), help="Legend: IDs without a suffix are post-ETL, the latest run belongs to the data in production, 'pre' means pre-ETL and 'ppp' means partner preview platform."
-            )
-            mask_run = data["runId"] == select_run
-            data = data[mask_run]
-
+        data, selected_run = select_and_mask_data_to_explore(all_releases, all_runs, data)
+        if selected_run:
             st.markdown("## Key metrics")
             col1, col2, col3, col4, col5 = st.columns(5)
             col1.metric(
@@ -73,7 +65,7 @@ def main(cfg: DictConfig):
                 ),
             )
             # Print post ETL metrics only when available
-            if "pre" not in select_run:
+            if "pre" not in selected_run:
                 col2.metric(
                     label="Associations",
                     value=int(
@@ -147,28 +139,15 @@ def main(cfg: DictConfig):
             st.download_button(
                 label="Download data as CSV",
                 data=output.to_csv().encode("utf-8"),
-                file_name=f"metrics-{select_run}.csv",
+                file_name=f"metrics-{selected_run}.csv",
                 mime="text/csv",
             )
 
     if page == "Compare metrics":
-        # Select two datasets to compare
-        st.sidebar.header("What do you want to compare?")
-        select_releases = st.sidebar.multiselect(
-            "Select one or two releases to compare:",
-            sorted(all_releases, reverse=True),
-        )
+        data, selected_runs = select_and_mask_data_to_compare(all_releases, all_runs, data)
 
-        # Apply masks
-        if len(select_releases) in {1, 2}:
-            select_runs = st.sidebar.multiselect(
-                "Select two specific release runs:", extract_secondary_run_id_list(all_runs, select_releases), help="First indicate the latest run and secondly the run with which you wish to make the comparison. Legend: IDs without a suffix are post-ETL, the latest run belongs to the data in production, 'pre' means pre-ETL and 'ppp' means partner preview platform."
-            )
-            latest_run = select_runs[0]
-            previous_run = select_runs[1]
-            masks_run = (data["runId"] == previous_run) | (data["runId"] == latest_run)
-            data = data[masks_run]
-
+        if selected_runs:
+            latest_run, previous_run = selected_runs
             # Compute variables
             # EVIDENCE
             old_evidence_count = data.query(
@@ -340,23 +319,8 @@ def main(cfg: DictConfig):
                 )
 
     if page == "Visualise metrics":
-        # Select two datasets to compare
-        st.sidebar.header("What do you want to compare?")
-        select_runs = st.sidebar.multiselect(
-            "Select two datasets to see the level of enrichment per data source:",
-            sorted(data.runId.unique(), reverse=True),
-        )
-
-        # Apply masks
-        if len(select_runs) == 2:
-            previous_run = select_runs[0]
-            latest_run = select_runs[1]
-
-            # Filter data per selected runIds and variables of interest
-            masks_run = (data["runId"] == previous_run) | (data["runId"] == latest_run)
-            data = data[masks_run]
-
-            # Plot
+        data, selected_runs = select_and_mask_data_to_compare(all_releases, all_runs, data)
+        if selected_runs:
             st.plotly_chart(plot_enrichment(data), use_container_width=True)
 
     st.markdown("###")
