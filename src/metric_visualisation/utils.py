@@ -254,11 +254,21 @@ def compare_entity(
     return df
 
 def extract_primary_run_id_list(all_run_ids: list[str]) -> list[str]:
-    """Generates a runId selector based on the runIds. This is used to identify to which major runId the metrics belong to."""
+    """Generates a runId selector based on the runIds. This is used to identify to which major runId the metrics belong to.
+    
+    Examples:
+    >>> extract_primary_run_id_list(["2023.09", "2023.09-pre", "2023.11-ppp"])
+    ["2023.11", "2023.09"]
+    """
     primary_run_id_pattern = r"^\d+.\d+"
     return ["All"] + sorted(list({re.match(primary_run_id_pattern, x).group() for x in all_run_ids}), reverse=True) # type: ignore
 
 def extract_secondary_run_id_list(all_run_ids: list[str], primary_run_ids: list[str]) -> list[str]:
-    """Generates a runId selector based on the runIds. This is used to identify to which major runId the metrics belong to."""
+    """Generates a runId selector based on the runIds. This is used to identify to which major runId the metrics belong to.
+    
+    Examples:
+    >>> extract_secondary_run_id_list(["2023.09", "2023.09-pre", "2023.11-ppp"], ["2023.11"])
+    ["2023.11-ppp"]
+    """
     return sorted([run_id for run_id in all_run_ids if any(primary_id in run_id for primary_id in primary_run_ids)], reverse=True)
 
