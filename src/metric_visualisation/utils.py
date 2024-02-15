@@ -301,4 +301,4 @@ def select_and_mask_data_to_explore(all_releases, all_runs, data):
         mask_run = data["runId"] == select_run
         data = data[mask_run]
 
-    return data, select_release
+    return data, select_run
