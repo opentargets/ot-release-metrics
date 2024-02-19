@@ -1,5 +1,6 @@
 import logging
 import os
+import re
 
 import gcsfs
 import pandas as pd
@@ -253,7 +254,6 @@ def compare_entity(
 
     return df
 
-
 def _delete_release_metrics(file_path: str):
     """Deletes the metrics of the release from GCS if the password matchs up."""
     password_input = st.session_state.password_input
@@ -269,3 +269,53 @@ def _delete_release_metrics(file_path: str):
             c.write("Metrics deleted successfully")
         except Exception as e:
             c.error(f"Error deleting metrics: {e}")
+
+def extract_primary_run_id_list(all_run_ids: list[str]) -> list[str]:
+    """Generates a runId selector based on the runIds. This is used to identify to which major runId the metrics belong to.
+    
+    Examples:
+    >>> extract_primary_run_id_list(["2023.09", "2023.09-pre", "2023.11-ppp"])
+    ["2023.11", "2023.09"]
+    """
+    primary_run_id_pattern = r"^\d+.\d+"
+    return ["All"] + sorted(list({re.match(primary_run_id_pattern, x).group() for x in all_run_ids}), reverse=True) # type: ignore
+
+def extract_secondary_run_id_list(all_run_ids: list[str], primary_run_ids: list[str]) -> list[str]:
+    """Generates a runId selector based on the runIds. This is used to identify to which major runId the metrics belong to.
+    
+    Examples:
+    >>> extract_secondary_run_id_list(["2023.09", "2023.09-pre", "2023.11-ppp"], ["2023.11"])
+    ["2023.11-ppp"]
+    """
+    return sorted([run_id for run_id in all_run_ids if any(primary_id in run_id for primary_id in primary_run_ids)], reverse=True)
+
+def select_and_mask_data_to_compare(all_releases, all_runs, data):
+    st.sidebar.header("What do you want to compare?")
+    select_releases = st.sidebar.multiselect(
+        "Select one or two releases to compare:",
+        sorted(all_releases, reverse=True),
+    )
+
+    if len(select_releases) in {1, 2}:
+        select_runs = st.sidebar.multiselect(
+            "Select two specific release runs:",
+            extract_secondary_run_id_list(all_runs, select_releases),
+            help="First indicate the latest run and secondly the run with which you wish to make the comparison. Legend: IDs without a suffix are post-ETL, the latest run belongs to the data in production, 'pre' means pre-ETL and 'ppp' means partner preview platform."
+        )
+        masks_run = (data["runId"] == select_runs[0]) | (data["runId"] == select_runs[1])
+        filtered_data = data[masks_run]
+        return filtered_data, select_runs
+    return data, []
+
+def select_and_mask_data_to_explore(all_releases, all_runs, data):
+    st.sidebar.header("What do you want to explore?")
+    select_release = [st.sidebar.selectbox("Select a release:", all_releases)]
+
+    if select_release != "All":
+        select_run = st.sidebar.selectbox(
+                "Select a specific release run:", extract_secondary_run_id_list(all_runs, select_release), help="Legend: IDs without a suffix are post-ETL, the latest run belongs to the data in production, 'pre' means pre-ETL and 'ppp' means partner preview platform."
+            )
+        mask_run = data["runId"] == select_run
+        data = data[mask_run]
+
+    return data, select_run

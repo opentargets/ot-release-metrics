@@ -8,10 +8,13 @@ import streamlit as st
 
 from src.metric_visualisation.utils import (
     _delete_release_metrics,
+    extract_primary_run_id_list,
     show_table,
     load_data,
     plot_enrichment,
     compare_entity,
+    select_and_mask_data_to_compare,
+    select_and_mask_data_to_explore,
 )
 
 
@@ -48,18 +51,12 @@ def main(cfg: DictConfig):
         ),
     )
     data = load_data(cfg.metric_calculation.data_repositories.metrics_root)
+    all_runs = list(data.runId.unique())
+    all_releases = extract_primary_run_id_list(all_runs)
 
     if page == "Explore metrics":
-        # Select a dataset to explore
-        runs = sorted(list(data.runId.unique()), reverse=True)
-        runs.insert(0, "All")
-        select_run = st.sidebar.selectbox("Select a pipeline run:", runs)
-
-        # Apply select_run mask
-        if select_run != "All":
-            mask_run = data["runId"] == select_run
-            data = data[mask_run]
-
+        data, selected_run = select_and_mask_data_to_explore(all_releases, all_runs, data)
+        if selected_run:
             st.markdown("## Key metrics")
             col1, col2, col3, col4, col5 = st.columns(5)
             col1.metric(
@@ -69,7 +66,7 @@ def main(cfg: DictConfig):
                 ),
             )
             # Print post ETL metrics only when available
-            if "pre" not in select_run:
+            if "pre" not in selected_run:
                 col2.metric(
                     label="Associations",
                     value=int(
@@ -163,21 +160,10 @@ def main(cfg: DictConfig):
                     )
 
     if page == "Compare metrics":
-        # Select two datasets to compare
-        st.sidebar.header("What do you want to compare?")
-        select_runs = st.sidebar.multiselect(
-            "Select two datasets:",
-            sorted(data.runId.unique(), reverse=True),
-            help="First indicate the latest run and secondly the run with which you wish to make the comparison.",
-        )
+        data, selected_runs = select_and_mask_data_to_compare(all_releases, all_runs, data)
 
-        # Apply masks
-        if len(select_runs) == 2:
-            latest_run = select_runs[0]
-            previous_run = select_runs[1]
-            masks_run = (data["runId"] == previous_run) | (data["runId"] == latest_run)
-            data = data[masks_run]
-
+        if selected_runs:
+            latest_run, previous_run = selected_runs
             # Compute variables
             # EVIDENCE
             old_evidence_count = data.query(
@@ -349,23 +335,8 @@ def main(cfg: DictConfig):
                 )
 
     if page == "Visualise metrics":
-        # Select two datasets to compare
-        st.sidebar.header("What do you want to compare?")
-        select_runs = st.sidebar.multiselect(
-            "Select two datasets to see the level of enrichment per data source:",
-            sorted(data.runId.unique(), reverse=True),
-        )
-
-        # Apply masks
-        if len(select_runs) == 2:
-            previous_run = select_runs[0]
-            latest_run = select_runs[1]
-
-            # Filter data per selected runIds and variables of interest
-            masks_run = (data["runId"] == previous_run) | (data["runId"] == latest_run)
-            data = data[masks_run]
-
-            # Plot
+        data, selected_runs = select_and_mask_data_to_compare(all_releases, all_runs, data)
+        if selected_runs:
             st.plotly_chart(plot_enrichment(data), use_container_width=True)
 
     st.markdown("###")
