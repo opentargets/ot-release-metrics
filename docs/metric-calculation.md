@@ -14,7 +14,7 @@ The format of this variable, as well as the name of the resulting metrics output
 
 ## Submit job to Dataproc
 ```bash
-export IMAGE=gcr.io/open-targets-eu-dev/ot-release-metrics:latest
+export IMAGE=europe-west1-docker.pkg.dev/open-targets-eu-dev/ot-release-metrics/metric-calculation:latest
 export PROJECT=open-targets-eu-dev
 export REGION=europe-west1
 export BUCKET=gs://ot-release-metrics
@@ -25,7 +25,7 @@ gcloud dataproc batches submit pyspark \
     --deps-bucket ${BUCKET} \
     --files config/config.yaml \
     --properties "spark.executor.cores=16" \
-    src/metric_calculation/metrics.py \
+    metric-calculation/src/metric_calculation/metrics.py \
     -- \
     metric_calculation.ot_release=${OT_RELEASE}
 ```

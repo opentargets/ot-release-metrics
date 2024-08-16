@@ -24,7 +24,7 @@ RUN mkdir -p "${PIP_PACKAGES}"
 # Part 2: ot-release-metrics specific setup.
 
 # Install main requirements.
-COPY requirements.txt /home/spark/requirements.txt
+COPY metric-calculation/requirements.txt /home/spark/requirements.txt
 RUN python3 -m pip install -q --target "${PIP_PACKAGES}" -r /home/spark/requirements.txt
 
 # Install PIS and its requirements.
@@ -33,7 +33,7 @@ RUN python3 -m pip install -q --target "${PIP_PACKAGES}" configargparse strenum 
 RUN git clone -b master https://github.com/opentargets/platform-input-support $PIS_PATH
 
 # Copy the main package.
-COPY src ${PIP_PACKAGES}/src
+COPY metric-calculation/src ${PIP_PACKAGES}/src
 
 # Define Dataproc Serverless parameters.
 ENV PYTHONPATH="${PIP_PACKAGES}:${PIS_PATH}"
