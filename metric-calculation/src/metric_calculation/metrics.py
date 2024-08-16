@@ -611,10 +611,11 @@ def main(cfg: DictConfig) -> None:
     write_metrics_to_csv(metrics, app_metrics_path)
     logging.info(f"Wrote metrics to the visualisation app path: {app_metrics_path}")
 
-    write_metrics_to_csv(metrics, cfg.outputs.release_output_path)
-    logging.info(
-        f"Wrote metrics to the release folder: {cfg.outputs.release_output_path}"
-    )
+    if not ot_release.endswith("_pre"):
+        write_metrics_to_csv(metrics, cfg.outputs.release_output_path)
+        logging.info(
+            f"Wrote metrics to the release folder: {cfg.outputs.release_output_path}"
+        )
 
     spark.stop()
 
