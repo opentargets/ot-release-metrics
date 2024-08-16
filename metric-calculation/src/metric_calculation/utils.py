@@ -67,7 +67,7 @@ def write_metrics_to_csv(metrics: DataFrame, output_path: str):
 
 def detect_release_timestamp(evidence_metadata_path):
     """Automatically detects ETL run timestamp based on the latest update time."""
-    evidence_metadata = read_path_if_provided(evidence_metadata_path, format="json")
+    evidence_metadata = read_path_if_provided(evidence_metadata_path, dir_format="json")
     parquet_rows = evidence_metadata.filter(
         f.col("resource").getField("format") == "parquet"
     ).collect()
