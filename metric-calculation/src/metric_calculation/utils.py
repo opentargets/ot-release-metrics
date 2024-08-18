@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 import yaml
 
 from addict import Dict
+from datasets import Dataset
 import gcsfs
 from pyspark.sql import SparkSession
 import pyspark.sql.functions as f
@@ -104,3 +105,15 @@ def fetch_pre_etl_evidence():
 
     # Read all files into Spark.
     return SparkSession.getActiveSession().read.json(all_files)
+
+def write_metrics_to_hf_hub(
+    metrics_df: DataFrame,
+    file_output_name: str,
+    repo_id: str = "opentargets/ot-release-metrics",
+    data_dir: str = "metrics",
+) -> None:
+    """Upload dataset of metrics to HuggingFace Hub."""
+    assert file_output_name.endswith(".csv"), "Only CSV files are supported."
+    hf_path = f"hf://datasets/{repo_id}/{data_dir}/{file_output_name}"
+    ds = Dataset.from_pandas(metrics_df.toPandas())
+    ds.to_csv(hf_path)

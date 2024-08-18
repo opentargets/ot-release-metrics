@@ -29,8 +29,7 @@ metric_calculation:
     efo_mappings: ${metric_calculation.data_repositories.metrics_root}/gold-standard/mesh_mappings.tsv
 
   outputs:
-    # Metrics are written to the directory that contains them all.
-    all_metrics_path_base: ${metric_calculation.data_repositories.metrics_root}
+    hf_repo_id: opentargets/ot-release-metrics
     release_output_path: ${metric_calculation.data_repositories.metadata_output_root}/metrics.csv
 
 metric_visualization:

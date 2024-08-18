@@ -19,9 +19,10 @@ import pyspark.sql.types as t
 from src.metric_calculation.utils import (
     initialize_spark_session,
     read_path_if_provided,
-    write_metrics_to_csv,
     fetch_pre_etl_evidence,
     detect_release_timestamp,
+    write_metrics_to_csv,
+    write_metrics_to_hf_hub
 )
 
 if TYPE_CHECKING:
@@ -607,9 +608,12 @@ def main(cfg: DictConfig) -> None:
     metrics = reduce(DataFrame.unionByName, datasets)
     metrics = metrics.withColumn("runId", f.lit(run_id)).cache()
 
-    app_metrics_path = f"{cfg.outputs.all_metrics_path_base}/{run_id}.csv"
-    write_metrics_to_csv(metrics, app_metrics_path)
-    logging.info(f"Wrote metrics to the visualisation app path: {app_metrics_path}")
+    write_metrics_to_hf_hub(
+        metrics,
+        file_output_name=f"{run_id}.csv",
+        repo_id=cfg.outputs.hf_repo_id,
+    )
+    logging.info(f"Metrics {run_id}.csv have been uploaded to HG Hub app: {cfg.outputs.hf_repo_id}")
 
     if not ot_release.endswith("_pre"):
         write_metrics_to_csv(metrics, cfg.outputs.release_output_path)
