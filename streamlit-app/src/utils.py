@@ -3,6 +3,7 @@ import os
 import re
 
 import gcsfs
+from huggingface_hub import HfFileSystem
 import pandas as pd
 import plotly.express as px
 import streamlit as st
@@ -68,9 +69,25 @@ def highlight_cell(
 
     return background
 
+@st.cache_data(ttl="1h")
+def load_data_from_hf(hf_repo_id: str = "opentargets/ot-release-metrics",) -> pd.DataFrame:
+    """Pulls Platform metrics from HuggingFace Hub."""
+    fs = HfFileSystem()
+    all_hf_paths = [
+        f"hf://{path}"
+        for path in fs.glob(f"datasets/{hf_repo_id}/metrics/*.csv")
+    ]
+    logging.info(f"Number of csv files found in the data folder: {len(all_hf_paths)}")
+    data = pd.concat(
+        [pd.read_csv(path, sep=",", dtype={"runId": "str"}) for path in all_hf_paths],
+        ignore_index=True,
+    ).fillna({"value": 0})
+    logging.info(f"Number of datasets: {len(data.runId.unique())}")
+    assert len(data.runId.unique()) == len(all_hf_paths), "Number of datasets does not match number of metrics runs."
+    return data
 
 @st.cache_data(ttl="1h")
-def load_data(data_folder: str) -> pd.DataFrame:
+def load_data(data_folder: str, ) -> pd.DataFrame:
     """This function reads all csv files from a provided location and returns as a concatenated pandas dataframe"""
 
     # Get list of csv files in a Google bucket:

@@ -9,7 +9,7 @@ import streamlit as st
 from src.utils import (
     extract_primary_run_id_list,
     show_table,
-    load_data,
+    load_data_from_hf,
     plot_enrichment,
     compare_entity,
     select_and_mask_data_to_compare,
@@ -49,7 +49,7 @@ def main(cfg: DictConfig):
             "allows you to compare the main metrics between two releases."
         ),
     )
-    data = load_data(cfg.metric_calculation.data_repositories.metrics_root)
+    data = load_data_from_hf()
     all_runs = list(data.runId.unique())
     all_releases = extract_primary_run_id_list(all_runs)
 
