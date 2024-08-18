@@ -17,6 +17,7 @@ import pyspark.sql.functions as f
 import pyspark.sql.types as t
 
 from src.metric_calculation.utils import (
+    access_gcp_secret,
     initialize_spark_session,
     read_path_if_provided,
     fetch_pre_etl_evidence,
@@ -612,6 +613,7 @@ def main(cfg: DictConfig) -> None:
         metrics,
         file_output_name=f"{run_id}.csv",
         repo_id=cfg.outputs.hf_repo_id,
+        hf_token=access_gcp_secret("hfhub-key", "open-targets-eu-dev")
     )
     logging.info(f"Metrics {run_id}.csv have been uploaded to HG Hub app: {cfg.outputs.hf_repo_id}")
 
