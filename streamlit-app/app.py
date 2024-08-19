@@ -6,7 +6,7 @@ import pandas as pd
 from PIL import Image
 import streamlit as st
 
-from src.metric_visualisation.utils import (
+from src.utils import (
     extract_primary_run_id_list,
     show_table,
     load_data,
