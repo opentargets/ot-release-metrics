@@ -1,6 +1,6 @@
 # Part 1: Common set up. This can be eventually separated into a shared base Open Targets image.
 
-FROM python:3.10
+FROM python:3.12-bullseye
 
 # Suppress interactive prompts.
 ENV DEBIAN_FRONTEND=noninteractive
