@@ -18,11 +18,13 @@ export IMAGE=europe-west1-docker.pkg.dev/open-targets-eu-dev/ot-release-metrics/
 export PROJECT=open-targets-eu-dev
 export REGION=europe-west1
 export BUCKET=gs://ot-release-metrics
+export SUBNET=ot-dataproc-serverless
 gcloud dataproc batches submit pyspark \
     --container-image ${IMAGE} \
     --region ${REGION} \
     --project ${PROJECT} \
     --deps-bucket ${BUCKET} \
+    --subnet ${SUBNET} \
     --files config/config.yaml \
     --properties "spark.executor.cores=16" \
     metric-calculation/src/metric_calculation/metrics.py \
