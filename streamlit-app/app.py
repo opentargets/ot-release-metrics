@@ -18,7 +18,10 @@ from src.utils import (
 )
 
 
-@hydra.main(version_base=None, config_path=os.path.join(os.path.dirname(os.path.dirname(__file__)), "config"), config_name="config")
+# Get config path from environment variable or use default
+CONFIG_PATH = os.getenv('OT_CONFIG_PATH', os.path.join(os.path.dirname(os.path.dirname(__file__)), "config"))
+
+@hydra.main(version_base=None, config_path=CONFIG_PATH, config_name="config")
 def main(cfg: DictConfig):
     # App UI
     st.set_page_config(

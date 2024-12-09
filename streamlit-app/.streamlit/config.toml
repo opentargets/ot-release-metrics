@@ -1,0 +1,2 @@
+[env]
+OT_CONFIG_PATH = "/mount/src/ot-release-metrics/config"
