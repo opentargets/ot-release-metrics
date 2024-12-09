@@ -3,7 +3,7 @@ The app is deployed here: **https://open-targets-metrics.streamlit.app/**
 
 
 ## Running the web app to visualise and compare the metrics
-To start the app locally, run `streamlit run app.py`.
+To start the app locally, run the Docker image stored in the GCP container registry with `docker run -p 8501:8501 europe-west1-docker.pkg.dev/open-targets-eu-dev/ot-release-metrics/app:latest`. A new instances will be deployed using port 8501.
 
 If you encounter a `TomlDecodeError`, this can be resolved by removing the `~/.streamlit` folder.
 
