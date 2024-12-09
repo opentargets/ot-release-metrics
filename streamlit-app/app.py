@@ -19,6 +19,9 @@ from src.utils import (
 
 @hydra.main(version_base=None, config_path="config", config_name="config")
 def main(cfg: DictConfig):
+    # print path of the current working directory
+    import os
+    print(f"Working directory: {os.getcwd()}")
     # App UI
     st.set_page_config(
         page_title="Open Targets Data Metrics",
