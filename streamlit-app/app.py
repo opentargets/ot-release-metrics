@@ -1,6 +1,7 @@
 from functools import reduce
 
 import hydra
+import os
 from omegaconf import DictConfig
 import pandas as pd
 from PIL import Image
@@ -17,11 +18,8 @@ from src.utils import (
 )
 
 
-@hydra.main(version_base=None, config_path="../config", config_name="config")
+@hydra.main(version_base=None, config_path=os.path.join(os.path.dirname(os.path.dirname(__file__)), "config"), config_name="config")
 def main(cfg: DictConfig):
-    # print path of the current working directory
-    import os
-    print(f"Working directory: {os.getcwd()}")
     # App UI
     st.set_page_config(
         page_title="Open Targets Data Metrics",
