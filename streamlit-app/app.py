@@ -23,7 +23,7 @@ def main(cfg: DictConfig):
     # App UI
     st.set_page_config(
         page_title="Open Targets Data Metrics",
-        page_icon=Image.open("src/assets/img/favicon.png"),
+        page_icon=Image.open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "src/assets/img/favicon.png")),
         layout="wide",
         initial_sidebar_state="expanded",
     )
