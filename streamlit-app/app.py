@@ -1,6 +1,7 @@
 from functools import reduce
 
 import hydra
+import os
 from omegaconf import DictConfig
 import pandas as pd
 from PIL import Image
@@ -17,12 +18,12 @@ from src.utils import (
 )
 
 
-@hydra.main(version_base=None, config_path="config", config_name="config")
+@hydra.main(version_base=None, config_path=os.path.join(os.path.dirname(os.path.dirname(__file__)), "config"), config_name="config")
 def main(cfg: DictConfig):
     # App UI
     st.set_page_config(
         page_title="Open Targets Data Metrics",
-        page_icon=Image.open("src/assets/img/favicon.png"),
+        page_icon=Image.open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "streamlit-app/src/assets/img/favicon.png")),
         layout="wide",
         initial_sidebar_state="expanded",
     )
@@ -324,7 +325,7 @@ def main(cfg: DictConfig):
             st.plotly_chart(plot_enrichment(data), use_container_width=True)
 
     st.markdown("###")
-    st.image(Image.open("src/assets/img/logo.png"), width=150)
+    st.image(Image.open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "streamlit-app/src/assets/img/logo.png")), width=150)
 
 
 if __name__ == "__main__":
