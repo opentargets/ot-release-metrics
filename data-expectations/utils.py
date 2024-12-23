@@ -114,6 +114,7 @@ def run_validation(asset_name: str):
     """
     context = gx.get_context()
     validation_definition = context.validation_definitions.get(f"{asset_name}_validation")
+
     try:
         checkpoint = context.checkpoints.get(f"{asset_name}_checkpoint")
     except Exception:
