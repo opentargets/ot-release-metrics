@@ -31,35 +31,34 @@ def get_bigquery_datasource(source_name: str = "my_bigquery"):
         The created datasource.
     """
     context = gx.get_context()
-    connection_string = f"bigquery://{PROJECT_ID}/{DB_ID}?credentials_path=/content/Open Targets EU Dev.json"  # TODO: Resolver
-    return context.data_sources.add_or_update_sql(
+    connection_string = f"bigquery://{PROJECT_ID}/{DB_ID}?credentials_path=Open Targets EU Dev.json"  # TODO: Resolver
+    context.data_sources.add_or_update_sql(
         name=source_name, connection_string=connection_string
     )
+    return context.data_sources.get(source_name)
 
-def create_ge_assets(your_project_id: str = PROJECT_ID):
+def create_table_assets(data_source: Any, tables_list: list[str], project_id: str = PROJECT_ID, db_id: str = DB_ID):
     """Create Great Expectations assets for all tables in the Open Targets BigQuery database.
     
     Args:
-        your_project_id (str): The ID of the GCP project where the OT database is located.
+        data_source (Any): The GE data source instance to create assets for.
+        tables_list (list[str]): A list of table IDs to create assets for.
+        project_id (str): The ID of the project containing the database.
+        db_id (str): The ID of the database containing the tables.
     """
-    data_source = get_bigquery_datasource()
-    tables_to_add = [table_id for table_id in list_db_tables() if table_id not in ["ot_release"]]
-    
-    # Create assets for each table
-    for table_id in tables_to_add:
+    for table_id in tables_list:
         try:
             asset = data_source.add_table_asset(
                 name=table_id,
-                table_name=f"open-targets-eu-dev.platform_dev.{table_id}"
+                table_name=f"{project_id}.{db_id}.{table_id}"
             )
-            full_table_batch_definition = (
-                asset.get_batch_definition_whole_table(
-                  name=f"{table_id}_full_table"
-            ))
+            asset.add_batch_definition_whole_table(
+                name=f"{table_id}_full_table"
+            )  # full_table_batch_definition
             print(f"Successfully created asset for: {table_id}")
             
-        except Exception:
-            print(f"Error creating asset for {table_id}")
+        except Exception as e:
+            print(f"Error creating asset for {table_id}: {e}")
 
 def add_expectations_for_table(asset_name: str, expectations: list[Any]):
     """Adds a suite and a validation definition containing the set of validations to run on a specific table.
