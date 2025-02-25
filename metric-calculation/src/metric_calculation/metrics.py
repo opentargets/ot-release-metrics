@@ -472,7 +472,7 @@ def calculate_additional_post_etl_metrics(metrics_cfg):
             associations_df = associations_df.join(
                 gold_standard, on=["targetId", "diseaseId"], how="left"
             ).fillna({"gold_standard": 0.0})
-        if "Overall" not in associations.filename:
+        if "overall" not in associations.filename:
             datasets.extend(
                 [
                     # Total association count.
