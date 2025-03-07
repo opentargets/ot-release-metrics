@@ -1,0 +1,12 @@
+{
+  "actions": [],
+  "id": "b94ed88c-2528-4a63-ac83-acd343582d19",
+  "name": "targetPrioritisation_checkpoint",
+  "result_format": "SUMMARY",
+  "validation_definitions": [
+    {
+      "id": "4fc68466-5d67-4e4b-ae32-37bad7c6bbbb",
+      "name": "targetPrioritisation_validation"
+    }
+  ]
+}
