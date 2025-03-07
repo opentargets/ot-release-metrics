@@ -5,21 +5,20 @@ metric_calculation:
 
   data_repositories:
     release_output_root: gs://open-targets-pre-data-releases/${metric_calculation.ot_release}/output
-    data_output_root: ${metric_calculation.data_repositories.release_output_root}/etl/parquet
-    metadata_output_root: ${metric_calculation.data_repositories.release_output_root}/metadata
+    metadata_output_root: gs://open-targets-pre-data-releases/${metric_calculation.ot_release}/metadata
     metrics_root: gs://otar000-evidence_input/release-metrics
 
   datasets:
     # Post ETL data.
-    evidence: ${metric_calculation.data_repositories.data_output_root}/evidence
-    evidence_failed: ${metric_calculation.data_repositories.data_output_root}/errors/evidence
-    associations_overall_indirect: ${metric_calculation.data_repositories.data_output_root}/associationByOverallIndirect
-    associations_overall_direct: ${metric_calculation.data_repositories.data_output_root}/associationByOverallDirect
-    associations_source_indirect: ${metric_calculation.data_repositories.data_output_root}/associationByDatasourceIndirect
-    associations_source_direct: ${metric_calculation.data_repositories.data_output_root}/associationByDatasourceDirect
-    diseases: ${metric_calculation.data_repositories.data_output_root}/diseases
-    targets: ${metric_calculation.data_repositories.data_output_root}/targets
-    drugs: ${metric_calculation.data_repositories.data_output_root}/molecule
+    evidence: ${metric_calculation.data_repositories.release_output_root}/evidence
+    evidence_failed: gs://open-targets-pre-data-releases/${metric_calculation.ot_release}/excluded/evidence
+    associations_overall_indirect: ${metric_calculation.data_repositories.release_output_root}/association_by_overall_indirect
+    associations_overall_direct: ${metric_calculation.data_repositories.release_output_root}/association_overall_direct
+    associations_source_indirect: ${metric_calculation.data_repositories.release_output_root}/association_by_datasource_indirect
+    associations_source_direct: ${metric_calculation.data_repositories.release_output_root}/association_by_datasource_direct
+    diseases: ${metric_calculation.data_repositories.release_output_root}/disease
+    targets: ${metric_calculation.data_repositories.release_output_root}/target
+    drugs: ${metric_calculation.data_repositories.release_output_root}/drug_molecule
 
   metadata:
     evidence: ${metric_calculation.data_repositories.metadata_output_root}/evidence
@@ -30,7 +29,7 @@ metric_calculation:
 
   outputs:
     hf_repo_id: opentargets/ot-release-metrics
-    release_output_path: ${metric_calculation.data_repositories.metadata_output_root}/metrics.csv
+    release_output_path: gs://open-targets-pre-data-releases/${metric_calculation.ot_release}/metrics.csv
 
 metric_visualization:
   parameters:
