@@ -4,24 +4,20 @@ metric_calculation:
   ot_release: ???
 
   data_repositories:
-    release_output_root: gs://open-targets-pre-data-releases/${metric_calculation.ot_release}/output
-    metadata_output_root: gs://open-targets-pre-data-releases/${metric_calculation.ot_release}/metadata
+    release_bucket: gs://open-targets-pre-data-releases
     metrics_root: gs://otar000-evidence_input/release-metrics
 
   datasets:
-    # Post ETL data.
-    evidence: ${metric_calculation.data_repositories.release_output_root}/evidence
-    evidence_failed: gs://open-targets-pre-data-releases/${metric_calculation.ot_release}/excluded/evidence
-    associations_overall_indirect: ${metric_calculation.data_repositories.release_output_root}/association_by_overall_indirect
-    associations_overall_direct: ${metric_calculation.data_repositories.release_output_root}/association_overall_direct
-    associations_source_indirect: ${metric_calculation.data_repositories.release_output_root}/association_by_datasource_indirect
-    associations_source_direct: ${metric_calculation.data_repositories.release_output_root}/association_by_datasource_direct
-    diseases: ${metric_calculation.data_repositories.release_output_root}/disease
-    targets: ${metric_calculation.data_repositories.release_output_root}/target
-    drugs: ${metric_calculation.data_repositories.release_output_root}/drug_molecule
-
-  metadata:
-    evidence: ${metric_calculation.data_repositories.metadata_output_root}/evidence
+    evidence_pre_etl: input/evidence
+    evidence_post_etl: output/evidence
+    evidence_failed: excluded/evidence
+    associations_overall_indirect: output/association_by_overall_indirect
+    associations_overall_direct: output/association_overall_direct
+    associations_source_indirect: output/association_by_datasource_indirect
+    associations_source_direct: output/association_by_datasource_direct
+    diseases: output/disease
+    targets: output/target
+    drugs: output/drug_molecule
 
   gold_standard:
     associations: ${metric_calculation.data_repositories.metrics_root}/gold-standard/informa_abbvie.tsv
@@ -29,7 +25,7 @@ metric_calculation:
 
   outputs:
     hf_repo_id: opentargets/ot-release-metrics
-    release_output_path: gs://open-targets-pre-data-releases/${metric_calculation.ot_release}/metrics.csv
+    release_output_path: ${metric_calculation.data_repositories.release_bucket}/${metric_calculation.ot_release}/metrics.csv
 
 metric_visualization:
   parameters:
