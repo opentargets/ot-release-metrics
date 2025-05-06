@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 from collections import namedtuple
+from datetime import datetime
 from functools import reduce
 import logging
 import logging.config
@@ -20,10 +21,8 @@ from src.metric_calculation.utils import (
     access_gcp_secret,
     initialize_spark_session,
     read_path_if_provided,
-    fetch_pre_etl_evidence,
-    detect_release_timestamp,
     write_metrics_to_csv,
-    write_metrics_to_hf_hub
+    write_metrics_to_hf_hub,
 )
 
 if TYPE_CHECKING:
@@ -309,22 +308,30 @@ def get_columns_to_report(dataset_columns):
 
 
 def calculate_additional_post_etl_metrics(metrics_cfg):
-    evidence_failed = read_path_if_provided(metrics_cfg.datasets.evidence_failed)
+    evidence_failed = read_path_if_provided(
+        f"{metrics_cfg.data_repositories.release_bucket}/{ot_release_bucket}/{metrics_cfg.datasets.evidence_failed}"
+    )
     associations_direct = read_path_if_provided(
-        metrics_cfg.datasets.associations_source_direct
+        f"{metrics_cfg.data_repositories.release_bucket}/{ot_release_bucket}/{metrics_cfg.datasets.associations_source_direct}"
     )
     associations_indirect = read_path_if_provided(
-        metrics_cfg.datasets.associations_source_indirect
+        f"{metrics_cfg.data_repositories.release_bucket}/{ot_release_bucket}/{metrics_cfg.datasets.associations_source_indirect}"
     )
     associations_overall_direct = read_path_if_provided(
-        metrics_cfg.datasets.associations_overall_direct
+        f"{metrics_cfg.data_repositories.release_bucket}/{ot_release_bucket}/{metrics_cfg.datasets.associations_overall_direct}"
     )
     associations_overall_indirect = read_path_if_provided(
-        metrics_cfg.datasets.associations_overall_indirect
+        f"{metrics_cfg.data_repositories.release_bucket}/{ot_release_bucket}/{metrics_cfg.datasets.associations_overall_indirect}"
     )
-    diseases = read_path_if_provided(metrics_cfg.datasets.diseases)
-    targets = read_path_if_provided(metrics_cfg.datasets.targets)
-    drugs = read_path_if_provided(metrics_cfg.datasets.drugs)
+    diseases = read_path_if_provided(
+        f"{metrics_cfg.data_repositories.release_bucket}/{ot_release_bucket}/{metrics_cfg.datasets.diseases}"
+    )
+    targets = read_path_if_provided(
+        f"{metrics_cfg.data_repositories.release_bucket}/{ot_release_bucket}/{metrics_cfg.datasets.targets}"
+    )
+    drugs = read_path_if_provided(
+        f"{metrics_cfg.data_repositories.release_bucket}/{ot_release_bucket}/{metrics_cfg.datasets.drugs}"
+    )
     gold_standard_associations = read_path_if_provided(
         metrics_cfg.gold_standard.associations
     )
@@ -541,7 +548,8 @@ def calculate_additional_post_etl_metrics(metrics_cfg):
 
 @hydra.main(config_path=os.getcwd(), config_name="config")
 def main(cfg: DictConfig) -> None:
-    global spark
+    global spark, ot_release_bucket
+    cfg = cfg.metric_calculation
     spark = initialize_spark_session()
 
     logging_config = {
@@ -551,30 +559,36 @@ def main(cfg: DictConfig) -> None:
     }
     logging.basicConfig(**logging_config)
 
-    # Determine type of run and load evidence accordingly.
-    cfg = cfg.metric_calculation
+    # Determine type of run
     ot_release = str(cfg.ot_release)
+    ot_release_bucket = ot_release.replace("_pre", "")
+    release_timestamp = datetime.today().strftime("%Y-%m-%d")
     if ot_release.endswith("_pre"):
-        # Pre-ETL mode.
+        # Pre-ETL mode. Example: "23.12_pre".
         is_pre_etl_run = True
-        run_id = ot_release  # Example: "23.12_pre".
-        logging.info(f"Fetching evidence for pre-ETL run {run_id}")
-        evidence = fetch_pre_etl_evidence()
+        run_id = f"{ot_release}_{release_timestamp}"
     else:
         # Post-ETL mode.
         is_pre_etl_run = False
-        release_timestamp = detect_release_timestamp(cfg.metadata.evidence)
         if ot_release.startswith("partners/"):
             # Remove the "partners" prefix which was important for locating the files.
-            ot_release = ot_release.split('/')[1] + "_ppp"
+            ot_release = ot_release.split("/")[1] + "_ppp"
         # Calculate the final run ID:
         # - Example for regular: "23.12_2023-10-26".
         # - Example for PPP: "23.12_ppp_2023-11-27".
         run_id = f"{ot_release}_{release_timestamp}"
-        logging.info(f"Reading evidence for post-ETL run {run_id}")
-        evidence = read_path_if_provided(cfg.datasets.evidence)
 
     # Process evidence metrics.
+    evidence = (
+        read_path_if_provided(
+            f"{cfg.data_repositories.release_bucket}/{ot_release_bucket}/{cfg.datasets.evidence_pre_etl}",
+            dir_format="json",
+        )
+        if is_pre_etl_run
+        else read_path_if_provided(
+            f"{cfg.data_repositories.release_bucket}/{ot_release_bucket}/{cfg.datasets.evidence_post_etl}"
+        )
+    )
     datasets = []
     if evidence:
         logging.info("Running evidence metrics.")
@@ -613,9 +627,11 @@ def main(cfg: DictConfig) -> None:
         metrics,
         file_output_name=f"{run_id}.csv",
         repo_id=cfg.outputs.hf_repo_id,
-        hf_token=access_gcp_secret("hfhub-key", "open-targets-eu-dev")
+        hf_token=access_gcp_secret("hfhub-key", "open-targets-eu-dev"),
     )
-    logging.info(f"Metrics {run_id}.csv have been uploaded to HG Hub app: {cfg.outputs.hf_repo_id}")
+    logging.info(
+        f"Metrics {run_id}.csv have been uploaded to HG Hub app: {cfg.outputs.hf_repo_id}"
+    )
 
     if not ot_release.endswith("_pre"):
         write_metrics_to_csv(metrics, cfg.outputs.release_output_path)
