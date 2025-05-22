@@ -1,7 +1,6 @@
 from functools import reduce
 
 import hydra
-import os
 from omegaconf import DictConfig
 import pandas as pd
 from PIL import Image
@@ -10,6 +9,7 @@ import streamlit as st
 from src.utils import (
     extract_primary_run_id_list,
     show_table,
+    get_config_path,
     load_data_from_hf,
     plot_enrichment,
     compare_entity,
@@ -18,7 +18,7 @@ from src.utils import (
 )
 
 
-@hydra.main(version_base=None, config_path=os.path.join(os.path.dirname(os.path.dirname(__file__)), "config"), config_name="config")
+@hydra.main(version_base=None, config_path=get_config_path(), config_name="config")
 def main(cfg: DictConfig):
     # App UI
     st.set_page_config(
