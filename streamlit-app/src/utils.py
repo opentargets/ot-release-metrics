@@ -10,13 +10,11 @@ import plotly.express as px
 import streamlit as st
 
 
-def resolve_path(path_type: str, relative_path: str = "") -> str:
-    """
-    Resolve paths for different resource types across environments.
+def get_asset_path(relative_path: str = "") -> str:
+    """Resolve asset paths across different environments.
 
     Args:
-        path_type: Either "config" or "asset"
-        relative_path: The path relative to the resource root (only for assets)
+        relative_path: The path relative to the asset root
 
     Returns:
         Absolute path as string
@@ -28,35 +26,19 @@ def resolve_path(path_type: str, relative_path: str = "") -> str:
         Path(__file__).parent.parent.parent,  # Local dev (from utils.py)
         Path("/app"),  # Docker
     ]
+    path_structures = [
+        Path("streamlit-app") / relative_path,
+        Path(relative_path),
+    ]
 
-    # Define different path structures for each type
-    path_structures = {
-        "config": [
-            Path("config"),  # Direct config directory
-            Path("streamlit-app/config"),  # Nested config directory
-        ],
-        "asset": [
-            Path("streamlit-app") / relative_path,  # Production path
-            Path(relative_path),  # Simpler local path
-        ],
-    }
-
-    # Locate path to asset or config
+    # Locate path to asset
     for root in possible_roots:
-        for path_structure in path_structures[path_type]:
+        for path_structure in path_structures:
             full_path = root / path_structure
             if full_path.exists():
                 return str(full_path)
 
-    raise FileNotFoundError(f"Could not find {path_type} at {relative_path}.")
-
-
-def get_config_path() -> str:
-    return resolve_path("config")
-
-
-def get_asset_path(relative_path: str) -> str:
-    return resolve_path("asset", relative_path)
+    raise FileNotFoundError(f"Could not find asset at {relative_path}.")
 
 
 def show_table(
