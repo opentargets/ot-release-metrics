@@ -1,7 +1,8 @@
-from functools import reduce
+from functools import lru_cache, reduce
+from pathlib import Path
 
 import hydra
-from omegaconf import DictConfig
+from hydra.core.global_hydra import GlobalHydra
 import pandas as pd
 from PIL import Image
 import streamlit as st
@@ -18,9 +19,16 @@ from src.utils import (
     select_and_mask_data_to_explore,
 )
 
+@lru_cache(maxsize=None)
+def get_hydra_config():
+    """Clear hydra instance and initialize with relative config path."""
+    GlobalHydra.instance().clear()
+    # Hydra needs a relative path to the config directory
+    config_dir = Path(get_config_path()).relative_to(Path.cwd())
+    hydra.initialize(version_base=None, config_path=str(config_dir))
+    return hydra.compose(config_name="config")
 
-@hydra.main(version_base=None, config_path=get_config_path(), config_name="config")
-def main(cfg: DictConfig):
+def main():
     # App UI
     st.set_page_config(
         page_title="Open Targets Data Metrics",
@@ -51,6 +59,7 @@ def main(cfg: DictConfig):
             "allows you to compare the main metrics between two releases."
         ),
     )
+    cfg = get_hydra_config()
     data = load_data_from_hf()
     all_runs = list(data.runId.unique())
     all_releases = extract_primary_run_id_list(all_runs)
