@@ -10,6 +10,7 @@ from src.utils import (
     extract_primary_run_id_list,
     show_table,
     get_config_path,
+    get_asset_path,
     load_data_from_hf,
     plot_enrichment,
     compare_entity,
@@ -23,7 +24,7 @@ def main(cfg: DictConfig):
     # App UI
     st.set_page_config(
         page_title="Open Targets Data Metrics",
-        page_icon=Image.open("src/assets/img/favicon.png"),
+        page_icon=Image.open(get_asset_path("src/assets/img/favicon.png")),
         layout="wide",
         initial_sidebar_state="expanded",
     )
@@ -325,7 +326,7 @@ def main(cfg: DictConfig):
             st.plotly_chart(plot_enrichment(data), use_container_width=True)
 
     st.markdown("###")
-    st.image(Image.open("src/assets/img/logo.png"), width=150)
+    st.image(Image.open(get_asset_path("src/assets/img/logo.png")), width=150)
 
 
 if __name__ == "__main__":
