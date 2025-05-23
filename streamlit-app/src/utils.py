@@ -9,9 +9,6 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-from pathlib import Path
-from typing import Literal
-
 
 def resolve_path(path_type: str, relative_path: str = "") -> str:
     """
@@ -53,11 +50,14 @@ def resolve_path(path_type: str, relative_path: str = "") -> str:
 
     raise FileNotFoundError(f"Could not find {path_type} at {relative_path}.")
 
+
 def get_config_path() -> str:
     return resolve_path("config")
 
+
 def get_asset_path(relative_path: str) -> str:
     return resolve_path("asset", relative_path)
+
 
 def show_table(
     name: str, latest_run: str, df: pd.DataFrame, yellow_bound: float, red_bound: float

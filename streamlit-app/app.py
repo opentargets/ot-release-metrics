@@ -1,8 +1,5 @@
-from functools import lru_cache, reduce
-from pathlib import Path
+from functools import reduce
 
-import hydra
-from hydra.core.global_hydra import GlobalHydra
 import pandas as pd
 from PIL import Image
 import streamlit as st
@@ -10,7 +7,6 @@ import streamlit as st
 from src.utils import (
     extract_primary_run_id_list,
     show_table,
-    get_config_path,
     get_asset_path,
     load_data_from_hf,
     plot_enrichment,
@@ -19,14 +15,9 @@ from src.utils import (
     select_and_mask_data_to_explore,
 )
 
-@lru_cache(maxsize=None)
-def get_hydra_config():
-    """Clear hydra instance and initialize with relative config path."""
-    GlobalHydra.instance().clear()
-    # Hydra needs a relative path to the config directory
-    config_dir = Path(get_config_path()).relative_to(Path.cwd())
-    hydra.initialize(version_base=None, config_path=str(config_dir))
-    return hydra.compose(config_name="config")
+YELLOW_HIGHLIGHT_BOUND = 0.2
+RED_HIGHLIGHT_BOUND = 0.5
+
 
 def main():
     # App UI
@@ -59,13 +50,14 @@ def main():
             "allows you to compare the main metrics between two releases."
         ),
     )
-    cfg = get_hydra_config()
     data = load_data_from_hf()
     all_runs = list(data.runId.unique())
     all_releases = extract_primary_run_id_list(all_runs)
 
     if page == "Explore metrics":
-        data, selected_run = select_and_mask_data_to_explore(all_releases, all_runs, data)
+        data, selected_run = select_and_mask_data_to_explore(
+            all_releases, all_runs, data
+        )
         if selected_run:
             st.markdown("## Key metrics")
             col1, col2, col3, col4, col5 = st.columns(5)
@@ -155,7 +147,9 @@ def main():
             )
 
     if page == "Compare metrics":
-        data, selected_runs = select_and_mask_data_to_compare(all_releases, all_runs, data)
+        data, selected_runs = select_and_mask_data_to_compare(
+            all_releases, all_runs, data
+        )
 
         if selected_runs:
             latest_run, previous_run = selected_runs
@@ -325,12 +319,14 @@ def main():
                     name,
                     latest_run,
                     df,
-                    cfg.metric_visualization.parameters.yellow_highlight_bound,
-                    cfg.metric_visualization.parameters.red_highlight_bound,
+                    YELLOW_HIGHLIGHT_BOUND,
+                    RED_HIGHLIGHT_BOUND,
                 )
 
     if page == "Visualise metrics":
-        data, selected_runs = select_and_mask_data_to_compare(all_releases, all_runs, data)
+        data, selected_runs = select_and_mask_data_to_compare(
+            all_releases, all_runs, data
+        )
         if selected_runs:
             st.plotly_chart(plot_enrichment(data), use_container_width=True)
 
