@@ -1,5 +1,6 @@
 import logging
 import os
+from pathlib import Path
 import re
 
 import gcsfs
@@ -10,29 +11,26 @@ import streamlit as st
 
 def get_config_path() -> str:
     """Get the path to the config directory based on the deployment environment."""
-    paths_to_check = [
-        "/mount/src/ot-release-metrics/streamlit-app/config",  # Streamlit Cloud path
-        os.path.join(os.path.dirname(os.path.dirname(__file__)), "config"),  # Local path relative to utils.py
-        os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "streamlit-app", "config"),  # Alternative local path
-    ]
+    # 1. Streamlit Cloud path assuming working dir is project root
+    streamlit_cloud_path = Path("/mount/src/ot-release-metrics/config")
+    if streamlit_cloud_path.exists():
+        return str(streamlit_cloud_path)
     
-    st.write("Checking config paths:")
-    for path in paths_to_check:
-        st.write(f"Checking path: {path}")
-        st.write(f"Path exists: {os.path.exists(path)}")
-        
-        if os.path.exists(path):
-            st.write(f"Found config directory at: {path}")
-            return path
+    # 2. Relative path from project root (for Streamlit Cloud)
+    project_root_path = Path("config")
+    if project_root_path.exists():
+        return str(project_root_path)
     
-    st.error("Could not find config directory in any of the checked locations")
-    st.error("Checked paths:")
-    for path in paths_to_check:
-        st.error(path)
+    # 3. Local development path (relative to utils.py location)
+    local_path = Path(__file__).parent.parent.parent / "config"
+    if local_path.exists():
+        return str(local_path)
     
     raise FileNotFoundError(
-        "Could not find config directory. Checked paths:\n" + 
-        "\n".join(paths_to_check)
+        "Could not find config directory in any of the expected locations:\n"
+        f"1. {streamlit_cloud_path}\n"
+        f"2. {project_root_path}\n"
+        f"3. {local_path}\n"
     )
 
 def show_table(
