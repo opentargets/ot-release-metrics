@@ -8,17 +8,29 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
+logger = logging.getLogger(__name__)
+
 def get_config_path() -> str:
     """Get the path to the config directory based on the deployment environment."""
-    streamlit_cloud_path = "/mount/src/ot-release-metrics/streamlit-app/config"
-    local_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "config")
+    paths_to_check = [
+        "/mount/src/ot-release-metrics/streamlit-app/config",  # Streamlit Cloud path
+        os.path.join(os.path.dirname(os.path.dirname(__file__)), "config"),  # Local path relative to utils.py
+        os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "streamlit-app", "config"),  # Alternative local path
+    ]
     
-    if os.path.exists(streamlit_cloud_path):
-        return streamlit_cloud_path
-    elif os.path.exists(local_path):
-        return local_path
-    else:
-        raise FileNotFoundError("Could not find config directory in either Streamlit Cloud or local path")
+    for path in paths_to_check:
+        logger.info(f"Checking config path: {path}")
+        logger.info(f"Path exists: {os.path.exists(path)}")
+        
+        if os.path.exists(path):
+            logger.info(f"Found config directory at: {path}")
+            return path
+    
+    logger.error("Could not find config directory in any of the checked locations")
+    raise FileNotFoundError(
+        "Could not find config directory. Checked paths:\n" + 
+        "\n".join(paths_to_check)
+    )
 
 def show_table(
     name: str, latest_run: str, df: pd.DataFrame, yellow_bound: float, red_bound: float
