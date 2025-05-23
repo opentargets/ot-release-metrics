@@ -8,8 +8,6 @@ import pandas as pd
 import plotly.express as px
 import streamlit as st
 
-logger = logging.getLogger(__name__)
-
 def get_config_path() -> str:
     """Get the path to the config directory based on the deployment environment."""
     paths_to_check = [
@@ -18,15 +16,20 @@ def get_config_path() -> str:
         os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "streamlit-app", "config"),  # Alternative local path
     ]
     
+    st.write("Checking config paths:")
     for path in paths_to_check:
-        logger.info(f"Checking config path: {path}")
-        logger.info(f"Path exists: {os.path.exists(path)}")
+        st.write(f"Checking path: {path}")
+        st.write(f"Path exists: {os.path.exists(path)}")
         
         if os.path.exists(path):
-            logger.info(f"Found config directory at: {path}")
+            st.write(f"Found config directory at: {path}")
             return path
     
-    logger.error("Could not find config directory in any of the checked locations")
+    st.error("Could not find config directory in any of the checked locations")
+    st.error("Checked paths:")
+    for path in paths_to_check:
+        st.error(path)
+    
     raise FileNotFoundError(
         "Could not find config directory. Checked paths:\n" + 
         "\n".join(paths_to_check)
