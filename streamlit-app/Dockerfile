@@ -10,7 +10,6 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 COPY streamlit-app/requirements.txt .
-COPY config ./config
 COPY streamlit-app/src ./src
 COPY streamlit-app/app.py .
 
