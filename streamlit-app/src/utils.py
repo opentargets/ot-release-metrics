@@ -1,5 +1,6 @@
 import logging
 import os
+from pathlib import Path
 import re
 
 import gcsfs
@@ -7,6 +8,37 @@ from huggingface_hub import HfFileSystem
 import pandas as pd
 import plotly.express as px
 import streamlit as st
+
+
+def get_asset_path(relative_path: str = "") -> str:
+    """Resolve asset paths across different environments.
+
+    Args:
+        relative_path: The path relative to the asset root
+
+    Returns:
+        Absolute path as string
+    """
+    # Define possible root locations in search order
+    possible_roots = [
+        Path("/mount/src/ot-release-metrics"),  # Streamlit Cloud absolute
+        Path.cwd(),  # Streamlit Cloud relative
+        Path(__file__).parent.parent.parent,  # Local dev (from utils.py)
+        Path("/app"),  # Docker
+    ]
+    path_structures = [
+        Path("streamlit-app") / relative_path,
+        Path(relative_path),
+    ]
+
+    # Locate path to asset
+    for root in possible_roots:
+        for path_structure in path_structures:
+            full_path = root / path_structure
+            if full_path.exists():
+                return str(full_path)
+
+    raise FileNotFoundError(f"Could not find asset at {relative_path}.")
 
 
 def show_table(
@@ -69,13 +101,15 @@ def highlight_cell(
 
     return background
 
+
 @st.cache_data(ttl="1h")
-def load_data_from_hf(hf_repo_id: str = "opentargets/ot-release-metrics",) -> pd.DataFrame:
+def load_data_from_hf(
+    hf_repo_id: str = "opentargets/ot-release-metrics",
+) -> pd.DataFrame:
     """Pulls Platform metrics from HuggingFace Hub."""
     fs = HfFileSystem()
     all_hf_paths = [
-        f"hf://{path}"
-        for path in fs.glob(f"datasets/{hf_repo_id}/metrics/*.csv")
+        f"hf://{path}" for path in fs.glob(f"datasets/{hf_repo_id}/metrics/*.csv")
     ]
     logging.info(f"Number of csv files found in the data folder: {len(all_hf_paths)}")
     data = pd.concat(
@@ -83,11 +117,16 @@ def load_data_from_hf(hf_repo_id: str = "opentargets/ot-release-metrics",) -> pd
         ignore_index=True,
     ).fillna({"value": 0})
     logging.info(f"Number of datasets: {len(data.runId.unique())}")
-    assert len(data.runId.unique()) == len(all_hf_paths), "Number of datasets does not match number of metrics runs."
+    assert len(data.runId.unique()) == len(all_hf_paths), (
+        "Number of datasets does not match number of metrics runs."
+    )
     return data
 
+
 @st.cache_data(ttl="1h")
-def load_data(data_folder: str, ) -> pd.DataFrame:
+def load_data(
+    data_folder: str,
+) -> pd.DataFrame:
     """This function reads all csv files from a provided location and returns as a concatenated pandas dataframe"""
 
     # Get list of csv files in a Google bucket:
@@ -202,7 +241,8 @@ def show_total_between_runs_for_entity(
         # Prettify column names
         .assign(runId=lambda df: f"Nr of {entity_name} in " + df["runId"])
         # Transpose dataframe to have the runIds as columns
-        .set_index("runId").T
+        .set_index("runId")
+        .T
     )
 
 
@@ -270,24 +310,39 @@ def compare_entity(
 
     return df
 
+
 def extract_primary_run_id_list(all_run_ids: list[str]) -> list[str]:
     """Generates a runId selector based on the runIds. This is used to identify to which major runId the metrics belong to.
-    
+
     Examples:
     >>> extract_primary_run_id_list(["2023.09", "2023.09-pre", "2023.11-ppp"])
     ["2023.11", "2023.09"]
     """
     primary_run_id_pattern = r"^\d+.\d+"
-    return ["All"] + sorted(list({re.match(primary_run_id_pattern, x).group() for x in all_run_ids}), reverse=True) # type: ignore
+    return ["All"] + sorted(
+        list({re.match(primary_run_id_pattern, x).group() for x in all_run_ids}),
+        reverse=True,
+    )  # type: ignore
 
-def extract_secondary_run_id_list(all_run_ids: list[str], primary_run_ids: list[str]) -> list[str]:
+
+def extract_secondary_run_id_list(
+    all_run_ids: list[str], primary_run_ids: list[str]
+) -> list[str]:
     """Generates a runId selector based on the runIds. This is used to identify to which major runId the metrics belong to.
-    
+
     Examples:
     >>> extract_secondary_run_id_list(["2023.09", "2023.09-pre", "2023.11-ppp"], ["2023.11"])
     ["2023.11-ppp"]
     """
-    return sorted([run_id for run_id in all_run_ids if any(primary_id in run_id for primary_id in primary_run_ids)], reverse=True)
+    return sorted(
+        [
+            run_id
+            for run_id in all_run_ids
+            if any(primary_id in run_id for primary_id in primary_run_ids)
+        ],
+        reverse=True,
+    )
+
 
 def select_and_mask_data_to_compare(all_releases, all_runs, data):
     st.sidebar.header("What do you want to compare?")
@@ -300,12 +355,15 @@ def select_and_mask_data_to_compare(all_releases, all_runs, data):
         select_runs = st.sidebar.multiselect(
             "Select two specific release runs:",
             extract_secondary_run_id_list(all_runs, select_releases),
-            help="First indicate the latest run and secondly the run with which you wish to make the comparison. Legend: IDs without a suffix are post-ETL, the latest run belongs to the data in production, 'pre' means pre-ETL and 'ppp' means partner preview platform."
+            help="First indicate the latest run and secondly the run with which you wish to make the comparison. Legend: IDs without a suffix are post-ETL, the latest run belongs to the data in production, 'pre' means pre-ETL and 'ppp' means partner preview platform.",
         )
-        masks_run = (data["runId"] == select_runs[0]) | (data["runId"] == select_runs[1])
+        masks_run = (data["runId"] == select_runs[0]) | (
+            data["runId"] == select_runs[1]
+        )
         filtered_data = data[masks_run]
         return filtered_data, select_runs
     return data, []
+
 
 def select_and_mask_data_to_explore(all_releases, all_runs, data):
     st.sidebar.header("What do you want to explore?")
@@ -313,8 +371,10 @@ def select_and_mask_data_to_explore(all_releases, all_runs, data):
 
     if select_release != "All":
         select_run = st.sidebar.selectbox(
-                "Select a specific release run:", extract_secondary_run_id_list(all_runs, select_release), help="Legend: IDs without a suffix are post-ETL, the latest run belongs to the data in production, 'pre' means pre-ETL and 'ppp' means partner preview platform."
-            )
+            "Select a specific release run:",
+            extract_secondary_run_id_list(all_runs, select_release),
+            help="Legend: IDs without a suffix are post-ETL, the latest run belongs to the data in production, 'pre' means pre-ETL and 'ppp' means partner preview platform.",
+        )
         mask_run = data["runId"] == select_run
         data = data[mask_run]
 

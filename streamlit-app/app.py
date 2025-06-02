@@ -1,8 +1,5 @@
 from functools import reduce
 
-import hydra
-import os
-from omegaconf import DictConfig
 import pandas as pd
 from PIL import Image
 import streamlit as st
@@ -10,6 +7,7 @@ import streamlit as st
 from src.utils import (
     extract_primary_run_id_list,
     show_table,
+    get_asset_path,
     load_data_from_hf,
     plot_enrichment,
     compare_entity,
@@ -17,13 +15,15 @@ from src.utils import (
     select_and_mask_data_to_explore,
 )
 
+YELLOW_HIGHLIGHT_BOUND = 0.2
+RED_HIGHLIGHT_BOUND = 0.5
 
-@hydra.main(version_base=None, config_path=os.path.join(os.path.dirname(os.path.dirname(__file__)), "config"), config_name="config")
-def main(cfg: DictConfig):
+
+def main():
     # App UI
     st.set_page_config(
         page_title="Open Targets Data Metrics",
-        page_icon=Image.open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "streamlit-app/src/assets/img/favicon.png")),
+        page_icon=Image.open(get_asset_path("src/assets/img/favicon.png")),
         layout="wide",
         initial_sidebar_state="expanded",
     )
@@ -55,7 +55,9 @@ def main(cfg: DictConfig):
     all_releases = extract_primary_run_id_list(all_runs)
 
     if page == "Explore metrics":
-        data, selected_run = select_and_mask_data_to_explore(all_releases, all_runs, data)
+        data, selected_run = select_and_mask_data_to_explore(
+            all_releases, all_runs, data
+        )
         if selected_run:
             st.markdown("## Key metrics")
             col1, col2, col3, col4, col5 = st.columns(5)
@@ -145,7 +147,9 @@ def main(cfg: DictConfig):
             )
 
     if page == "Compare metrics":
-        data, selected_runs = select_and_mask_data_to_compare(all_releases, all_runs, data)
+        data, selected_runs = select_and_mask_data_to_compare(
+            all_releases, all_runs, data
+        )
 
         if selected_runs:
             latest_run, previous_run = selected_runs
@@ -315,17 +319,19 @@ def main(cfg: DictConfig):
                     name,
                     latest_run,
                     df,
-                    cfg.metric_visualization.parameters.yellow_highlight_bound,
-                    cfg.metric_visualization.parameters.red_highlight_bound,
+                    YELLOW_HIGHLIGHT_BOUND,
+                    RED_HIGHLIGHT_BOUND,
                 )
 
     if page == "Visualise metrics":
-        data, selected_runs = select_and_mask_data_to_compare(all_releases, all_runs, data)
+        data, selected_runs = select_and_mask_data_to_compare(
+            all_releases, all_runs, data
+        )
         if selected_runs:
             st.plotly_chart(plot_enrichment(data), use_container_width=True)
 
     st.markdown("###")
-    st.image(Image.open(os.path.join(os.path.dirname(os.path.dirname(__file__)), "streamlit-app/src/assets/img/logo.png")), width=150)
+    st.image(Image.open(get_asset_path("src/assets/img/logo.png")), width=150)
 
 
 if __name__ == "__main__":

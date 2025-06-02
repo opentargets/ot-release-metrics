@@ -9,12 +9,11 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-COPY streamlit-app/requirements.txt /streamlit-app/requirements.txt
-COPY config /streamlit-app/config
-COPY streamlit-app /streamlit-app
+COPY streamlit-app/requirements.txt .
+COPY streamlit-app/src ./src
+COPY streamlit-app/app.py .
 
 RUN pip3 install -r requirements.txt
-
 
 EXPOSE 8501
 

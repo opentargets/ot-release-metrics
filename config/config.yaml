@@ -27,7 +27,3 @@ metric_calculation:
     hf_repo_id: opentargets/ot-release-metrics
     release_output_path: ${metric_calculation.data_repositories.release_bucket}/${metric_calculation.ot_release}/metrics.csv
 
-metric_visualization:
-  parameters:
-    yellow_highlight_bound: 0.2
-    red_highlight_bound: 0.5
