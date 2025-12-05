@@ -21,6 +21,7 @@ from src.metric_calculation.utils import (
     access_gcp_secret,
     initialize_spark_session,
     read_path_if_provided,
+    read_path_with_schema,
     write_metrics_to_csv,
     write_metrics_to_hf_hub,
 )
@@ -302,13 +303,12 @@ def get_columns_to_report(dataset_columns):
         if "diseaseFromSourceMappedId" in dataset_columns
         else "diseaseFromSourceId",
         "drugId",
-        "variantId",
         "literature",
     ]
 
 
 def calculate_additional_post_etl_metrics(metrics_cfg):
-    evidence_failed = read_path_if_provided(
+    evidence_failed = read_path_with_schema(
         f"{metrics_cfg.data_repositories.release_bucket}/{ot_release_bucket}/{metrics_cfg.datasets.evidence_failed}"
     )
     associations_direct = read_path_if_provided(
@@ -366,22 +366,34 @@ def calculate_additional_post_etl_metrics(metrics_cfg):
                 document_total_count(evidence_failed, "evidenceInvalidTotalCount"),
                 # Evidence count (duplicates).
                 document_total_count(
-                    evidence_failed.filter(f.col("markedDuplicate")),
+                    (
+                        evidence_failed
+                        .filter(f.array_contains(f.col("qualityControls"), 'Duplicated'))
+                    ),
                     "evidenceDuplicateTotalCount",
                 ),
                 # Evidence count (nullified score).
                 document_total_count(
-                    evidence_failed.filter(f.col("nullifiedScore")),
+                    (
+                        evidence_failed
+                        .filter(f.array_contains(f.col("qualityControls"), 'No valid score'))
+                    ),
                     "evidenceNullifiedScoreTotalCount",
                 ),
                 # Evidence count (targets not resolved).
                 document_total_count(
-                    evidence_failed.filter(~f.col("resolvedTarget")),
+                    (
+                        evidence_failed
+                        .filter(f.array_contains(f.col("qualityControls"), 'No valid target'))
+                    ),
                     "evidenceUnresolvedTargetTotalCount",
                 ),
                 # Evidence count (diseases not resolved).
                 document_total_count(
-                    evidence_failed.filter(~f.col("resolvedDisease")),
+                    (
+                        evidence_failed
+                        .filter(f.array_contains(f.col("qualityControls"), 'No valid disease'))
+                    ),
                     "evidenceUnresolvedDiseaseTotalCount",
                 ),
                 # Total invalids by datasource.
@@ -390,61 +402,73 @@ def calculate_additional_post_etl_metrics(metrics_cfg):
                 ),
                 # Evidence count by datasource (duplicates).
                 document_count_by(
-                    evidence_failed.filter(f.col("markedDuplicate")),
+                    (
+                        evidence_failed
+                        .filter(f.array_contains(f.col("qualityControls"), 'Duplicated'))
+                    ),
                     "datasourceId",
                     "evidenceDuplicateCountByDatasource",
                 ),
                 # Evidence count by datasource (nullified score).
                 document_count_by(
-                    evidence_failed.filter(f.col("nullifiedScore")),
+                    (
+                        evidence_failed
+                        .filter(f.array_contains(f.col("qualityControls"), 'No valid score'))
+                    ),
                     "datasourceId",
                     "evidenceNullifiedScoreCountByDatasource",
                 ),
                 # Evidence count by datasource (targets not resolved).
                 document_count_by(
-                    evidence_failed.filter(~f.col("resolvedTarget")),
+                    (
+                        evidence_failed
+                        .filter(f.array_contains(f.col("qualityControls"), 'No valid target'))
+                    ),
                     "datasourceId",
                     "evidenceUnresolvedTargetCountByDatasource",
                 ),
                 # Evidence count by datasource (diseases not resolved).
                 document_count_by(
-                    evidence_failed.filter(~f.col("resolvedDisease")),
+                    (
+                        evidence_failed
+                        .filter(f.array_contains(f.col("qualityControls"), 'No valid disease'))
+                    ),
                     "datasourceId",
                     "evidenceUnresolvedDiseaseCountByDatasource",
                 ),
-                # Distinct values in selected fields (total invalid evidence).
-                evidence_distinct_fields_count(
-                    evidence_failed.select(columns_to_report),
-                    "evidenceInvalidDistinctFieldsCountByDatasource",
-                ),
-                # Evidence count by datasource (duplicates).
-                evidence_distinct_fields_count(
-                    evidence_failed.filter(f.col("markedDuplicate")).select(
-                        columns_to_report
-                    ),
-                    "evidenceDuplicateDistinctFieldsCountByDatasource",
-                ),
-                # Evidence count by datasource (nullified score).
-                evidence_distinct_fields_count(
-                    evidence_failed.filter(f.col("nullifiedScore")).select(
-                        columns_to_report
-                    ),
-                    "evidenceNullifiedScoreDistinctFieldsCountByDatasource",
-                ),
-                # Evidence count by datasource (targets not resolved).
-                evidence_distinct_fields_count(
-                    evidence_failed.filter(~f.col("resolvedTarget")).select(
-                        columns_to_report
-                    ),
-                    "evidenceUnresolvedTargetDistinctFieldsCountByDatasource",
-                ),
-                # Evidence count by datasource (diseases not resolved).
-                evidence_distinct_fields_count(
-                    evidence_failed.filter(~f.col("resolvedDisease")).select(
-                        columns_to_report
-                    ),
-                    "evidenceUnresolvedDiseaseDistinctFieldsCountByDatasource",
-                ),
+                # # Distinct values in selected fields (total invalid evidence).
+                # evidence_distinct_fields_count(
+                #     evidence_failed.select(columns_to_report),
+                #     "evidenceInvalidDistinctFieldsCountByDatasource",
+                # ),
+                # # Evidence count by datasource (duplicates).
+                # evidence_distinct_fields_count(
+                #     evidence_failed.filter(f.col("markedDuplicate")).select(
+                #         columns_to_report
+                #     ),
+                #     "evidenceDuplicateDistinctFieldsCountByDatasource",
+                # ),
+                # # Evidence count by datasource (nullified score).
+                # evidence_distinct_fields_count(
+                #     evidence_failed.filter(f.col("nullifiedScore")).select(
+                #         columns_to_report
+                #     ),
+                #     "evidenceNullifiedScoreDistinctFieldsCountByDatasource",
+                # ),
+                # # Evidence count by datasource (targets not resolved).
+                # evidence_distinct_fields_count(
+                #     evidence_failed.filter(~f.col("resolvedTarget")).select(
+                #         columns_to_report
+                #     ),
+                #     "evidenceUnresolvedTargetDistinctFieldsCountByDatasource",
+                # ),
+                # # Evidence count by datasource (diseases not resolved).
+                # evidence_distinct_fields_count(
+                #     evidence_failed.filter(~f.col("resolvedDisease")).select(
+                #         columns_to_report
+                #     ),
+                #     "evidenceUnresolvedDiseaseDistinctFieldsCountByDatasource",
+                # ),
             ]
         )
 
