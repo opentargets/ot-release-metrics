@@ -34,6 +34,29 @@ def initialize_spark_session():
     return SparkSession.builder.getOrCreate()
 
 
+def read_path_with_schema(path: str):
+    """
+    Read the provided path as a Spark dataframe using a specific schema.
+    """
+
+    assert gcsfs.GCSFileSystem().exists(path), (
+        f"The provided path {path} does not exist."
+    )
+
+    schema = t.StructType([
+        t.StructField("id", t.StringType(), True),
+        t.StructField("datasourceId", t.StringType(), True),
+        t.StructField("qualityControls", t.ArrayType(t.StringType()), True)
+    ])
+
+    return (
+        SparkSession.getActiveSession().read
+        .schema(schema)
+        .option("recursiveFileLookup", "true")
+        .parquet(path)
+    )
+
+
 def read_path_if_provided(path: str | None, dir_format="parquet"):
     """
     Automatically detect the format of the input data and read it into the Spark dataframe. The supported formats
@@ -44,9 +67,14 @@ def read_path_if_provided(path: str | None, dir_format="parquet"):
         return None
 
     # The provided path must exist and must be either a file or a directory.
-    assert gcsfs.GCSFileSystem().exists(path), (
-        f"The provided path {path} does not exist."
-    )
+    if "*" in path:
+        assert gcsfs.GCSFileSystem().glob(path), (
+            f"There are no matching files for the provided path {path}."
+        )
+    else:
+        assert gcsfs.GCSFileSystem().exists(path), (
+            f"The provided path {path} does not exist."
+        )
 
     # Case 1: We are provided with a single file.
     if gcsfs.GCSFileSystem().isfile(path):
