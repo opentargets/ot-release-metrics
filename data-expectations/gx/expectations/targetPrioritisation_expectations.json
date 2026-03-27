@@ -1,0 +1,30 @@
+{
+  "expectations": [
+    {
+      "id": "e30bd1c4-34ec-4466-8ad7-78ff5a6aa2e2",
+      "kwargs": {
+        "column": "targetId"
+      },
+      "meta": {},
+      "type": "expect_column_values_to_not_be_null"
+    },
+    {
+      "id": "9a39a1a9-28b3-4921-a64b-3f4db36e497a",
+      "kwargs": {
+        "column": "isSecreted",
+        "value_set": [
+          0,
+          1
+        ]
+      },
+      "meta": {},
+      "type": "expect_column_distinct_values_to_be_in_set"
+    }
+  ],
+  "id": "b15a1c8b-01a9-41c5-8a34-4e27cc4b2867",
+  "meta": {
+    "great_expectations_version": "1.2.6"
+  },
+  "name": "targetPrioritisation_expectations",
+  "notes": null
+}

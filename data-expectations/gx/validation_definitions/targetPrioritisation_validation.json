@@ -1,0 +1,22 @@
+{
+  "data": {
+    "asset": {
+      "id": "b4a005dc-fa46-4f4d-b224-ed29ce2cf915",
+      "name": "targetPrioritisation"
+    },
+    "batch_definition": {
+      "id": "a9daf23a-af37-4505-b145-ad24429fcb37",
+      "name": "targetPrioritisation_full_table"
+    },
+    "datasource": {
+      "id": "1f2aaf6b-52f4-4e3e-8d89-a83259c8bced",
+      "name": "my_bigquery"
+    }
+  },
+  "id": "4fc68466-5d67-4e4b-ae32-37bad7c6bbbb",
+  "name": "targetPrioritisation_validation",
+  "suite": {
+    "id": "b15a1c8b-01a9-41c5-8a34-4e27cc4b2867",
+    "name": "targetPrioritisation_expectations"
+  }
+}

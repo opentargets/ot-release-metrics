@@ -1,0 +1,351 @@
+# Welcome to Great Expectations! Always know what to expect from your data.
+#
+# Here you can define datasources, batch kwargs generators, integrations and
+# more. This file is intended to be committed to your repo. For help with
+# configuration please:
+#   - Read our docs: https://docs.greatexpectations.io/docs/guides/connecting_to_your_data/connect_to_data_overview/#2-configure-your-datasource
+#   - Join our slack channel: http://greatexpectations.io/slack
+
+# config_version refers to the syntactic version of this config file, and is used in maintaining backwards compatibility
+# It is auto-generated and usually does not need to be changed.
+config_version: 4.0
+
+# This config file supports variable substitution which enables: 1) keeping
+# secrets out of source control & 2) environment-based configuration changes
+# such as staging vs prod.
+#
+# When GX encounters substitution syntax (like `my_key: ${my_value}` or
+# `my_key: $my_value`) in the great_expectations.yml file, it will attempt
+# to replace the value of `my_key` with the value from an environment
+# variable `my_value` or a corresponding key read from this config file,
+# which is defined through the `config_variables_file_path`.
+# Environment variables take precedence over variables defined here.
+#
+# Substitution values defined here can be a simple (non-nested) value,
+# nested value such as a dictionary, or an environment variable (i.e. ${ENV_VAR})
+#
+#
+# https://docs.greatexpectations.io/docs/guides/setup/configuring_data_contexts/how_to_configure_credentials
+
+
+config_variables_file_path: uncommitted/config_variables.yml
+
+# The plugins_directory will be added to your python path for custom modules
+# used to override and extend Great Expectations.
+plugins_directory: plugins/
+
+stores:
+# Stores are configurable places to store things like Expectations, Validations
+# Data Docs, and more. These are for advanced users only - most users can simply
+# leave this section alone.
+  expectations_store:
+    class_name: ExpectationsStore
+    store_backend:
+      class_name: TupleFilesystemStoreBackend
+      base_directory: expectations/
+
+  validation_results_store:
+    class_name: ValidationResultsStore
+    store_backend:
+      class_name: TupleFilesystemStoreBackend
+      base_directory: uncommitted/validations/
+
+  checkpoint_store:
+    class_name: CheckpointStore
+    store_backend:
+      class_name: TupleFilesystemStoreBackend
+      suppress_store_backend_id: true
+      base_directory: checkpoints/
+
+  validation_definition_store:
+    class_name: ValidationDefinitionStore
+    store_backend:
+      class_name: TupleFilesystemStoreBackend
+      base_directory: validation_definitions/
+
+expectations_store_name: expectations_store
+validation_results_store_name: validation_results_store
+checkpoint_store_name: checkpoint_store
+
+data_docs_sites:
+  # Data Docs make it simple to visualize data quality in your project. These
+  # include Expectations, Validations & Profiles. The are built for all
+  # Datasources from JSON artifacts in the local repo including validations &
+  # profiles from the uncommitted directory. Read more at https://docs.greatexpectations.io/docs/terms/data_docs
+  local_site:
+    class_name: SiteBuilder
+    show_how_to_buttons: true
+    store_backend:
+      class_name: TupleFilesystemStoreBackend
+      base_directory: uncommitted/data_docs/local_site/
+    site_index_builder:
+      class_name: DefaultSiteIndexBuilder
+fluent_datasources:
+  my_bigquery:
+    type: sql
+    id: 1f2aaf6b-52f4-4e3e-8d89-a83259c8bced
+    assets:
+      associationByDatasourceDirect:
+        type: table
+        id: f0f1fc59-5af3-410d-ba3c-e32a403d9f44
+        batch_metadata: {}
+        batch_definitions:
+          associationByDatasourceDirect_full_table:
+            id: 5a465af7-a954-4083-b5fb-26e46c728436
+            partitioner:
+        table_name: open-targets-eu-dev.platform_dev.associationByDatasourceDirect
+        schema_name:
+      associationByDatasourceIndirect:
+        type: table
+        id: aa0ecfdc-c626-4141-8387-c60d45c655ae
+        batch_metadata: {}
+        batch_definitions:
+          associationByDatasourceIndirect_full_table:
+            id: 19d61661-fccc-4817-bf75-4de652df56b4
+            partitioner:
+        table_name: open-targets-eu-dev.platform_dev.associationByDatasourceIndirect
+        schema_name:
+      associationByDatatypeDirect:
+        type: table
+        id: 4ad1dae0-49d7-4ab5-af9a-dac92828fcd2
+        batch_metadata: {}
+        batch_definitions:
+          associationByDatatypeDirect_full_table:
+            id: 6af1bb6f-4e44-4a04-8a12-e0e8182b63fa
+            partitioner:
+        table_name: open-targets-eu-dev.platform_dev.associationByDatatypeDirect
+        schema_name:
+      associationByDatatypeIndirect:
+        type: table
+        id: df8a11bf-c3f0-4214-afe6-f2d49747cc23
+        batch_metadata: {}
+        batch_definitions:
+          associationByDatatypeIndirect_full_table:
+            id: e84e7a00-5edc-4688-b1d0-6abde4449f9f
+            partitioner:
+        table_name: open-targets-eu-dev.platform_dev.associationByDatatypeIndirect
+        schema_name:
+      associationByOverallDirect:
+        type: table
+        id: c8da3ec0-e663-439d-8cf2-f4c8388e080e
+        batch_metadata: {}
+        batch_definitions:
+          associationByOverallDirect_full_table:
+            id: db1c40f1-a577-412a-9d6b-3235f1ef9125
+            partitioner:
+        table_name: open-targets-eu-dev.platform_dev.associationByOverallDirect
+        schema_name:
+      associationByOverallIndirect:
+        type: table
+        id: e66557c2-5b60-4aca-9365-340372238804
+        batch_metadata: {}
+        batch_definitions:
+          associationByOverallIndirect_full_table:
+            id: ab56f37d-26f4-4ad1-99de-e786dee8cad6
+            partitioner:
+        table_name: open-targets-eu-dev.platform_dev.associationByOverallIndirect
+        schema_name:
+      baselineExpression:
+        type: table
+        id: d5e1e9e3-043f-45b1-bd9c-9811d9fd75e8
+        batch_metadata: {}
+        batch_definitions:
+          baselineExpression_full_table:
+            id: 851a2639-0393-4a64-b985-ea05d8f90261
+            partitioner:
+        table_name: open-targets-eu-dev.platform_dev.baselineExpression
+        schema_name:
+      diseaseToPhenotype:
+        type: table
+        id: 2ec665e5-2537-46c0-888f-ba630136980b
+        batch_metadata: {}
+        batch_definitions:
+          diseaseToPhenotype_full_table:
+            id: df969608-c63f-4f55-8367-854f6e6c18f6
+            partitioner:
+        table_name: open-targets-eu-dev.platform_dev.diseaseToPhenotype
+        schema_name:
+      diseases:
+        type: table
+        id: b4e3b1f4-258e-417a-9219-b94a1c76b9e2
+        batch_metadata: {}
+        batch_definitions:
+          diseases_full_table:
+            id: 7a88bc17-5fbc-404a-aaed-9886442d630e
+            partitioner:
+        table_name: open-targets-eu-dev.platform_dev.diseases
+        schema_name:
+      drugWarnings:
+        type: table
+        id: e9535973-220d-4978-ac5f-7c4a4f009418
+        batch_metadata: {}
+        batch_definitions:
+          drugWarnings_full_table:
+            id: 3b0e9495-b7a0-41ef-a106-10baaea84f65
+            partitioner:
+        table_name: open-targets-eu-dev.platform_dev.drugWarnings
+        schema_name:
+      evidence:
+        type: table
+        id: 4d34f43a-8396-47f4-8121-dde49f478776
+        batch_metadata: {}
+        batch_definitions:
+          evidence_full_table:
+            id: 7bea9550-0613-445d-944d-18f0f509ca57
+            partitioner:
+        table_name: open-targets-eu-dev.platform_dev.evidence
+        schema_name:
+      go:
+        type: table
+        id: 732341e0-febe-40df-9f05-f36a8b599f56
+        batch_metadata: {}
+        batch_definitions:
+          go_full_table:
+            id: fa927c78-4622-47ca-96f1-ca5451427816
+            partitioner:
+        table_name: open-targets-eu-dev.platform_dev.go
+        schema_name:
+      hpo:
+        type: table
+        id: 662f836a-7024-4411-8f3e-f77d7e3958eb
+        batch_metadata: {}
+        batch_definitions:
+          hpo_full_table:
+            id: 96c98f28-b8fa-4bc3-b049-7c1d0fc64205
+            partitioner:
+        table_name: open-targets-eu-dev.platform_dev.hpo
+        schema_name:
+      indication:
+        type: table
+        id: 23e8a45f-f367-4ea7-ac63-5f75b2ac9fba
+        batch_metadata: {}
+        batch_definitions:
+          indication_full_table:
+            id: 41360ccb-cf72-4d13-bb8f-f09c1d5e7f08
+            partitioner:
+        table_name: open-targets-eu-dev.platform_dev.indication
+        schema_name:
+      interaction:
+        type: table
+        id: 6e9d1345-ca4a-4616-b76e-ca9ed7d1da44
+        batch_metadata: {}
+        batch_definitions:
+          interaction_full_table:
+            id: 61757d45-afd9-462c-b0d2-6ff23b093a97
+            partitioner:
+        table_name: open-targets-eu-dev.platform_dev.interaction
+        schema_name:
+      interactionEvidence:
+        type: table
+        id: 952c672d-e43e-4ba3-bcd3-6d929c3dd308
+        batch_metadata: {}
+        batch_definitions:
+          interactionEvidence_full_table:
+            id: 6b66d71a-9c62-44ef-92d6-3918dc205261
+            partitioner:
+        table_name: open-targets-eu-dev.platform_dev.interactionEvidence
+        schema_name:
+      knownDrugsAggregated:
+        type: table
+        id: d9ade241-588e-44f0-b7a1-c9f8630b78a3
+        batch_metadata: {}
+        batch_definitions:
+          knownDrugsAggregated_full_table:
+            id: affafbd7-108f-4cbc-a479-6f8ee50caa74
+            partitioner:
+        table_name: open-targets-eu-dev.platform_dev.knownDrugsAggregated
+        schema_name:
+      mechanismOfAction:
+        type: table
+        id: c5b86bb5-50e3-4140-83ec-97af2e0f7363
+        batch_metadata: {}
+        batch_definitions:
+          mechanismOfAction_full_table:
+            id: 8012f8ef-7ddc-445b-9bc2-7dbee7355a13
+            partitioner:
+        table_name: open-targets-eu-dev.platform_dev.mechanismOfAction
+        schema_name:
+      molecule:
+        type: table
+        id: e22e7481-25d4-4e5d-826d-2c6f84631da5
+        batch_metadata: {}
+        batch_definitions:
+          molecule_full_table:
+            id: b42c170e-5d22-4975-a938-17869aa85ed7
+            partitioner:
+        table_name: open-targets-eu-dev.platform_dev.molecule
+        schema_name:
+      mousePhenotypes:
+        type: table
+        id: 1aa91553-e694-4696-b986-aa3a010115b4
+        batch_metadata: {}
+        batch_definitions:
+          mousePhenotypes_full_table:
+            id: 0dbfa69e-22fd-4954-9f89-b887bc88586b
+            partitioner:
+        table_name: open-targets-eu-dev.platform_dev.mousePhenotypes
+        schema_name:
+      pharmacogenomics:
+        type: table
+        id: 4cd0d383-c171-483a-b98e-b3d4d6b78747
+        batch_metadata: {}
+        batch_definitions:
+          pharmacogenomics_full_table:
+            id: cec00e24-d27f-44a6-ad4f-a395a56cb262
+            partitioner:
+        table_name: open-targets-eu-dev.platform_dev.pharmacogenomics
+        schema_name:
+      reactome:
+        type: table
+        id: 25b55f2d-2380-4511-9da6-73b1bb208e99
+        batch_metadata: {}
+        batch_definitions:
+          reactome_full_table:
+            id: 03dbc6c4-c4cd-439a-874f-30dc342ca453
+            partitioner:
+        table_name: open-targets-eu-dev.platform_dev.reactome
+        schema_name:
+      significantAdverseDrugReactions:
+        type: table
+        id: a6a86764-5ad9-4315-aa3f-3f4342931a0a
+        batch_metadata: {}
+        batch_definitions:
+          significantAdverseDrugReactions_full_table:
+            id: 570e87c7-b834-4c70-aa3b-97b9e0ff6349
+            partitioner:
+        table_name: open-targets-eu-dev.platform_dev.significantAdverseDrugReactions
+        schema_name:
+      targetEssentiality:
+        type: table
+        id: c196c3e7-f508-47fc-9fe4-a8831d361be2
+        batch_metadata: {}
+        batch_definitions:
+          targetEssentiality_full_table:
+            id: aa20e784-7b94-45ce-9b01-ea11a8d5d021
+            partitioner:
+        table_name: open-targets-eu-dev.platform_dev.targetEssentiality
+        schema_name:
+      targetPrioritisation:
+        type: table
+        id: b4a005dc-fa46-4f4d-b224-ed29ce2cf915
+        batch_metadata: {}
+        batch_definitions:
+          targetPrioritisation_full_table:
+            id: a9daf23a-af37-4505-b145-ad24429fcb37
+            partitioner:
+        table_name: open-targets-eu-dev.platform_dev.targetPrioritisation
+        schema_name:
+      targets:
+        type: table
+        id: 8da56a39-2b24-4689-92ea-985c0230a297
+        batch_metadata: {}
+        batch_definitions:
+          targets_full_table:
+            id: ebed77c7-c162-408e-a594-3b0609f97851
+            partitioner:
+        table_name: open-targets-eu-dev.platform_dev.targets
+        schema_name:
+    connection_string: bigquery://open-targets-eu-dev/platform_dev?credentials_path=Open
+      Targets EU Dev.json
+analytics_enabled:
+data_context_id: 58bde212-ef29-4652-ba30-541a4d2fc3cd
