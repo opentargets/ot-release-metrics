@@ -11,32 +11,15 @@ import streamlit as st
 
 
 def get_asset_path(relative_path: str = "") -> str:
-    """Resolve asset paths across different environments.
-
-    Args:
-        relative_path: The path relative to the asset root
-
-    Returns:
-        Absolute path as string
-    """
-    # Define possible root locations in search order
     possible_roots = [
-        Path("/mount/src/ot-release-metrics"),  # Streamlit Cloud absolute
-        Path.cwd(),  # Streamlit Cloud relative
-        Path(__file__).parent.parent.parent,  # Local dev (from utils.py)
-        Path("/app"),  # Docker
+        Path("/mount/src/ot-release-metrics"),
+        Path.cwd(),
+        Path(__file__).parent.parent,
     ]
-    path_structures = [
-        Path("streamlit-app") / relative_path,
-        Path(relative_path),
-    ]
-
-    # Locate path to asset
     for root in possible_roots:
-        for path_structure in path_structures:
-            full_path = root / path_structure
-            if full_path.exists():
-                return str(full_path)
+        full_path = root / relative_path
+        if full_path.exists():
+            return str(full_path)
 
     raise FileNotFoundError(f"Could not find asset at {relative_path}.")
 
