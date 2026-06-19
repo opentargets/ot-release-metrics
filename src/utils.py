@@ -1,9 +1,7 @@
 import logging
-import os
 from pathlib import Path
 import re
 
-import gcsfs
 from huggingface_hub import HfFileSystem
 import pandas as pd
 import plotly.express as px
@@ -103,46 +101,6 @@ def load_data_from_hf(
     assert len(data.runId.unique()) == len(all_hf_paths), (
         "Number of datasets does not match number of metrics runs."
     )
-    return data
-
-
-@st.cache_data(ttl="1h")
-def load_data(
-    data_folder: str,
-) -> pd.DataFrame:
-    """This function reads all csv files from a provided location and returns as a concatenated pandas dataframe"""
-
-    # Get list of csv files in a Google bucket:
-    if data_folder.startswith("gs://"):
-        csv_files = [
-            f"gs://{x}"
-            for x in gcsfs.GCSFileSystem().ls(data_folder)
-            if x.endswith("csv")
-        ]
-
-    else:
-        csv_files = [
-            os.path.join(data_folder, x)
-            for x in os.listdir(data_folder)
-            if x.endswith("csv")
-        ]
-
-    dataset_count = len(csv_files)
-    logging.info(f"Number of csv files found in the data folder: {dataset_count}")
-
-    # Reading csv files as pandas dataframes:
-    while True:
-        data = pd.concat(
-            [pd.read_csv(x, sep=",", dtype={"runId": "str"}) for x in csv_files],
-            ignore_index=True,
-        ).fillna({"value": 0})
-        logging.info(f"Number of rows in the dataframe: {len(data)}")
-        logging.info(f"Number of datasets: {len(data.runId.unique())}")
-
-        if len(data.runId.unique()) == dataset_count:
-            logging.info("All datasets loaded successfully.")
-            break
-
     return data
 
 
