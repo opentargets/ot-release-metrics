@@ -299,9 +299,14 @@ def main():
                 old_direct_association,
                 new_direct_association,
             ]
-            association = reduce(
-                lambda x, y: pd.merge(x, y, on='datasourceId'), association_datasets
-            ).set_index('datasourceId')
+            association = (
+                reduce(
+                    lambda x, y: pd.merge(x, y, on='datasourceId', how='outer'),
+                    association_datasets,
+                )
+                .set_index('datasourceId')
+                .fillna(0)
+            )
 
             # Compare datasets
             evidence_comparison = compare_entity(
@@ -330,6 +335,7 @@ def main():
                 show_table(
                     name,
                     latest_run,
+                    previous_run,
                     df,
                     YELLOW_HIGHLIGHT_BOUND,
                     RED_HIGHLIGHT_BOUND,

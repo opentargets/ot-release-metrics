@@ -25,7 +25,12 @@ def get_asset_path(relative_path: str = "") -> str:
 
 
 def show_table(
-    name: str, latest_run: str, df: pd.DataFrame, yellow_bound: float, red_bound: float
+    name: str,
+    latest_run: str,
+    previous_run: str,
+    df: pd.DataFrame,
+    yellow_bound: float,
+    red_bound: float,
 ) -> None:
     """Displays the dataframe as a table in the Streamlit app."""
     st.header(f"{name.capitalize()} related metrics")
@@ -36,6 +41,7 @@ def show_table(
             highlight_cell,
             entity=name,
             latest_run=latest_run,
+            previous_run=previous_run,
             yellow_bound=yellow_bound,
             red_bound=red_bound,
             axis=1,
@@ -44,7 +50,12 @@ def show_table(
 
 
 def highlight_cell(
-    row: pd.Series, entity: str, latest_run: str, yellow_bound: float, red_bound: float
+    row: pd.Series,
+    entity: str,
+    latest_run: str,
+    previous_run: str,
+    yellow_bound: float,
+    red_bound: float,
 ) -> list[str]:
     """Highlights the cell in red if the count relative to the total number of evidence is higher than a set threshold.
 
@@ -52,6 +63,7 @@ def highlight_cell(
         row: row of the dataframe
         entity: name of the entity the metrics refer to
         latest_run: latest runId to indicate which column is useful to extract the total number
+        previous_run: previous runId used to compute the delta against the latest run
 
     Returns:
         An array of strings with the css property to pass the Pandas Styler and set the background color.
@@ -73,7 +85,7 @@ def highlight_cell(
             # For diseases, targets and drugs, we have to calculate the delta between releases first
             total_count_diff = (
                 row[f"Nr of {entity} in {latest_run}"]
-                - row[f"Nr of {entity} in {latest_run}"]
+                - row[f"Nr of {entity} in {previous_run}"]
             )
             ratio = abs(total_count_diff / total_count)
         if ratio >= red_bound and ratio != 1:
