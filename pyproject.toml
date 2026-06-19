@@ -10,4 +10,5 @@ dependencies = [
     "Pillow>=10.0.0",
     "plotly-express>=0.4.1",
     "streamlit>=1.28.1",
+    "urllib3>=2.7.0",
 ]

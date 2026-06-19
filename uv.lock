@@ -1600,6 +1600,7 @@ dependencies = [
     { name = "pillow" },
     { name = "plotly-express" },
     { name = "streamlit" },
+    { name = "urllib3" },
 ]
 
 [package.metadata]
@@ -1610,6 +1611,7 @@ requires-dist = [
     { name = "pillow", specifier = ">=10.0.0" },
     { name = "plotly-express", specifier = ">=0.4.1" },
     { name = "streamlit", specifier = ">=1.28.1" },
+    { name = "urllib3", specifier = ">=2.7.0" },
 ]
 
 [[package]]
