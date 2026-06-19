@@ -340,22 +340,25 @@ def select_and_mask_data_to_compare(all_releases, all_runs, data):
             extract_secondary_run_id_list(all_runs, select_releases),
             help="First indicate the latest run and secondly the run with which you wish to make the comparison. Legend: IDs without a suffix are post-ETL, the latest run belongs to the data in production, 'pre' means pre-ETL and 'ppp' means partner preview platform.",
         )
-        masks_run = (data["runId"] == select_runs[0]) | (
-            data["runId"] == select_runs[1]
-        )
-        filtered_data = data[masks_run]
-        return filtered_data, select_runs
+        if len(select_runs) == 2:
+            masks_run = (data["runId"] == select_runs[0]) | (
+                data["runId"] == select_runs[1]
+            )
+            filtered_data = data[masks_run]
+            return filtered_data, select_runs
+        st.sidebar.info("Please select exactly two runs to compare.")
     return data, []
 
 
 def select_and_mask_data_to_explore(all_releases, all_runs, data):
     st.sidebar.header("What do you want to explore?")
-    select_release = [st.sidebar.selectbox("Select a release:", all_releases)]
+    select_release = st.sidebar.selectbox("Select a release:", all_releases)
 
+    select_run = None
     if select_release != "All":
         select_run = st.sidebar.selectbox(
             "Select a specific release run:",
-            extract_secondary_run_id_list(all_runs, select_release),
+            extract_secondary_run_id_list(all_runs, [select_release]),
             help="Legend: IDs without a suffix are post-ETL, the latest run belongs to the data in production, 'pre' means pre-ETL and 'ppp' means partner preview platform.",
         )
         mask_run = data["runId"] == select_run
